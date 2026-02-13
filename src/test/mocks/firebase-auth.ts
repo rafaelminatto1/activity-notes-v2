@@ -1,0 +1,11 @@
+export const signInWithEmail = vi.fn();
+export const signInWithGoogle = vi.fn();
+export const signUpWithEmail = vi.fn();
+export const signOut = vi.fn();
+export const resetPassword = vi.fn();
+export const onAuthChange = vi.fn();
+export const getCurrentUser = vi.fn();
+export const isEmailProvider = vi.fn();
+export const changePassword = vi.fn();
+export const deleteUserAccount = vi.fn();
+export const updateUserAuthProfile = vi.fn();

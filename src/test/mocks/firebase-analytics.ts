@@ -1,0 +1,12 @@
+export const trackEvent = vi.fn();
+export const setAnalyticsUser = vi.fn();
+export const setAnalyticsUserProperties = vi.fn();
+export const trackPageView = vi.fn();
+export const trackDocumentCreated = vi.fn();
+export const trackDocumentDeleted = vi.fn();
+export const trackDocumentPublished = vi.fn();
+export const trackAIUsed = vi.fn();
+export const trackSearchPerformed = vi.fn();
+export const trackThemeChanged = vi.fn();
+export const trackSlashCommandUsed = vi.fn();
+export const startTrace = vi.fn();

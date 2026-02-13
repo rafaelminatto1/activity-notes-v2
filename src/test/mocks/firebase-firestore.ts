@@ -1,0 +1,15 @@
+export const createDocument = vi.fn();
+export const getDocument = vi.fn();
+export const getDocumentsByParent = vi.fn();
+export const updateDocument = vi.fn();
+export const archiveDocument = vi.fn();
+export const restoreDocument = vi.fn();
+export const deleteDocumentPermanently = vi.fn();
+export const searchDocuments = vi.fn();
+export const subscribeToDocuments = vi.fn();
+export const publishDocument = vi.fn();
+export const createUserProfile = vi.fn();
+export const getUserProfile = vi.fn();
+export const updateUserProfile = vi.fn();
+export const toggleFavorite = vi.fn();
+export const getArchivedDocuments = vi.fn();

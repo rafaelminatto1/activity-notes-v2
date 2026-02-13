@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only read/write their own profile
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Documents - owner access + published docs are public
+    match /documents/{documentId} {
+      allow read: if resource.data.isPublished == true
+                  || (request.auth != null && request.auth.uid == resource.data.userId);
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null
+                            && resource.data.userId == request.auth.uid;
+    }
+
+    // Workspaces
+    match /workspaces/{workspaceId} {
+      allow read: if request.auth != null
+                  && request.auth.uid in resource.data.members;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+                            && resource.data.ownerId == request.auth.uid;
+    }
+  }
+}
