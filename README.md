@@ -4,6 +4,19 @@ Aplicativo de anotacoes moderno com editor rich-text, IA integrada (Gemini) e pu
 
 **Stack:** Next.js 16.1 | Firebase (Auth, Firestore, Storage, Functions, Analytics) | Tiptap | Tailwind CSS 4 | shadcn/ui
 
+## Repositorio V2
+
+- GitHub: https://github.com/rafaelminatto1/activity-notes-v2
+- Branch principal: `main`
+- Tag inicial de versao: `v2.0.0`
+
+## Status de deploy Firebase (13/02/2026)
+
+- Firestore Rules: deployado com sucesso (`firestore.rules`)
+- Firestore Indexes: deployado com sucesso (`firestore.indexes.json`)
+- Functions: deploy bloqueado porque o projeto remoto possui varias funcoes legadas que nao existem neste codigo local (Firebase aborta em modo nao-interativo sem deletar antes)
+- Hosting: deploy bloqueado porque `firebase.json` aponta para `out/` e esse diretório ainda nao existe no build atual
+
 ## Funcionalidades
 
 - Editor rich-text completo (Tiptap) com slash commands, tabelas, callouts, toggles, code blocks
