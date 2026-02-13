@@ -8,7 +8,7 @@ import {
 } from "firebase-functions/v2/firestore";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { beforeUserCreated } from "firebase-functions/v2/identity";
+import * as functionsV1 from "firebase-functions/v1";
 
 initializeApp();
 setGlobalOptions({ region: "southamerica-east1" });
@@ -20,167 +20,169 @@ const storage = getStorage();
 // 1. onUserCreated — Create profile + welcome document
 // ============================================================
 
-export const onUserCreated = beforeUserCreated(async (event) => {
-  const user = event.data;
-  if (!user?.uid) return;
+export const onUserCreated = functionsV1
+  .region("southamerica-east1")
+  .auth.user()
+  .onCreate(async (user) => {
+    if (!user.uid) return;
 
-  const uid = user.uid;
-  const userRef = db.collection("users").doc(uid);
-  const existing = await userRef.get();
-  if (existing.exists) return;
+    const uid = user.uid;
+    const userRef = db.collection("users").doc(uid);
+    const existing = await userRef.get();
+    if (existing.exists) return;
 
-  const now = FieldValue.serverTimestamp();
+    const now = FieldValue.serverTimestamp();
 
-  // Create user profile with defaults
-  await userRef.set({
-    displayName: user.displayName ?? "",
-    email: user.email ?? "",
-    avatarUrl: user.photoURL ?? "",
-    plan: "free",
-    settings: {
-      theme: "system",
-      defaultView: "list",
-      fontSize: "medium",
-      contentWidth: "medium",
-      aiEnabled: true,
-      aiPreferredModel: "flash",
-      aiResponseLanguage: "pt-BR",
-    },
-    favoriteIds: [],
-    recentDocIds: [],
-    createdAt: now,
-    updatedAt: now,
+    // Create user profile with defaults
+    await userRef.set({
+      displayName: user.displayName ?? "",
+      email: user.email ?? "",
+      avatarUrl: user.photoURL ?? "",
+      plan: "free",
+      settings: {
+        theme: "system",
+        defaultView: "list",
+        fontSize: "medium",
+        contentWidth: "medium",
+        aiEnabled: true,
+        aiPreferredModel: "flash",
+        aiResponseLanguage: "pt-BR",
+      },
+      favoriteIds: [],
+      recentDocIds: [],
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Create welcome document with tutorial content
+    const welcomeContent = {
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 2 },
+          content: [{ type: "text", text: "Bem-vindo ao Activity Notes!" }],
+        },
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: "Este é seu primeiro documento. Aqui estão algumas dicas para começar:",
+            },
+          ],
+        },
+        {
+          type: "bulletList",
+          content: [
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      marks: [{ type: "bold" }],
+                      text: "Comandos de barra:",
+                    },
+                    {
+                      type: "text",
+                      text: ' Digite "/" para acessar blocos como títulos, listas, tabelas e mais.',
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      marks: [{ type: "bold" }],
+                      text: "IA integrada:",
+                    },
+                    {
+                      type: "text",
+                      text: " Selecione um texto e use a IA para melhorar, resumir, expandir ou traduzir.",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      marks: [{ type: "bold" }],
+                      text: "Organização:",
+                    },
+                    {
+                      type: "text",
+                      text: " Crie documentos aninhados, adicione ícones e capas para organizar suas notas.",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      marks: [{ type: "bold" }],
+                      text: "Atalhos:",
+                    },
+                    {
+                      type: "text",
+                      text: " Ctrl+K para buscar, Ctrl+N para novo documento, Ctrl+Shift+A para a IA.",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: "Boas notas! ✨",
+            },
+          ],
+        },
+      ],
+    };
+
+    await db.collection("documents").add({
+      title: "Bem-vindo ao Activity Notes",
+      content: welcomeContent,
+      plainText:
+        "Bem-vindo ao Activity Notes! Este é seu primeiro documento. Comandos de barra, IA integrada, Organização, Atalhos.",
+      icon: "👋",
+      coverImage: "",
+      workspaceId: "",
+      parentDocumentId: null,
+      userId: uid,
+      isArchived: false,
+      isPublished: false,
+      position: 0,
+      childCount: 0,
+      createdAt: now,
+      updatedAt: now,
+    });
   });
-
-  // Create welcome document with tutorial content
-  const welcomeContent = {
-    type: "doc",
-    content: [
-      {
-        type: "heading",
-        attrs: { level: 2 },
-        content: [{ type: "text", text: "Bem-vindo ao Activity Notes!" }],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "Este é seu primeiro documento. Aqui estão algumas dicas para começar:",
-          },
-        ],
-      },
-      {
-        type: "bulletList",
-        content: [
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
-                  {
-                    type: "text",
-                    marks: [{ type: "bold" }],
-                    text: "Comandos de barra:",
-                  },
-                  {
-                    type: "text",
-                    text: ' Digite "/" para acessar blocos como títulos, listas, tabelas e mais.',
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
-                  {
-                    type: "text",
-                    marks: [{ type: "bold" }],
-                    text: "IA integrada:",
-                  },
-                  {
-                    type: "text",
-                    text: " Selecione um texto e use a IA para melhorar, resumir, expandir ou traduzir.",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
-                  {
-                    type: "text",
-                    marks: [{ type: "bold" }],
-                    text: "Organização:",
-                  },
-                  {
-                    type: "text",
-                    text: " Crie documentos aninhados, adicione ícones e capas para organizar suas notas.",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            type: "listItem",
-            content: [
-              {
-                type: "paragraph",
-                content: [
-                  {
-                    type: "text",
-                    marks: [{ type: "bold" }],
-                    text: "Atalhos:",
-                  },
-                  {
-                    type: "text",
-                    text: " Ctrl+K para buscar, Ctrl+N para novo documento, Ctrl+Shift+A para a IA.",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "Boas notas! ✨",
-          },
-        ],
-      },
-    ],
-  };
-
-  await db.collection("documents").add({
-    title: "Bem-vindo ao Activity Notes",
-    content: welcomeContent,
-    plainText:
-      "Bem-vindo ao Activity Notes! Este é seu primeiro documento. Comandos de barra, IA integrada, Organização, Atalhos.",
-    icon: "👋",
-    coverImage: "",
-    workspaceId: "",
-    parentDocumentId: null,
-    userId: uid,
-    isArchived: false,
-    isPublished: false,
-    position: 0,
-    childCount: 0,
-    createdAt: now,
-    updatedAt: now,
-  });
-});
 
 // ============================================================
 // 2. onDocumentDeleted — Clean up children + Storage images
