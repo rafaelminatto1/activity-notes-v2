@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue, Timestamp } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
+import { setGlobalOptions } from "firebase-functions/v2";
 import {
   onDocumentDeleted,
   onDocumentCreated,
@@ -10,6 +11,7 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { beforeUserCreated } from "firebase-functions/v2/identity";
 
 initializeApp();
+setGlobalOptions({ region: "southamerica-east1" });
 
 const db = getFirestore();
 const storage = getStorage();

@@ -14,8 +14,10 @@ Aplicativo de anotacoes moderno com editor rich-text, IA integrada (Gemini) e pu
 
 - Firestore Rules: deployado com sucesso (`firestore.rules`)
 - Firestore Indexes: deployado com sucesso (`firestore.indexes.json`)
-- Functions: deploy bloqueado porque o projeto remoto possui varias funcoes legadas que nao existem neste codigo local (Firebase aborta em modo nao-interativo sem deletar antes)
-- Hosting: deploy bloqueado porque `firebase.json` aponta para `out/` e esse diretório ainda nao existe no build atual
+- Functions (Activity Notes): deployadas com sucesso em `southamerica-east1`:
+  `onDocDeleted`, `onDocCreated`, `scheduledCleanup`, `trackAIUsage`
+- Functions (pendencia de migracao): `onUserCreated` conflita com funcao legada homonima ja existente no projeto remoto
+- Hosting (Next.js SSR): deployado com sucesso em `https://fisioflow-migration.web.app`
 
 ## Funcionalidades
 
