@@ -1,6 +1,11 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, connectAuthEmulator, type Auth } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator, type Firestore } from "firebase/firestore";
+import {
+  initializeFirestore,
+  connectFirestoreEmulator,
+  type Firestore,
+  type FirestoreSettings,
+} from "firebase/firestore";
 import { getStorage, connectStorageEmulator, type FirebaseStorage } from "firebase/storage";
 import { getAnalytics, type Analytics } from "firebase/analytics";
 
@@ -18,10 +23,17 @@ function getFirebaseApp(): FirebaseApp | null {
   return getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 }
 
+const firestoreSettings: FirestoreSettings = {
+  ignoreUndefinedProperties: true,
+};
+if (process.env.NEXT_PUBLIC_FIRESTORE_FORCE_LONG_POLLING === "true") {
+  firestoreSettings.experimentalForceLongPolling = true;
+}
+
 const app = getFirebaseApp();
 
 export const auth: Auth | null = app ? getAuth(app) : null;
-export const db: Firestore | null = app ? getFirestore(app) : null;
+export const db: Firestore | null = app ? initializeFirestore(app, firestoreSettings) : null;
 export const storage: FirebaseStorage | null = app ? getStorage(app) : null;
 
 // Analytics — browser-only, only if measurement ID is configured

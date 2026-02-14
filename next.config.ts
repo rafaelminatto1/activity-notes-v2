@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  env: {
+    NEXT_PUBLIC_FIRESTORE_FORCE_LONG_POLLING: "true",
+  },
 };
 
 export default nextConfig;
