@@ -156,4 +156,5 @@ service cloud.firestore {
                           || (request.auth.uid == resource.data.ownerId && resource.data.ownerId != resource.data.sharedBy));
       allow delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
     }
+  }
 }
