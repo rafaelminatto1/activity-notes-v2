@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "fisioflow-migration"
+  },
+  "targets": {
+    "fisioflow-migration": {
+      "hosting": {
+        "activitynotesv2": [
+          "fisioflow-activity-notes-v2"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
