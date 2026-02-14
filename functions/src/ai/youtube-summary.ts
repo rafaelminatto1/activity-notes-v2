@@ -1,18 +1,53 @@
 import * as functions from "firebase-functions/v2";
-import * as admin from "firebase-admin";
+import { GoogleGenerativeAI, SchemaType, ResponseSchema } from "@google/generative-ai";
 
 /**
- * YouTube Summary using GLM API
+ * YouTube Summary using Gemini 1.5 Flash
  * Trigger: callable function (manual trigger by user)
  */
+const summarySchema: ResponseSchema = {
+  description: "YouTube video summary",
+  type: SchemaType.OBJECT,
+  properties: {
+    title: { type: SchemaType.STRING },
+    summary: { type: SchemaType.STRING },
+    keyTopics: {
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
+    },
+    timestampedPoints: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          timestamp: { type: SchemaType.STRING },
+          point: { type: SchemaType.STRING },
+        },
+      },
+    },
+    actionItems: {
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
+    },
+  },
+  required: ["title", "summary", "keyTopics"],
+};
+
 export const summarizeYoutubeVideo = functions.https.onCall(async (request) => {
-  const data = request.data;
-  const { url } = data as any;
+  const { url } = request.data as { url?: string };
 
   if (!url || typeof url !== "string") {
     throw new functions.https.HttpsError(
       "invalid-argument",
       "YouTube URL is required"
+    );
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GLM_API_KEY;
+  if (!apiKey) {
+    throw new functions.https.HttpsError(
+      "failed-precondition",
+      "AI API Key is not configured."
     );
   }
 
@@ -34,45 +69,27 @@ export const summarizeYoutubeVideo = functions.https.onCall(async (request) => {
     const oembedData = await oembedResponse.json();
     const videoTitle = oembedData.title || "Untitled Video";
 
-    // Generate summary using GLM API
-    const response = await fetch("https://api.z.ai/api/paas/v4/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.GLM_API_KEY}`,
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: summarySchema,
       },
-      body: JSON.stringify({
-        model: "glm-4.7-flash",
-        messages: [
-          {
-            role: "system",
-            content: "You are a YouTube video summarizer. Summarize following video title and content in a structured way. Return a JSON object with this exact structure:\n{\n  \"title\": \"Brief engaging title\",\n  \"summary\": \"3-5 bullet points of key takeaways\",\n  \"keyTopics\": [\"topic1\", \"topic2\", \"topic3\"],\n  \"timestampedPoints\": [{\"timestamp\": \"MM:SS\", \"point\": \"point text\"}],\n  \"actionItems\": [\"action item 1\", \"action item 2\"]\n}",
-          },
-          {
-            role: "user",
-            content: "Summarize this YouTube video:\n\nTitle: " + videoTitle + "\n\nURL: " + url,
-          },
-        ],
-        temperature: 0.5,
-        response_format: { type: "json_object" },
-      }),
     });
 
-    const result = await response.json();
-    const aiContent = result.choices?.[0]?.message?.content || "{}";
-
-    let summary;
-    try {
-      summary = JSON.parse(aiContent);
-    } catch {
-      summary = {
-        title: "Summary: " + videoTitle,
-        summary: "Unable to generate summary",
-        keyTopics: [],
-        timestampedPoints: [],
-        actionItems: [],
-      };
-    }
+    // Note: Standard Gemini API does not fetch URL content. 
+    // This prompt relies on the model's training data or the title.
+    // For better results, one should fetch transcripts.
+    const prompt = `Summarize this YouTube video based on its title and context. 
+    Title: ${videoTitle}
+    URL: ${url}
+    
+    Provide a structured summary with key topics and action items.`;
+    
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const summary = JSON.parse(response.text());
 
     // Return the summary
     return {

@@ -1,17 +1,40 @@
 import * as functions from "firebase-functions/v2";
-import * as admin from "firebase-admin";
 import * as storage from "@google-cloud/storage";
+import { GoogleGenerativeAI, SchemaType, ResponseSchema } from "@google/generative-ai";
 
 const storageClient = new storage.Storage();
 
+const ocrSchema: ResponseSchema = {
+  description: "OCR extraction result",
+  type: SchemaType.OBJECT,
+  properties: {
+    textContent: {
+      type: SchemaType.STRING,
+      description: "All visible text extracted from the image",
+    },
+    confidence: {
+      type: SchemaType.STRING,
+      description: "Confidence level: high, medium, or low",
+    },
+  },
+  required: ["textContent"],
+};
+
 export const analyzeImageWithOCR = functions.https.onCall(async (request) => {
-  const data = request.data;
-  const { imageRef } = data as any;
+  const { imageRef } = request.data as { imageRef?: string };
 
   if (!imageRef || typeof imageRef !== "string") {
     throw new functions.https.HttpsError(
       "invalid-argument",
       "Image reference is required"
+    );
+  }
+
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GLM_API_KEY;
+  if (!apiKey) {
+    throw new functions.https.HttpsError(
+      "failed-precondition",
+      "AI API Key is not configured."
     );
   }
 
@@ -34,49 +57,29 @@ export const analyzeImageWithOCR = functions.https.onCall(async (request) => {
       throw new Error("Failed to download image");
     }
 
-    const buffer = Buffer.from(file);
-    const base64Image = "data:image/jpeg;base64," + buffer.toString("base64");
+    const base64Image = file.toString("base64");
 
-    const response = await fetch("https://api.z.ai/api/paas/v4/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + process.env.GLM_API_KEY,
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: ocrSchema,
       },
-      body: JSON.stringify({
-        model: "glm-4.6v",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "image_url",
-                image_url: imagePath,
-              },
-              {
-                type: "text",
-                text: "Extract all visible text from this image. Return JSON with textContent field.",
-              },
-            ],
-          },
-        ],
-        temperature: 0.3,
-        max_tokens: 2000,
-      }),
     });
 
-    const result = await response.json();
-    const aiContent = result.choices?.[0]?.message?.content || "{}";
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          mimeType: "image/jpeg", // Assuming JPEG for now, could detect from filename
+          data: base64Image,
+        },
+      },
+      { text: "Extract all visible text from this image." },
+    ]);
 
-    let analysis;
-    try {
-      analysis = JSON.parse(aiContent);
-    } catch {
-      analysis = {
-        textContent: "",
-        confidence: "low",
-      };
-    }
+    const response = result.response;
+    const analysis = JSON.parse(response.text());
 
     return {
       success: true,

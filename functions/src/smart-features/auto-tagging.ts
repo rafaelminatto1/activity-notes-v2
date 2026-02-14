@@ -1,25 +1,42 @@
 import * as functions from "firebase-functions/v2";
-import * as admin from "firebase-admin";
-import { z } from "zod";
+import { GoogleGenerativeAI, SchemaType, ResponseSchema } from "@google/generative-ai";
 
 /**
- * Auto-tagging using GLM AI
+ * Auto-tagging using Gemini 1.5 Flash
  * Trigger: callable function (manual trigger by user)
  * Analyzes note content and generates relevant tags
  */
-const schema = z.object({
-  tags: z.array(z.string()),
-  summary: z.string(),
-  category: z.string().optional(),
-  topics: z.array(z.string()).optional(),
-  keyPoints: z.array(z.string()).optional(),
-});
-
-type AIAnalysisResult = z.infer<typeof schema>;
+const responseSchema: ResponseSchema = {
+  description: "Analysis of note content",
+  type: SchemaType.OBJECT,
+  properties: {
+    tags: {
+      type: SchemaType.ARRAY,
+      description: "3-5 relevant lowercase tags",
+      items: { type: SchemaType.STRING },
+    },
+    summary: {
+      type: SchemaType.STRING,
+      description: "Brief summary max 200 chars",
+    },
+    category: {
+      type: SchemaType.STRING,
+      description: "One of: meeting, project, idea, personal, reference, code, design",
+    },
+    topics: {
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
+    },
+    keyPoints: {
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
+    },
+  },
+  required: ["tags", "summary", "category"],
+};
 
 export const autoTagDocument = functions.https.onCall(async (request) => {
-  const data = request.data;
-  const { content } = data as any;
+  const { content } = request.data as { content?: string };
 
   if (!content || typeof content !== "string") {
     throw new functions.https.HttpsError(
@@ -28,61 +45,39 @@ export const autoTagDocument = functions.https.onCall(async (request) => {
     );
   }
 
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GLM_API_KEY;
+  if (!apiKey) {
+    throw new functions.https.HttpsError(
+      "failed-precondition",
+      "AI API Key is not configured."
+    );
+  }
+
   try {
-    const response = await fetch("https://api.z.ai/api/paas/v4/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + process.env.GLM_API_KEY,
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: responseSchema,
       },
-      body: JSON.stringify({
-        model: "glm-4.7-flash",
-        messages: [
-          {
-            role: "system",
-            content: "You are an intelligent note organizer. Analyze the following note content and generate:\n1. 3-5 relevant tags (max 20 chars each)\n2. A brief summary (max 200 chars)\n3. Category (one of: meeting, project, idea, personal, reference, code, design)\n\nTags should be lowercase, comma-separated (no spaces after commas). Focus on meaningful topics, not generic terms.\n\nReturn ONLY a JSON object with this exact structure:\n{\n  \"tags\": [\"tag1\", \"tag2\", \"tag3\"],\n  \"summary\": \"Brief summary here\",\n  \"category\": \"category_name\",\n  \"topics\": [\"topic1\", \"topic2\"],\n  \"keyPoints\": [\"point1\", \"point2\"]\n}",
-          },
-          {
-            role: "user",
-            content: content.slice(0, 3000),
-          },
-        ],
-        temperature: 0.3,
-        response_format: { type: "json_object" },
-      }),
     });
 
-    const result = await response.json();
-    const aiContent = result.choices?.[0]?.message?.content || "{}";
-
-    let aiData: AIAnalysisResult;
-    try {
-      aiData = JSON.parse(aiContent);
-    } catch {
-      // Fallback: create simple analysis
-      const words = content.split(/\s+/);
-      const topics = words.filter(w =>
-        ["project", "task", "meeting", "idea", "code", "design", "reference", "work"].includes(w.toLowerCase())
-      ).slice(0, 5);
-
-      aiData = {
-        tags: topics.map(t => t.toLowerCase()),
-        summary: content.slice(0, 200),
-        category: topics[0] || "personal",
-        topics: topics,
-        keyPoints: [],
-      };
-    }
+    const prompt = `Analyze the following note content and organize it. Note content: ${content.slice(0, 10000)}`;
+    
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const aiData = JSON.parse(response.text());
 
     return {
       success: true,
       data: aiData,
     };
   } catch (error) {
-    console.error("Error in auto-tagging:", error);
+    console.error("Error in auto-tagging with Gemini:", error);
     throw new functions.https.HttpsError(
       "internal",
-      "Failed to generate tags"
+      "Failed to generate tags with Gemini"
     );
   }
 });

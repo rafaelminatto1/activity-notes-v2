@@ -9,7 +9,6 @@ import {
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as functionsV1 from "firebase-functions/v1";
-import * as functions from "firebase-functions/v2";
 
 initializeApp();
 setGlobalOptions({ region: "southamerica-east1", maxInstances: 10 });
@@ -24,6 +23,7 @@ const storage = getStorage();
 // Import new AI functions
 export * from "./smart-features/auto-tagging";
 export * from "./smart-features/embedding-generator";
+export * from "./smart-features/backup-manager";
 export * from "./ai/youtube-summary";
 export * from "./ai/vision-ocr";
 export * from "./ai/voice-transcription";

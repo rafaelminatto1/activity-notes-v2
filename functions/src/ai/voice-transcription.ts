@@ -1,14 +1,40 @@
 import * as functions from "firebase-functions/v2";
 import * as admin from "firebase-admin";
+import * as storage from "@google-cloud/storage";
+import { GoogleGenerativeAI, SchemaType, ResponseSchema } from "@google/generative-ai";
+
+const storageClient = new storage.Storage();
 
 /**
  * Voice Note Intelligence - Audio Transcription and Analysis
- * Uses GLM Audio API
+ * Uses Gemini 1.5 Flash Audio capabilities
  * Trigger: callable function
  */
+const transcriptionSchema: ResponseSchema = {
+  description: "Audio transcription and analysis",
+  type: SchemaType.OBJECT,
+  properties: {
+    transcript: { type: SchemaType.STRING },
+    summary: { type: SchemaType.STRING },
+    actionItems: {
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
+    },
+    speakers: {
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
+    },
+    decisions: {
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING },
+    },
+    duration: { type: SchemaType.STRING },
+  },
+  required: ["transcript", "summary"],
+};
+
 export const transcribeAudioNote = functions.https.onCall(async (request) => {
-  const data = request.data;
-  const { audioRef, documentId } = data as any;
+  const { audioRef, documentId } = request.data as { audioRef?: string; documentId?: string };
 
   if (!audioRef || !documentId) {
     throw new functions.https.HttpsError(
@@ -17,54 +43,63 @@ export const transcribeAudioNote = functions.https.onCall(async (request) => {
     );
   }
 
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GLM_API_KEY;
+  if (!apiKey) {
+    throw new functions.https.HttpsError(
+      "failed-precondition",
+      "AI API Key is not configured."
+    );
+  }
+
   try {
-    // Using GLM API for audio transcription
-    const response = await fetch("https://api.z.ai/api/paas/v4/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.GLM_API_KEY}`,
+    // Download audio file
+    let audioPath = audioRef;
+    if (!audioRef.startsWith("gs://")) {
+       const bucketName = process.env.STORAGE_BUCKET || "fisioflow-migration.appspot.com";
+       audioPath = "gs://" + bucketName + "/" + audioRef;
+    }
+    const pathParts = audioPath.split("/");
+    const bucketName = pathParts[2];
+    const fileName = pathParts.slice(3).join("/");
+    const [file] = await storageClient.bucket(bucketName).file(fileName).download();
+    
+    // Convert to base64
+    const base64Audio = file.toString("base64");
+    
+    // Determine mime type (simple check)
+    const mimeType = fileName.endsWith(".mp3") ? "audio/mp3" : "audio/wav";
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: transcriptionSchema,
       },
-      body: JSON.stringify({
-        model: "glm-4.7-flash", // Supports audio natively
-        messages: [
-          {
-            role: "system",
-            content: "You are a voice note transcriber. Transcribe the audio and extract: 1) Full verbatim transcript, 2) A bulleted summary, 3) A list of action items/tasks, 4) Identified speakers if possible, 5) Key decisions made. Return a JSON object with this exact structure:\n{\n  \"transcript\": \"Full transcription text\",\n  \"summary\": \"3-5 bullet points summary\",\n  \"actionItems\": [\"action item 1\", \"action item 2\"],\n  \"speakers\": [\"Speaker 1\", \"Speaker 2\"],\n  \"decisions\": [\"decision 1\", \"decision 2\"],\n  \"duration\": \"estimated duration in MM:SS format\"\n}",
-          },
-          {
-            role: "user",
-            content: "Transcribe this audio file: " + audioRef,
-          },
-        ],
-        temperature: 0.3,
-      }),
     });
 
-    const result = await response.json();
-    const aiContent = result.choices?.[0]?.message?.content || "{}";
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          mimeType: mimeType,
+          data: base64Audio,
+        },
+      },
+      { text: "Transcribe this audio and extract a summary, action items, speakers, and decisions." },
+    ]);
 
-    let transcriptionData;
-    try {
-      transcriptionData = JSON.parse(aiContent);
-    } catch {
-      transcriptionData = {
-        transcript: "Transcription failed",
-        summary: "Unable to summarize",
-        actionItems: [],
-        speakers: [],
-        decisions: [],
-        duration: "0:00",
-      };
-    }
+    const response = result.response;
+    const transcriptionData = JSON.parse(response.text());
 
     // Update document with transcription data
     await admin.firestore().collection("notes").doc(documentId).update({
       aiAnalysis: {
         summary: transcriptionData.summary,
-        actionItems: transcriptionData.actionItems,
+        actionItems: transcriptionData.actionItems || [],
         generatedAt: admin.firestore.FieldValue.serverTimestamp(),
       },
+      // You might also want to save the full transcript somewhere
+      plainText: (transcriptionData.transcript || ""),
     });
 
     return {
