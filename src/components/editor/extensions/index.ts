@@ -18,6 +18,7 @@ import { common, createLowlight } from "lowlight";
 import { CalloutExtension } from "./callout";
 import { ToggleExtension } from "./toggle";
 import { AIBlockExtension } from "./ai-block";
+import { BacklinkExtension } from "./backlink";
 
 const lowlight = createLowlight(common);
 
@@ -69,6 +70,7 @@ export function getEditorExtensions(placeholder?: string) {
     CalloutExtension,
     ToggleExtension,
     AIBlockExtension,
+    BacklinkExtension,
   ];
 }
 

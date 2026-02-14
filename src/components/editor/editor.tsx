@@ -138,6 +138,38 @@ export function Editor({
     return () => window.removeEventListener("slash-ai", handleSlashAI);
   }, [ai]);
 
+  // Listen for mention/backlink insertion and update Firestore
+  useEffect(() => {
+    if (!editor) return void 0;
+
+    const handleTransaction = () => {
+      const docId = (editor as any).options.documentId;
+      if (!docId) return;
+
+      // Find all mentions in the document
+      const mentions: string[] = [];
+      editor.state.doc.descendants((node: any, pos: number) => {
+        if (node.type.name === "mention" && node.attrs.id) {
+          mentions.push(node.attrs.id);
+        }
+      });
+
+      // Update backlinks asynchronously
+      if (mentions.length > 0) {
+        fetch(`/api/documents/${docId}/backlinks`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ addBacklink: mentions[0] }),
+        }).catch(console.error);
+      }
+    };
+
+    editor.on("transaction", handleTransaction);
+    return () => {
+      editor.off("transaction", handleTransaction);
+    };
+  }, [editor]);
+
   const handleImageFile = useCallback(
     async (file: File, pos?: number) => {
       if (!editor) return;

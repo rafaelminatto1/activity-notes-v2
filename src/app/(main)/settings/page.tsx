@@ -245,7 +245,7 @@ export default function SettingsPage() {
     .toUpperCase();
 
   return (
-    <div className="mx-auto max-w-2xl p-8">
+    <div className="mx-auto max-w-5xl p-4">
       <div className="flex items-center gap-2 mb-6">
         <Settings className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Configurações</h1>

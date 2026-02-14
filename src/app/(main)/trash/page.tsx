@@ -60,7 +60,7 @@ export default function TrashPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-2xl space-y-2 p-8">
+      <div className="mx-auto max-w-2xl space-y-2 p-4">
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-12 w-full" />
         {Array.from({ length: 4 }).map((_, i) => (
@@ -71,7 +71,7 @@ export default function TrashPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl p-8">
+    <div className="mx-auto max-w-5xl p-4">
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <Trash2 className="h-6 w-6" />

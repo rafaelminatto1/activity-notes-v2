@@ -47,7 +47,7 @@ export default function DocumentsPage() {
   const greeting = getGreeting();
 
   return (
-    <div className="mx-auto max-w-3xl px-8 py-12">
+    <div className="mx-auto max-w-6xl px-4 py-12">
       {/* Welcome */}
       <div className="mb-10">
         <h1 className="text-3xl font-bold">

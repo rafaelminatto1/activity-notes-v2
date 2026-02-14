@@ -13,7 +13,10 @@
   "main": "lib/index.js",
   "dependencies": {
     "firebase-admin": "^13.0.0",
-    "firebase-functions": "^6.3.0"
+    "firebase-functions": "^6.3.0",
+    "@google-cloud/vertexai": "^1.0.0",
+    "zod": "^3.24.0",
+    "openai": "^4.80.0" // For GLM compatibility
   },
   "devDependencies": {
     "typescript": "^5.7.0"

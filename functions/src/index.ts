@@ -9,12 +9,26 @@ import {
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as functionsV1 from "firebase-functions/v1";
+import * as functions from "firebase-functions/v2";
 
 initializeApp();
-setGlobalOptions({ region: "southamerica-east1" });
+setGlobalOptions({ region: "southamerica-east1", maxInstances: 10 });
 
 const db = getFirestore();
 const storage = getStorage();
+
+// ============================================================
+// v2 Functions - Smart Features & AI
+// ============================================================
+
+// Import new AI functions
+export * from "./smart-features/auto-tagging";
+export * from "./smart-features/embedding-generator";
+export * from "./ai/youtube-summary";
+export * from "./ai/vision-ocr";
+export * from "./ai/voice-transcription";
+export * from "./ai/document-analysis";
+export * from "./ai/whiteboard-ocr";
 
 // ============================================================
 // 1. onUserCreated — Create profile + welcome document

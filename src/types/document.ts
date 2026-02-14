@@ -7,8 +7,10 @@ export interface Document {
   content: JSONContent | null;
   plainText: string;
   icon: string;
+  color: string;
   coverImage: string;
   workspaceId: string;
+  projectId: string | null;
   parentDocumentId: string | null;
   userId: string;
   isArchived: boolean;

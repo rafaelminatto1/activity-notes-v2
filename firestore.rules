@@ -1,15 +1,27 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
+    // ============================================================
     // Users can only read/write their own profile
+    // ============================================================
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
+    // ============================================================
+    // Projects Collection (for organizing documents)
+    // ============================================================
+    match /projects/{projectId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // ============================================================
     // Documents - owner access + published docs are public
+    // ============================================================
     match /documents/{documentId} {
-      allow read: if resource.data.isPublished == true
+      // Query access: allow users to query their own documents
+      allow read: if request.auth != null && request.query.where[0].field == 'userId' && request.query.where[0].value == request.auth.uid
+                  || resource.data.isPublished == true
                   || (request.auth != null && request.auth.uid == resource.data.userId);
       allow create: if request.auth != null
                     && request.resource.data.userId == request.auth.uid;
@@ -17,13 +29,131 @@ service cloud.firestore {
                             && resource.data.userId == request.auth.uid;
     }
 
-    // Workspaces
-    match /workspaces/{workspaceId} {
+    // ============================================================
+    // Tags Collection
+    // ============================================================
+    match /tags/{tagId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+                          && resource.data.userId == request.auth.uid;
+    }
+
+    // ============================================================
+    // Templates Collection
+    // ============================================================
+    match /templates/{templateId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+                              && resource.data.userId == request.auth.uid;
+    }
+
+    // ============================================================
+    // Tasks Collection (independent or embedded in notes)
+    // ============================================================
+    match /tasks/{taskId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // ============================================================
+    // Document Versions Collection
+    // ============================================================
+    match /document_versions/{versionId} {
       allow read: if request.auth != null
-                  && request.auth.uid in resource.data.members;
+                  && request.auth.uid == resource.data.userId
+                  || request.auth != null && resource.data.userId == request.data.createdBy;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null
+                         && (request.auth.uid == resource.data.userId || request.auth.uid == resource.data.createdBy);
+      allow delete: if request.auth != null
+                         && (request.auth.uid == resource.data.userId || request.auth.uid == resource.data.createdBy);
+    }
+
+    // ============================================================
+    // Comments Collection
+    // ============================================================
+    match /comments/{commentId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                        && request.auth.uid == resource.data.userId;
+      allow update, delete: if request.auth != null
+                         && request.auth.uid == resource.data.userId;
+    }
+
+    // ============================================================
+    // Reminders Collection
+    // ============================================================
+    match /reminders/{reminderId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // ============================================================
+    // Related Notes Collection (pre-calculated relationships)
+    // ============================================================
+    match /related_notes/{relationId} {
+      allow read: if request.auth != null
+                  && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null
+                         && request.auth.uid == resource.data.userId;
+    }
+
+    // ============================================================
+    // Embeddings Collection (for semantic search)
+    // ============================================================
+    match /embeddings/{embeddingId} {
+      allow read: if request.auth != null
+                  && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null
+                         && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null
+                         && request.auth.uid == resource.data.userId;
+    }
+
+    // ============================================================
+    // Workspace Analytics Collection
+    // ============================================================
+    match /workspace_analytics/{analyticsId} {
+      allow read: if request.auth != null
+                  && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null
+                        && request.auth.uid == resource.data.userId;
+      allow update: if request.auth != null
+                         && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null
+                         && resource.auth.uid == resource.data.userId;
+    }
+
+    // ============================================================
+    // Web Clips Collection
+    // ============================================================
+    match /web_clips/{clipId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // ============================================================
+    // Workspaces (for collaboration)
+    // ============================================================
+    match /workspaces/{workspaceId} {
+      allow read: if request.auth != null;
       allow create: if request.auth != null;
       allow update, delete: if request.auth != null
                             && resource.data.ownerId == request.auth.uid;
+      // Members can read workspaces they're part of
+      allow read: if request.auth != null
+                      && request.auth.uid in resource.data.members;
     }
-  }
+
+    // ============================================================
+    // Shared Documents (with permissions)
+    // ============================================================
+    match /shared_documents/{sharedDocId} {
+      allow read: if request.auth != null;
+      allow update: if request.auth != null
+                      && (request.auth.uid == resource.data.ownerId
+                          || (request.auth.uid == resource.data.ownerId && resource.data.ownerId != resource.data.sharedBy));
+      allow delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
+    }
 }

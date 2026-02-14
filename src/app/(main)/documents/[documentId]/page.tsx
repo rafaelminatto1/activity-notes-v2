@@ -255,7 +255,7 @@ export default function DocumentPage() {
           coverImage={document.coverImage}
         />
 
-        <div className="mx-auto max-w-3xl px-12 py-8">
+        <div className="mx-auto max-w-6xl px-4 py-8">
           {/* Icon + Action buttons */}
           <div className="flex items-end gap-2 mb-2">
             <IconPicker icon={document.icon} onChange={handleIconChange} />

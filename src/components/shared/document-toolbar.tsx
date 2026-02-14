@@ -40,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { MenuItemWithIconColor } from "./menu-item-with-icon-color";
 import { useEditorStore } from "@/stores/editor-store";
 import { trackDocumentPublished } from "@/lib/firebase/analytics";
 import { toast } from "sonner";
@@ -51,7 +52,7 @@ interface DocumentToolbarProps {
 
 export function DocumentToolbar({ document }: DocumentToolbarProps) {
   const router = useRouter();
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, refreshProfile } = useAuth();
   const saveStatus = useEditorStore((s) => s.saveStatus);
   const toggleAIPanel = useAIStore((s) => s.togglePanel);
   const [shareOpen, setShareOpen] = useState(false);
@@ -97,6 +98,8 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
       toast.success(
         nowFavorite ? "Adicionado aos favoritos." : "Removido dos favoritos."
       );
+      // Atualizar perfil para sincronizar favoritos na sidebar
+      await refreshProfile();
     } catch {
       toast.error("Falha ao atualizar favoritos.");
     }
@@ -189,20 +192,8 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
           <span className="hidden sm:inline">IA</span>
         </Button>
 
-        {/* Favorite */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          onClick={handleToggleFavorite}
-        >
-          <Star
-            className={cn(
-              "h-3.5 w-3.5",
-              isFavorite && "fill-yellow-500 text-yellow-500"
-            )}
-          />
-        </Button>
+        {/* Icon/Color/Project menu */}
+        <MenuItemWithIconColor documentId={document.id} currentIcon={document.icon} currentColor={document.color} />
 
         {/* More menu */}
         <DropdownMenu>
