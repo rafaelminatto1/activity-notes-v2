@@ -152,7 +152,7 @@ export function EditorBubbleMenu({ editor, onImproveWithAI }: EditorBubbleMenuPr
         <>
           <Separator orientation="vertical" className="mx-1 h-6" />
           <BubbleButton onClick={onImproveWithAI} title="Melhorar com IA">
-            <Sparkles className="h-4 w-4 text-purple-500" />
+            <Sparkles className="h-4 w-4 text-emerald-500" />
           </BubbleButton>
         </>
       )}
@@ -176,9 +176,8 @@ function BubbleButton({
       type="button"
       onClick={onClick}
       title={title}
-      className={`flex h-7 w-7 items-center justify-center rounded-sm hover:bg-accent ${
-        isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
-      }`}
+      className={`flex h-7 w-7 items-center justify-center rounded-sm hover:bg-accent ${isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+        }`}
     >
       {children}
     </button>

@@ -22,8 +22,8 @@ import { createDocument, getDocument } from "@/lib/firebase/firestore";
 import { useProjectStore } from "@/stores/project-store";
 import { Navigation } from "./navigation";
 import { UserMenu } from "./user-menu";
-import { ProjectCard } from "@/components/project/project-card";
-import { CreateProjectModal } from "@/components/project/create-project-modal";
+import { ProjectList } from "@/components/project/ProjectList";
+import { ProjectModal } from "@/components/project/project-modal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
@@ -35,15 +35,20 @@ function SidebarContent() {
   const { user, userProfile } = useAuth();
   const openSearch = useSearchStore((s) => s.open);
   const closeMobile = useSidebarStore((s) => s.closeMobile);
-  const { projects, currentProject, loadProjects, createProject } = useProjectStore();
-  const [createProjectOpen, setCreateProjectOpen] = useState(false);
+  const { projects, activeProjectId, initSubscription, cleanupSubscription, createProject } = useProjectStore();
+  const [projectModalOpen, setProjectModalOpen] = useState(false);
+
+  const currentProject = projects.find((p) => p.id === activeProjectId);
 
   // Carregar projetos ao montar
   useEffect(() => {
-    if (user) {
-      loadProjects(user.uid);
+    if (user?.uid) {
+      initSubscription(user.uid);
     }
-  }, [user, loadProjects]);
+    return () => {
+      cleanupSubscription();
+    };
+  }, [user, initSubscription, cleanupSubscription]);
 
   // Favorites — lidos do userProfile, docs carregados sob demanda
   const [favoriteDocs, setFavoriteDocs] = useState<Document[]>([]);
@@ -159,28 +164,16 @@ function SidebarContent() {
               Projetos
             </p>
             <button
-              onClick={() => setCreateProjectOpen(true)}
+              onClick={() => setProjectModalOpen(true)}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <Plus className="h-4 w-4" />
             </button>
           </div>
-          {projects.length > 0 ? (
-            <div className="space-y-0.5">
-              {projects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
-              <FolderOpen className="h-10 w-10 mb-2 text-muted-foreground/50" />
-              <p className="text-sm">Nenhum projeto criado ainda</p>
-              <button
-                onClick={() => setCreateProjectOpen(true)}
-                className="mt-4 text-sm hover:text-foreground transition-colors"
-              >
-                Criar primeiro projeto
-              </button>
+          <ProjectList />
+          {projects.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-4 text-center text-muted-foreground">
+              <p className="text-xs">Nenhum projeto</p>
             </div>
           )}
         </div>
@@ -194,9 +187,9 @@ function SidebarContent() {
         </div>
 
         {/* Create Project Modal */}
-        <CreateProjectModal
-          open={createProjectOpen}
-          onClose={() => setCreateProjectOpen(false)}
+        <ProjectModal
+          open={projectModalOpen}
+          onClose={() => setProjectModalOpen(false)}
         />
       </ScrollArea>
 

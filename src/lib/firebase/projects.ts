@@ -4,112 +4,163 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
-  getDoc,
-  getDocs,
   query,
   where,
-  orderBy,
-  writeBatch,
+  getDocs,
   serverTimestamp,
-  runTransaction,
-  getFirestore,
+  writeBatch,
+  getDoc,
+  onSnapshot,
+  Unsubscribe
 } from "firebase/firestore";
-import type { Project, ProjectCreate, ProjectUpdate } from "@/types/project";
-import type { Document } from "@/types/document";
+import { db } from "@/lib/firebase/config";
+import { Project, ProjectCreate, ProjectUpdate } from "@/types/project";
+import { Document } from "@/types/document";
 
-export async function createProject(data: ProjectCreate & { userId: string }): Promise<string> {
-  const colRef = collection(getFirestore(), "projects");
-  const now = serverTimestamp();
-  const docData = {
-    ...data,
-    createdAt: now,
-    updatedAt: now,
-  };
-  const docRef = await addDoc(colRef, docData);
-  return docRef.id;
+const PROJECTS_COLLECTION = "projects";
+const DOCUMENTS_COLLECTION = "documents";
+
+/**
+ * Cria um novo projeto
+ */
+export async function createProject(data: ProjectCreate): Promise<string> {
+  if (!db) throw new Error("Firestore not initialized");
+  try {
+    const docRef = await addDoc(collection(db, PROJECTS_COLLECTION), {
+      ...data,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      documentCount: 0
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating project:", error);
+    throw error;
+  }
 }
 
-export async function getProjects(userId: string): Promise<Project[]> {
-  const q = query(
-    collection(getFirestore(), "projects"),
-    where("userId", "==", userId),
-    orderBy("updatedAt", "desc")
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Project[];
+/**
+ * Atualiza um projeto existente
+ */
+export async function updateProject(id: string, data: ProjectUpdate): Promise<void> {
+  if (!db) throw new Error("Firestore not initialized");
+  try {
+    const docRef = doc(db, PROJECTS_COLLECTION, id);
+    await updateDoc(docRef, {
+      ...data,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error updating project:", error);
+    throw error;
+  }
 }
 
-export async function getProject(projectId: string): Promise<Project | null> {
-  const ref = doc(getFirestore(), "projects", projectId);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() } as Project;
-}
+/**
+ * Exclui um projeto
+ * Nota: Documentos associados terão projectId removido (opcional)
+ */
+export async function deleteProject(id: string): Promise<void> {
+  if (!db) throw new Error("Firestore not initialized");
+  try {
+    const batch = writeBatch(db);
 
-export async function updateProject(projectId: string, data: ProjectUpdate): Promise<void> {
-  const ref = doc(getFirestore(), "projects", projectId);
-  await updateDoc(ref, {
-    ...data,
-    updatedAt: serverTimestamp(),
-  });
-}
+    // 1. Delete project
+    const projectRef = doc(db, PROJECTS_COLLECTION, id);
+    batch.delete(projectRef);
 
-export async function deleteProject(projectId: string): Promise<void> {
-  const db = getFirestore();
+    // 2. Unlink documents (optional, but good for data integrity)
+    // Needs query to find affected docs
+    const q = query(
+      collection(db, DOCUMENTS_COLLECTION),
+      where("projectId", "==", id)
+    );
+    const snapshot = await getDocs(q);
+    snapshot.forEach((doc) => {
+      batch.update(doc.ref, { projectId: null, updatedAt: serverTimestamp() });
+    });
 
-  const docsQuery = query(
-    collection(db, "documents"),
-    where("projectId", "==", projectId)
-  );
-  const docsSnap = await getDocs(docsQuery);
-
-  const batch = writeBatch(db);
-  docsSnap.docs.forEach((docSnap) => {
-    batch.update(docSnap.ref, { projectId: null });
-  });
-
-  await deleteDoc(doc(db, "projects", projectId));
-
-  if (docsSnap.docs.length > 0) {
     await batch.commit();
+  } catch (error) {
+    console.error("Error deleting project:", error);
+    throw error;
   }
 }
 
-export async function moveDocumentToProject(docId: string, projectId: string): Promise<void> {
-  const ref = doc(getFirestore(), "documents", docId);
-  await updateDoc(ref, {
-    projectId,
-    updatedAt: serverTimestamp(),
-  });
+/**
+ * Busca projetos de um usuário
+ */
+export async function getUserProjects(userId: string): Promise<Project[]> {
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, PROJECTS_COLLECTION),
+      where("userId", "==", userId)
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as Project));
+  } catch (error) {
+    console.error("Error fetching projects:", error);
+    throw error;
+  }
 }
 
-export async function updateProjectDocumentCount(projectId: string): Promise<void> {
-  const db = getFirestore();
+/**
+ * Move um documento para um projeto
+ */
+export async function moveDocumentToProject(docId: string, projectId: string | null): Promise<void> {
+  if (!db) throw new Error("Firestore not initialized");
+  try {
+    const docRef = doc(db, DOCUMENTS_COLLECTION, docId);
 
-  const docsQuery = query(
-    collection(db, "documents"),
-    where("projectId", "==", projectId),
-    where("isArchived", "==", false)
+    // Get current doc to check previous project
+    // This is for updating counters if we implement them
+
+    await updateDoc(docRef, {
+      projectId,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error moving document:", error);
+    throw error;
+  }
+}
+
+/**
+ * Inscreve-se para atualizações em tempo real dos projetos do usuário
+ */
+export function subscribeToUserProjects(userId: string, callback: (projects: Project[]) => void): Unsubscribe {
+  if (!db) return () => { };
+
+  const q = query(
+    collection(db, PROJECTS_COLLECTION),
+    where("userId", "==", userId)
   );
 
-  const docsSnap = await getDocs(docsQuery);
-  const count = docsSnap.docs.filter((d) => d.data().isArchived === false).length;
-
-  const projectRef = doc(db, "projects", projectId);
-  await updateDoc(projectRef, {
-    documentCount: count,
-    updatedAt: serverTimestamp(),
+  return onSnapshot(q, (snapshot) => {
+    const projects = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as Project));
+    callback(projects);
+  }, (error) => {
+    console.error("Error subscribing to projects:", error);
   });
 }
 
-export async function updateAllProjectDocumentCounts(userId: string): Promise<void> {
-  const projects = await getProjects(userId);
-
-  for (const project of projects) {
-    try {
-      await updateProjectDocumentCount(project.id);
-    } catch (error) {
-      console.error("Erro ao atualizar contagem do projeto " + project.id + ":", error);
-    }
+/**
+ * Busca um projeto pelo ID
+ */
+export async function getProject(id: string): Promise<Project | null> {
+  if (!db) return null;
+  const docRef = doc(db, PROJECTS_COLLECTION, id);
+  const snap = await getDoc(docRef);
+  if (snap.exists()) {
+    return { id: snap.id, ...snap.data() } as Project;
   }
+  return null;
 }

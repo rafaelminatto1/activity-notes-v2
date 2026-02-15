@@ -44,6 +44,7 @@ import { MenuItemWithIconColor } from "./menu-item-with-icon-color";
 import { useEditorStore } from "@/stores/editor-store";
 import { trackDocumentPublished } from "@/lib/firebase/analytics";
 import { toast } from "sonner";
+import { ShareDialog } from "@/components/collaboration/share-dialog";
 import type { Document } from "@/types/document";
 
 interface DocumentToolbarProps {
@@ -167,6 +168,9 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
           )}
         </div>
 
+        {/* Share Button (Collaboration) */}
+        <ShareDialog />
+
         {/* Publish */}
         <Button
           variant="ghost"
@@ -185,7 +189,7 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
         <Button
           variant="ghost"
           size="sm"
-          className="h-7 gap-1 text-xs text-purple-600 dark:text-purple-400"
+          className="h-7 gap-1 text-xs text-emerald-600 dark:text-emerald-400"
           onClick={toggleAIPanel}
         >
           <Sparkles className="h-3.5 w-3.5" />
@@ -244,6 +248,7 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
                 <Input
                   value={publicUrl}
                   readOnly
+                  aria-label="Link público do documento"
                   className="flex-1 text-sm"
                   onClick={(e) => (e.target as HTMLInputElement).select()}
                 />

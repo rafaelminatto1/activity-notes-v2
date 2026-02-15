@@ -85,7 +85,7 @@ export function AIDropdown({
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 gap-1.5 text-purple-600 dark:text-purple-400"
+            className="h-8 gap-1.5 text-emerald-600 dark:text-emerald-400"
             disabled={loading || usage.remaining <= 0}
           >
             <Sparkles className="h-4 w-4" />
@@ -101,7 +101,7 @@ export function AIDropdown({
             </div>
             <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full rounded-full bg-purple-500 transition-all"
+                className="h-full rounded-full bg-emerald-500 transition-all"
                 style={{ width: `${usagePercent}%` }}
               />
             </div>

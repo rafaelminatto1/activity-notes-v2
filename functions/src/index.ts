@@ -30,6 +30,9 @@ export * from "./ai/voice-transcription";
 export * from "./ai/document-analysis";
 export * from "./ai/whiteboard-ocr";
 
+// Import GenKit AI functions
+export * from "./genkit/functions";
+
 // ============================================================
 // 1. onUserCreated — Create profile + welcome document
 // ============================================================

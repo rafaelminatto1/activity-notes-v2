@@ -11,8 +11,10 @@ import { useEditorAI } from "@/hooks/use-editor-ai";
 import { uploadImage } from "@/lib/firebase/storage";
 import { toast } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAutoEmbedding } from "@/hooks/use-auto-embedding";
 
 interface EditorProps {
+  documentId: string;
   content: JSONContent | null;
   onUpdate: (json: JSONContent, plainText: string) => void;
   editable?: boolean;
@@ -22,6 +24,7 @@ interface EditorProps {
 }
 
 export function Editor({
+  documentId,
   content,
   onUpdate,
   editable = true,
@@ -29,6 +32,7 @@ export function Editor({
   onAIReady,
   onEditorReady,
 }: EditorProps) {
+  useAutoEmbedding(documentId);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initialContentSet = useRef(false);
 

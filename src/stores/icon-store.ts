@@ -1,14 +1,13 @@
 import { create } from 'zustand';
-import type { DocumentIcon, IconCategory, IconHistory } from '@/types/icon';
+import type { DocumentIcon, IconCategory, IconCategoryData, IconHistory } from '@/types/icon';
 
 /**
  * Catálogo de ícones organizados por categorias
  */
-export const ICON_CATEGORIES: IconCategory[] = [
+export const ICON_CATEGORIES: IconCategoryData[] = [
   {
     id: 'work',
     name: 'Trabalho',
-    category: 'work',
     icons: [
       { id: 'briefcase', emoji: '💼', category: 'work' },
       { id: 'file-text', emoji: '📄', category: 'work' },
@@ -20,7 +19,6 @@ export const ICON_CATEGORIES: IconCategory[] = [
   {
     id: 'personal',
     name: 'Pessoal',
-    category: 'personal',
     icons: [
       { id: 'user', emoji: '👤', category: 'personal' },
       { id: 'heart', emoji: '❤️', category: 'personal' },
@@ -29,21 +27,19 @@ export const ICON_CATEGORIES: IconCategory[] = [
     ]
   },
   {
-    id: 'studies',
+    id: 'study',
     name: 'Estudos',
-    category: 'studies',
     icons: [
-      { id: 'book', emoji: '📚', category: 'studies' },
-      { id: 'graduation-cap', emoji: '🎓', category: 'studies' },
-      { id: 'pencil', emoji: '✏️', category: 'studies' },
-      { id: 'lightbulb', emoji: '💡', category: 'studies' },
-      { id: 'brain', emoji: '🧠', category: 'studies' },
+      { id: 'book', emoji: '📚', category: 'study' },
+      { id: 'graduation-cap', emoji: '🎓', category: 'study' },
+      { id: 'pencil', emoji: '✏️', category: 'study' },
+      { id: 'lightbulb', emoji: '💡', category: 'study' },
+      { id: 'brain', emoji: '🧠', category: 'study' },
     ]
   },
   {
     id: 'home',
     name: 'Casa',
-    category: 'home',
     icons: [
       { id: 'home', emoji: '🏠', category: 'home' },
       { id: 'utensils', emoji: '🍽️', category: 'home' },
@@ -54,7 +50,6 @@ export const ICON_CATEGORIES: IconCategory[] = [
   {
     id: 'travel',
     name: 'Viagem',
-    category: 'travel',
     icons: [
       { id: 'plane', emoji: '✈️', category: 'travel' },
       { id: 'map', emoji: '🗺️', category: 'travel' },
@@ -65,7 +60,6 @@ export const ICON_CATEGORIES: IconCategory[] = [
   {
     id: 'finance',
     name: 'Finanças',
-    category: 'finance',
     icons: [
       { id: 'dollar', emoji: '💵', category: 'finance' },
       { id: 'credit-card', emoji: '💳', category: 'finance' },
@@ -76,7 +70,6 @@ export const ICON_CATEGORIES: IconCategory[] = [
   {
     id: 'health',
     name: 'Saúde',
-    category: 'health',
     icons: [
       { id: 'heart-pulse', emoji: '❤️‍🔥', category: 'health' },
       { id: 'pill', emoji: '💊', category: 'health' },
@@ -101,7 +94,7 @@ export const COLOR_PALETTE = [
   { id: 'yellow-500', name: 'Amarelo', hex: '#eab308' },
   { id: 'green-500', name: 'Verde', hex: '#22c55e' },
   { id: 'blue-500', name: 'Azul', hex: '#3b82f6' },
-  { id: 'purple-500', name: 'Roxo', hex: '#a855f7' },
+  { id: 'indigo-500', name: 'Índigo', hex: '#6366f1' },
   { id: 'pink-500', name: 'Rosa', hex: '#ec4899' },
 
   // Cores Pastéis
@@ -110,7 +103,7 @@ export const COLOR_PALETTE = [
   { id: 'yellow-200', name: 'Amarelo pastel', hex: '#fef08a' },
   { id: 'green-200', name: 'Verde pastel', hex: '#bbf7d0' },
   { id: 'blue-200', name: 'Azul pastel', hex: '#bfdbfe' },
-  { id: 'purple-200', name: 'Roxo pastel', hex: '#e9d5ff' },
+  { id: 'indigo-200', name: 'Índigo pastel', hex: '#e0e7ff' },
   { id: 'pink-200', name: 'Rosa pastel', hex: '#fbcfe8' },
 ];
 
@@ -127,7 +120,7 @@ const DEFAULT_HISTORY: IconHistory = {
  */
 interface IconStore {
   // Estado
-  iconCategories: IconCategory[];
+  iconCategories: IconCategoryData[];
   selectedIcon: string | null;
   selectedColor: string | null;
   recentIcons: string[];

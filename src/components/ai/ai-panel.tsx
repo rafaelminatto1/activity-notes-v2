@@ -112,7 +112,7 @@ export function AIPanel({
         <SheetHeader className="border-b pb-3">
           <div className="flex items-center justify-between pr-8">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-purple-500" />
+              <Sparkles className="h-5 w-5 text-emerald-500" />
               <SheetTitle>Assistente IA</SheetTitle>
             </div>
             <Button
@@ -138,7 +138,7 @@ export function AIPanel({
           </div>
           <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-purple-500 transition-all"
+              className="h-full rounded-full bg-emerald-500 transition-all"
               style={{ width: `${usagePercent}%` }}
             />
           </div>
@@ -164,7 +164,7 @@ export function AIPanel({
                     <button
                       key={prompt}
                       onClick={() => sendMessage(prompt)}
-                      className="rounded-full border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-purple-300 hover:text-purple-600 dark:hover:border-purple-700 dark:hover:text-purple-400"
+                      className="rounded-full border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-emerald-300 hover:text-emerald-600 dark:hover:border-emerald-700 dark:hover:text-emerald-400"
                     >
                       {prompt}
                     </button>
@@ -179,11 +179,10 @@ export function AIPanel({
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`relative max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                    msg.role === "user"
-                      ? "bg-purple-600 text-white"
+                  className={`relative max-w-[85%] rounded-lg px-3 py-2 text-sm ${msg.role === "user"
+                      ? "bg-emerald-600 text-white"
                       : "bg-muted text-foreground"
-                  }`}
+                    }`}
                 >
                   <p className="whitespace-pre-wrap">{msg.content}</p>
                   {msg.role === "assistant" && (
@@ -234,14 +233,14 @@ export function AIPanel({
               onKeyDown={handleKeyDown}
               placeholder="Pergunte algo sobre seu documento..."
               rows={1}
-              className="max-h-32 min-h-[40px] flex-1 resize-none rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-500"
+              className="max-h-32 min-h-[40px] flex-1 resize-none rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
               disabled={chatLoading || loading || usage.remaining <= 0}
             />
             <Button
               size="sm"
               onClick={handleSubmit}
               disabled={!input.trim() || chatLoading || loading || usage.remaining <= 0}
-              className="h-10 w-10 shrink-0 bg-purple-600 p-0 hover:bg-purple-700"
+              className="h-10 w-10 shrink-0 bg-emerald-600 p-0 hover:bg-emerald-700"
             >
               <Send className="h-4 w-4" />
             </Button>

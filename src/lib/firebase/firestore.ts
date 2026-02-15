@@ -134,7 +134,10 @@ export async function getDocumentsByParent(
   return snap.docs
     .map((d) => ({ id: d.id, ...d.data() }) as Document)
     .filter(
-      (d) => !d.isArchived && (d.parentDocumentId ?? null) === parentDocumentId
+      (d) =>
+        !d.isArchived &&
+        (d.parentDocumentId ?? null) === parentDocumentId &&
+        (parentDocumentId !== null || !d.projectId)
     )
     .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
 }
@@ -235,9 +238,28 @@ export function subscribeToDocuments(
     const docs = snapshot.docs
       .map((d) => ({ id: d.id, ...d.data() }) as Document)
       .filter(
-        (d) => !d.isArchived && (d.parentDocumentId ?? null) === parentDocumentId
+        (d) =>
+          !d.isArchived &&
+          (d.parentDocumentId ?? null) === parentDocumentId &&
+          (parentDocumentId !== null || !d.projectId)
       )
       .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+    callback(docs);
+  });
+}
+
+export function subscribeToProjectDocuments(
+  userId: string,
+  projectId: string,
+  callback: (docs: Document[]) => void
+) {
+  const q = query(collection(getDb(), "documents"), where("userId", "==", userId));
+
+  return onSnapshot(q, (snapshot) => {
+    const docs = snapshot.docs
+      .map((d) => ({ id: d.id, ...d.data() }) as Document)
+      .filter((d) => !d.isArchived && d.projectId === projectId)
+      .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
     callback(docs);
   });
 }

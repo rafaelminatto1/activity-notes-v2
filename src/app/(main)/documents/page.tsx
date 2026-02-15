@@ -1,41 +1,81 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PlusCircle, FileText, Sparkles, Layout, Clock } from "lucide-react";
+import { PlusCircle, FileText, Sparkles, Layout, Clock, FolderOpen, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
-import { createDocument, getDocument } from "@/lib/firebase/firestore";
+import { createDocument, getDocument, subscribeToProjectDocuments } from "@/lib/firebase/firestore";
+import { getProject } from "@/lib/firebase/projects";
 import { toast } from "sonner";
 import type { Document } from "@/types/document";
+import type { Project } from "@/types/project";
 
 export default function DocumentsPage() {
   const { user, userProfile } = useAuth();
   const router = useRouter();
-  const [recentDocs, setRecentDocs] = useState<Document[]>([]);
-  const [loadingRecents, setLoadingRecents] = useState(true);
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get("project");
 
-  // Carregar documentos recentes do userProfile (denormalizados)
+  const [recentDocs, setRecentDocs] = useState<Document[]>([]);
+  const [projectDocs, setProjectDocs] = useState<Document[]>([]);
+  const [currentProject, setCurrentProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Carregar dados (Recentes ou Projeto)
   useEffect(() => {
-    async function loadRecents() {
-      const ids = userProfile?.recentDocIds ?? [];
-      if (ids.length === 0) {
-        setRecentDocs([]);
-        setLoadingRecents(false);
-        return;
+    if (!user) return;
+
+    setLoading(true);
+
+    if (projectId) {
+      // Modo Projeto
+      const loadProjectData = async () => {
+        try {
+          const project = await getProject(projectId);
+          setCurrentProject(project);
+          
+          const unsubscribe = subscribeToProjectDocuments(user.uid, projectId, (docs) => {
+            setProjectDocs(docs);
+            setLoading(false);
+          });
+          return unsubscribe;
+        } catch (error) {
+          console.error("Erro ao carregar projeto:", error);
+          setLoading(false);
+        }
+      };
+      
+      const unsubscribePromise = loadProjectData();
+      return () => {
+        unsubscribePromise.then((unsub) => unsub && unsub());
+      };
+    } else {
+      // Modo Dashboard (Recentes)
+      setCurrentProject(null);
+      async function loadRecents() {
+        const ids = userProfile?.recentDocIds ?? [];
+        if (ids.length === 0) {
+          setRecentDocs([]);
+          setLoading(false);
+          return;
+        }
+        const docs = await Promise.all(ids.slice(0, 8).map((id) => getDocument(id)));
+        setRecentDocs(docs.filter((d): d is Document => d !== null && !d.isArchived));
+        setLoading(false);
       }
-      const docs = await Promise.all(ids.slice(0, 8).map((id) => getDocument(id)));
-      setRecentDocs(docs.filter((d): d is Document => d !== null && !d.isArchived));
-      setLoadingRecents(false);
+      loadRecents();
     }
-    loadRecents();
-  }, [userProfile?.recentDocIds]);
+  }, [user, userProfile?.recentDocIds, projectId]);
 
   async function handleCreate() {
     if (!user) return;
     try {
-      const docId = await createDocument(user.uid);
+      // Se estiver em um projeto, criar já associado
+      const docId = await createDocument(user.uid, {
+         projectId: projectId || null
+      });
       router.push(`/documents/${docId}`);
     } catch {
       toast.error("Falha ao criar documento.");
@@ -45,6 +85,68 @@ export default function DocumentsPage() {
   const displayName = userProfile?.displayName || user?.displayName || "";
   const firstName = displayName.split(" ")[0] || "";
   const greeting = getGreeting();
+
+  if (projectId && currentProject) {
+     return (
+        <div className="mx-auto max-w-6xl px-4 py-8">
+           <div className="mb-6 flex items-center gap-4">
+              <Button variant="ghost" size="icon" onClick={() => router.push("/documents")}>
+                 <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div className="flex items-center gap-3">
+                 <div 
+                    className="flex h-10 w-10 items-center justify-center rounded-md text-xl"
+                    style={{ backgroundColor: currentProject.color }}
+                 >
+                    {currentProject.icon}
+                 </div>
+                 <div>
+                    <h1 className="text-2xl font-bold">{currentProject.name}</h1>
+                    <p className="text-sm text-muted-foreground">
+                       {projectDocs.length} documentos
+                    </p>
+                 </div>
+              </div>
+           </div>
+
+           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <button
+                 onClick={handleCreate}
+                 className="flex h-32 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-accent transition-colors"
+              >
+                 <PlusCircle className="h-8 w-8 text-muted-foreground" />
+                 <span className="font-medium text-muted-foreground">Novo Documento</span>
+              </button>
+              
+              {loading ? (
+                 Array.from({ length: 3 }).map((_, i) => (
+                    <Skeleton key={i} className="h-32 rounded-lg" />
+                 ))
+              ) : (
+                 projectDocs.map((doc) => (
+                    <button
+                       key={doc.id}
+                       onClick={() => router.push(`/documents/${doc.id}`)}
+                       className="flex h-32 flex-col justify-between rounded-lg border p-4 text-left hover:bg-accent transition-colors"
+                    >
+                       <div className="flex items-start justify-between">
+                          <span className="text-2xl">{doc.icon || "📄"}</span>
+                          {doc.isPublished && (
+                             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                Publicado
+                             </span>
+                          )}
+                       </div>
+                       <span className="font-medium line-clamp-2">
+                          {doc.title || "Sem título"}
+                       </span>
+                    </button>
+                 ))
+              )}
+           </div>
+        </div>
+     );
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
@@ -89,7 +191,7 @@ export default function DocumentsPage() {
           Recentes
         </div>
 
-        {loadingRecents ? (
+        {loading ? (
           <div className="space-y-2">
             {Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="h-10 w-full" />

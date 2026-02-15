@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import type { Document } from "@/types/document";
 import type { JSONContent, Editor as TiptapEditor } from "@tiptap/core";
 import type { useEditorAI } from "@/hooks/use-editor-ai";
+import { useCollaborationStore } from "@/stores/collaboration-store";
 
 const Editor = dynamic(
   () => import("@/components/editor/editor").then((mod) => mod.Editor),
@@ -40,6 +41,7 @@ export default function DocumentPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { setSaving, setSaved, setError, setIdle } = useEditorStore();
+  const initCollaboration = useCollaborationStore((s) => s.init);
 
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,6 +77,13 @@ export default function DocumentPage() {
     if (!tiptapEditorRef.current) return;
     tiptapEditorRef.current.chain().focus().insertContent(text).run();
   }, []);
+
+  // Initialize Collaboration
+  useEffect(() => {
+    if (!params.documentId || !user) return;
+    const cleanup = initCollaboration(params.documentId, user);
+    return cleanup;
+  }, [params.documentId, user, initCollaboration]);
 
   // Subscribe to document
   useEffect(() => {
@@ -285,6 +294,7 @@ export default function DocumentPage() {
           <div ref={editorRef} className="mt-4">
             {user && (
               <Editor
+                documentId={document.id}
                 content={initialContentRef.current}
                 onUpdate={handleEditorUpdate}
                 editable={!document.isArchived}

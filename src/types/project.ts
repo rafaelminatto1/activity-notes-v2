@@ -22,7 +22,7 @@ export interface ProjectCreate {
   name: string;
   icon: string;
   color: string;
-  userId?: string;
+  userId: string;
 }
 
 /**

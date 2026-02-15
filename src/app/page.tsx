@@ -66,11 +66,10 @@ function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        scrolled
+      className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled
           ? "border-b bg-background/95 backdrop-blur-md shadow-sm"
           : "bg-transparent"
-      }`}
+        }`}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
@@ -123,19 +122,19 @@ function HeroSection() {
       {/* Background gradient */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[900px] rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute top-20 right-0 h-[400px] w-[400px] rounded-full bg-purple-500/5 blur-3xl" />
+        <div className="absolute top-20 right-0 h-[400px] w-[400px] rounded-full bg-indigo-500/5 blur-3xl" />
       </div>
 
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-1.5 text-sm text-muted-foreground backdrop-blur-sm">
-          <Sparkles className="h-3.5 w-3.5 text-purple-500" />
+          <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
           Powered by Gemini AI
         </div>
 
         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
           Suas notas, ideias
           <br />e projetos.{" "}
-          <span className="bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
             Com inteligência artificial.
           </span>
         </h1>
@@ -204,13 +203,13 @@ function HeroSection() {
                   <div className="h-3 w-3/5 rounded bg-muted" />
                   <div className="h-3 w-full rounded bg-muted" />
                   <div className="h-3 w-2/3 rounded bg-muted" />
-                  <div className="mt-4 rounded-lg border-l-4 border-purple-500 bg-purple-500/5 p-3">
-                    <div className="flex items-center gap-2 text-xs font-medium text-purple-600 dark:text-purple-400">
+                  <div className="mt-4 rounded-lg border-l-4 border-indigo-500 bg-indigo-500/5 p-3">
+                    <div className="flex items-center gap-2 text-xs font-medium text-indigo-600 dark:text-indigo-400">
                       <Sparkles className="h-3.5 w-3.5" />
                       Sugestão da IA
                     </div>
-                    <div className="mt-1.5 h-3 w-full rounded bg-purple-500/10" />
-                    <div className="mt-1 h-3 w-3/4 rounded bg-purple-500/10" />
+                    <div className="mt-1.5 h-3 w-full rounded bg-indigo-500/10" />
+                    <div className="mt-1 h-3 w-3/4 rounded bg-indigo-500/10" />
                   </div>
                 </div>
               </div>
@@ -218,7 +217,7 @@ function HeroSection() {
           </div>
 
           {/* Glow effect */}
-          <div className="pointer-events-none absolute -inset-4 -z-10 rounded-2xl bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-purple-500/10 blur-2xl" />
+          <div className="pointer-events-none absolute -inset-4 -z-10 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-blue-500/10 to-indigo-500/10 blur-2xl" />
         </div>
       </div>
     </section>
@@ -271,7 +270,7 @@ function FeaturesSection() {
     <section id="features" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center mb-14">
-          <p className="text-sm font-medium text-purple-600 dark:text-purple-400 mb-2">
+          <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-2">
             Recursos
           </p>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -313,19 +312,19 @@ function AIShowcaseSection() {
       className="relative py-20 sm:py-28 overflow-hidden"
     >
       {/* Background */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-indigo-500/5 via-transparent to-transparent" />
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* Text */}
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full border bg-purple-500/10 px-3 py-1 text-sm font-medium text-purple-600 dark:text-purple-400">
+            <div className="inline-flex items-center gap-2 rounded-full border bg-indigo-500/10 px-3 py-1 text-sm font-medium text-indigo-600 dark:text-indigo-400">
               <Sparkles className="h-3.5 w-3.5" />
               Inteligência Artificial
             </div>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Escreva melhor,{" "}
-              <span className="bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
                 mais rápido
               </span>
             </h2>
@@ -343,7 +342,7 @@ function AIShowcaseSection() {
                 "Gere ideias e brainstorm criativo",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2 text-sm">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-purple-500" />
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -354,7 +353,7 @@ function AIShowcaseSection() {
           <div className="relative">
             <div className="rounded-xl border bg-card shadow-lg overflow-hidden">
               <div className="border-b px-4 py-2.5 flex items-center gap-2 text-xs text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5 text-purple-500" />
+                <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
                 Assistente IA
               </div>
               <div className="p-5 space-y-4">
@@ -368,7 +367,7 @@ function AIShowcaseSection() {
                 {/* AI response */}
                 <div className="flex justify-start">
                   <div className="rounded-lg border bg-muted/50 px-3.5 py-2.5 text-sm max-w-[85%] space-y-2">
-                    <p className="font-medium text-purple-600 dark:text-purple-400 text-xs flex items-center gap-1">
+                    <p className="font-medium text-indigo-600 dark:text-indigo-400 text-xs flex items-center gap-1">
                       <Sparkles className="h-3 w-3" /> Gemini AI
                     </p>
                     <ul className="space-y-1 text-muted-foreground">
@@ -392,7 +391,7 @@ function AIShowcaseSection() {
             </div>
 
             {/* Glow */}
-            <div className="pointer-events-none absolute -inset-4 -z-10 rounded-2xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 blur-2xl" />
+            <div className="pointer-events-none absolute -inset-4 -z-10 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-blue-500/10 blur-2xl" />
           </div>
         </div>
       </div>
@@ -431,7 +430,7 @@ function HowItWorksSection() {
     <section id="how-it-works" className="py-20 sm:py-28">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <div className="text-center mb-14">
-          <p className="text-sm font-medium text-purple-600 dark:text-purple-400 mb-2">
+          <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-2">
             Simples assim
           </p>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">

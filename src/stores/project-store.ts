@@ -1,134 +1,119 @@
 import { create } from 'zustand';
-import type { Project, ProjectCreate, ProjectUpdate } from '@/types/project';
+import { Project, ProjectCreate, ProjectUpdate } from '@/types/project';
 import {
   createProject,
-  getProjects,
   updateProject,
   deleteProject,
-  moveDocumentToProject,
+  subscribeToUserProjects,
+  moveDocumentToProject
 } from '@/lib/firebase/projects';
-import { useAuth } from '@/hooks/use-auth';
-import { Timestamp } from 'firebase/firestore';
+import { toast } from 'sonner';
 
-/**
- * Store para gerenciamento de projetos/pastas
- */
-interface ProjectStore {
-  // Estado
+interface ProjectState {
   projects: Project[];
-  currentProject: Project | null;
-  activeView: 'sidebar' | 'grid' | 'list';
-  loading: boolean;
+  isLoading: boolean;
   error: string | null;
+  activeProjectId: string | null; // For filtering view
 
-  // Ações
-  setCurrentProject: (project: Project | null) => void;
-  createProject: (data: ProjectCreate & { userId: string }) => Promise<string>;
+  // Actions
+  unsubscribe: (() => void) | null;
+
+  // Actions
+  initSubscription: (userId: string) => void;
+  cleanupSubscription: () => void;
+  createProject: (data: ProjectCreate) => Promise<string>;
   updateProject: (id: string, data: ProjectUpdate) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
-  moveDocumentToProject: (docId: string, projectId: string) => Promise<void>;
-  toggleView: () => void;
-  loadProjects: (userId?: string) => Promise<void>;
+  selectProject: (id: string | null) => void;
+  moveDocumentToProject: (docId: string, projectId: string | null) => Promise<void>;
 }
 
-export const useProjectStore = create<ProjectStore>((set, get) => ({
-  // Estado inicial
+export const useProjectStore = create<ProjectState>((set, get) => ({
   projects: [],
-  currentProject: null,
-  activeView: 'sidebar',
-  loading: false,
+  isLoading: false,
   error: null,
+  activeProjectId: null,
+  unsubscribe: null,
 
-  // Carregar projetos
-  loadProjects: async (userId?: string) => {
-    if (!userId) {
-      set({ projects: [], loading: false, error: null });
-      return;
+  initSubscription: (userId: string) => {
+    // Clean up previous subscription if exists
+    const currentUnsubscribe = get().unsubscribe;
+    if (currentUnsubscribe) {
+      currentUnsubscribe();
     }
-    set({ loading: true, error: null });
+
+    set({ isLoading: true, error: null });
+
     try {
-      const projects = await getProjects(userId);
-      set({ projects, loading: false });
-    } catch (err) {
-      set({ error: err instanceof Error ? err.message : 'Erro ao carregar projetos', loading: false });
+      const unsubscribe = subscribeToUserProjects(userId, (projects) => {
+        set({ projects, isLoading: false });
+      });
+      set({ unsubscribe });
+    } catch (error) {
+      console.error(error);
+      set({ error: 'Failed to subscribe to projects', isLoading: false });
+      toast.error('Erro ao conectar com projetos');
     }
   },
 
-  // Ações
-  setCurrentProject: (project) => {
-    set({ currentProject: project });
+  cleanupSubscription: () => {
+    const unsubscribe = get().unsubscribe;
+    if (unsubscribe) {
+      unsubscribe();
+      set({ unsubscribe: null });
+    }
   },
 
-  createProject: async (data) => {
-    set({ loading: true, error: null });
+  createProject: async (data: ProjectCreate) => {
+    set({ isLoading: true });
     try {
-      const projectId = await createProject(data);
-      const now = Timestamp.now();
-      set((state) => ({
-        projects: [
-          ...state.projects,
-          {
-            ...data,
-            id: projectId,
-            createdAt: now,
-            updatedAt: now,
-            documentCount: 0
-          }
-        ],
-        loading: false
-      }));
-      return projectId;
-    } catch (err) {
-      set({ error: err instanceof Error ? err.message : 'Erro ao criar projeto', loading: false });
-      throw err;
+      const id = await createProject(data);
+      // No need to manually update state, the listener will catch it
+      toast.success('Projeto criado com sucesso!');
+      return id;
+    } catch (error) {
+      console.error(error);
+      set({ error: 'Failed to create project', isLoading: false });
+      toast.error('Erro ao criar projeto');
+      throw error;
     }
   },
 
-  updateProject: async (id, data) => {
-    set({ loading: true, error: null });
+  updateProject: async (id: string, data: ProjectUpdate) => {
     try {
       await updateProject(id, data);
-      set((state) => ({
-        projects: state.projects.map((p) => (p.id === id ? { ...p, ...data } : p)),
-        loading: false,
-      }));
-    } catch (err) {
-      set({ error: err instanceof Error ? err.message : 'Erro ao atualizar projeto', loading: false });
-      throw err;
+      toast.success('Projeto atualizado');
+    } catch (error) {
+      console.error(error);
+      toast.error('Erro ao atualizar projeto');
     }
   },
 
-  deleteProject: async (id) => {
-    set({ loading: true, error: null });
+  deleteProject: async (id: string) => {
     try {
       await deleteProject(id);
-      set((state) => ({
-        projects: state.projects.filter((p) => p.id !== id),
-        loading: false,
-        currentProject: state.currentProject?.id === id ? null : state.currentProject,
-      }));
-    } catch (err) {
-      set({ error: err instanceof Error ? err.message : 'Erro ao excluir projeto', loading: false });
-      throw err;
+      toast.success('Projeto excluído');
+      // If deleted active project, clear selection
+      if (get().activeProjectId === id) {
+        set({ activeProjectId: null });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Erro ao excluir projeto');
     }
   },
 
-  moveDocumentToProject: async (docId, projectId) => {
-    set({ loading: true, error: null });
+  selectProject: (id: string | null) => {
+    set({ activeProjectId: id });
+  },
+
+  moveDocumentToProject: async (docId: string, projectId: string | null) => {
     try {
       await moveDocumentToProject(docId, projectId);
-      // Não recarregar aqui - será recarregado pelo usuário se necessário
-    } catch (err) {
-      set({ error: err instanceof Error ? err.message : 'Erro ao mover documento', loading: false });
-      throw err;
+      toast.success('Documento movido');
+    } catch (error) {
+      console.error(error);
+      toast.error('Erro ao mover documento');
     }
-  },
-
-  toggleView: () => {
-    set((state) => {
-      const views: ('sidebar' | 'grid' | 'list')[] = ['sidebar', 'grid', 'list'];
-      const currentIndex = views.indexOf(state.activeView);
-      return { activeView: views[(currentIndex + 1) % views.length] };
-    });
-  },
+  }
 }));

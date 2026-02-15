@@ -1,25 +1,33 @@
-/**
- * Ícone disponível para seleção
- */
 export interface DocumentIcon {
   id: string;
   emoji: string;
-  category: string;
+  label?: string;
+  category: IconCategory;
 }
 
-/**
- * Categoria de ícones para organização
- */
-export interface IconCategory {
-  id: string;
+export type IconCategory =
+  | 'work'
+  | 'personal'
+  | 'study'
+  | 'finance'
+  | 'travel'
+  | 'health'
+  | 'home'
+  | 'other';
+
+export interface IconCategoryData {
+  id: IconCategory;
   name: string;
   icons: DocumentIcon[];
-  category?: string;
 }
 
-/**
- * Dados de ícones e cores recentemente usados
- */
+export interface DocumentColor {
+  id: string;
+  name: string;
+  hex: string;
+  category: 'neutral' | 'vibrant' | 'pastel';
+}
+
 export interface IconHistory {
   recentIcons: string[];
   recentColors: string[];

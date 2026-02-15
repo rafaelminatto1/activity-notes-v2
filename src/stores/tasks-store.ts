@@ -1,139 +1,144 @@
 import { create } from "zustand";
+import type { Task, TaskStatus, TaskPriority } from "@/types/smart-note";
+import {
+  createTask,
+  updateTask,
+  deleteTask,
+  getTasks,
+  subscribeToTasks,
+} from "@/lib/firebase/tasks";
+import { toast } from "sonner";
 
-export type TaskStatus = "todo" | "in_progress" | "done" | "cancelled" | "archived";
-export type TaskPriority = "low" | "medium" | "high" | "urgent";
-
-export interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  status: TaskStatus;
-  priority: TaskPriority;
-  dueDate?: Date;
-  assigneeId?: string;
-  completedAt?: Date;
-  documentId?: string; // If embedded in a note
-  userId: string;
-  createdAt: Date;
-  labels?: string[];
-  subtasks?: Task[]; // For nested tasks
+interface TaskFilter {
+  status?: TaskStatus | "all";
+  priority?: TaskPriority | "all";
+  assignee?: string | "all";
+  dueDate?: "overdue" | "today" | "this-week" | "next-week" | "all";
+  searchQuery?: string;
 }
 
 export interface TasksStore {
   tasks: Task[];
-  filter: {
-    status?: TaskStatus | "all";
-    priority?: TaskPriority | "all";
-    assignee?: string | "all";
-    dueDate?: "all" | "overdue" | "today" | "this-week" | "next-week";
-    searchQuery?: string;
-  };
-  selectedTaskId: string | null;
   isLoading: boolean;
-  loadTasks: () => Promise<void>;
-  createTask: (task: Partial<Task> & Pick<Task, "title">) => Promise<string>;
+  initialized: boolean;
+  unsubscribe: (() => void) | null;
+  filter: TaskFilter;
+
+  // UI State
+  isPanelOpen: boolean;
+  togglePanel: () => void;
+  openPanel: () => void;
+  closePanel: () => void;
+
+  // Ações
+  loadTasks: (userId: string, documentId?: string) => Promise<void>;
+  subscribe: (userId: string, documentId?: string) => void;
+  createTask: (userId: string, task: Partial<Task>) => Promise<string>;
   updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
-  toggleTaskComplete: (taskId: string) => Promise<void>;
-  clearFilter: (filter: keyof TasksStore["filter"]) => void;
+  toggleTaskComplete: (task: Task) => Promise<void>;
+  setFilter: (updates: Partial<TaskFilter>) => void;
+  clearFilter: (key?: keyof TaskFilter) => void;
 }
 
 export const useTasksStore = create<TasksStore>((set, get) => ({
   tasks: [],
-  filter: { status: "all" },
-  selectedTaskId: null,
   isLoading: false,
-  loadTasks: async () => {
-    set({ isLoading: true });
+  initialized: false,
+  unsubscribe: null,
+  filter: {},
 
+  isPanelOpen: false,
+  togglePanel: () => set((state) => ({ isPanelOpen: !state.isPanelOpen })),
+  openPanel: () => set({ isPanelOpen: true }),
+  closePanel: () => set({ isPanelOpen: false }),
+
+  loadTasks: async (userId, documentId) => {
+    set({ isLoading: true });
     try {
-      const response = await fetch("/api/tasks");
-      if (response.ok) {
-        const tasks = await response.json();
-        set({ tasks, isLoading: false });
-      }
+      const tasks = await getTasks(userId, documentId);
+      set({ tasks, isLoading: false, initialized: true });
     } catch (error) {
       console.error("Failed to load tasks:", error);
       set({ isLoading: false });
+      toast.error("Erro ao carregar tarefas");
     }
   },
-  createTask: async (task) => {
+
+  subscribe: (userId, documentId) => {
+    const currentUnsub = get().unsubscribe;
+    if (currentUnsub) currentUnsub();
+
     set({ isLoading: true });
 
-    try {
-      const response = await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(task),
-      });
+    const unsub = subscribeToTasks(userId, documentId, (tasks) => {
+      set({ tasks, isLoading: false, initialized: true });
+    });
 
-      if (response.ok) {
-        const newTask = await response.json();
-        set({ tasks: [...get().tasks, newTask], isLoading: false });
-        return newTask.id;
-      }
+    set({ unsubscribe: unsub });
+  },
+
+  createTask: async (userId, task) => {
+    // Optimistic update (opcional, mas recomendado)
+    const tempId = Math.random().toString(36).substring(7);
+    const optimisticTask = { ...task, id: tempId, userId } as Task;
+
+    // set((state) => ({ tasks: [optimisticTask, ...state.tasks] }));
+
+    try {
+      const id = await createTask(userId, task);
+      toast.success("Tarefa criada");
+      return id;
     } catch (error) {
       console.error("Failed to create task:", error);
-      set({ isLoading: false });
+      toast.error("Erro ao criar tarefa");
+      // Revert optimistic update se implementado
       throw error;
     }
   },
+
   updateTask: async (taskId, updates) => {
-    set({ isLoading: true });
+    set((state) => ({
+      tasks: state.tasks.map((t) => (t.id === taskId ? { ...t, ...updates } : t)),
+    }));
 
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      });
-
-      if (response.ok) {
-        const updatedTask = await response.json();
-        set({
-          tasks: get().tasks.map((t) =>
-            t.id === taskId ? { ...t, ...updates } : t
-          ),
-          isLoading: false,
-        });
-      }
+      await updateTask(taskId, updates);
     } catch (error) {
       console.error("Failed to update task:", error);
-      set({ isLoading: false });
-      throw error;
+      toast.error("Erro ao atualizar tarefa");
+      // Revert logic would go here
     }
   },
+
   deleteTask: async (taskId) => {
-    set({ isLoading: true });
+    const previousTasks = get().tasks;
+    set((state) => ({
+      tasks: state.tasks.filter((t) => t.id !== taskId),
+    }));
 
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        set({
-          tasks: get().tasks.filter((t) => t.id !== taskId),
-          isLoading: false,
-        });
-      }
+      await deleteTask(taskId);
+      toast.success("Tarefa excluída");
     } catch (error) {
       console.error("Failed to delete task:", error);
-      set({ isLoading: false });
-      throw error;
+      toast.error("Erro ao excluir tarefa");
+      set({ tasks: previousTasks });
     }
   },
-  toggleTaskComplete: async (taskId) => {
-    const task = get().tasks.find((t) => t.id === taskId);
-    if (!task) return;
 
-    const newStatus: TaskStatus =
-      task.status === "done" ? "todo" : "done";
-
-    await get().updateTask(taskId, { status: newStatus });
+  toggleTaskComplete: async (task) => {
+    const newStatus = task.status === "done" ? "todo" : "done";
+    await get().updateTask(task.id, { status: newStatus });
   },
-  clearFilter: (filter) =>
+
+  setFilter: (updates) =>
+    set((state) => ({ filter: { ...state.filter, ...updates } })),
+
+  clearFilter: (key) =>
     set((state) => ({
-      filter: { ...state.filter, [filter]: "all" },
+      filter: key
+        ? { ...state.filter, [key]: undefined }
+        : {},
     })),
 }));

@@ -97,7 +97,7 @@ export function CoverImage({ documentId, coverImage }: CoverImageProps) {
         />
         <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <div {...getRootProps()}>
-            <input {...getInputProps()} />
+            <input {...getInputProps()} aria-label="Alterar imagem de capa" />
             <Button variant="secondary" size="sm" className="shadow-sm">
               <ImagePlus className="mr-2 h-3.5 w-3.5" />
               Trocar capa
@@ -158,7 +158,7 @@ export function AddCoverButton({ documentId }: { documentId: string }) {
 
   return (
     <div {...getRootProps()}>
-      <input {...getInputProps()} />
+      <input {...getInputProps()} aria-label="Adicionar capa" />
       <button
         className="text-xs text-muted-foreground hover:text-foreground transition-colors"
         disabled={uploading}

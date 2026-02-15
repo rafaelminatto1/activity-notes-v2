@@ -11,6 +11,7 @@ import {
   Trash2,
   Copy,
   Sparkles,
+  FolderOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -27,10 +28,14 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useSidebarStore } from "@/stores/sidebar-store";
+import { useProjectStore } from "@/stores/project-store";
 
 interface DocumentItemProps {
   id: string;
@@ -46,6 +51,7 @@ function DocumentItem({ id, title, icon, childCount, level }: DocumentItemProps)
   const { user, userProfile } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const closeMobile = useSidebarStore((s) => s.closeMobile);
+  const { projects, moveDocumentToProject } = useProjectStore();
 
   const isActive = params.documentId === id;
   const hasChildren = childCount > 0;
@@ -98,18 +104,35 @@ function DocumentItem({ id, title, icon, childCount, level }: DocumentItemProps)
     }
   }
 
+  async function handleMoveToProject(projectId: string) {
+    try {
+      await moveDocumentToProject(id, projectId);
+      toast.success("Documento movido para o projeto.");
+      // Atualização otimista ou recarregamento pode ser necessário
+    } catch {
+      toast.error("Falha ao mover documento.");
+    }
+  }
+
   function handleNavigate() {
     router.push(`/documents/${id}`);
     closeMobile();
   }
 
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData("documentId", id);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
   return (
     <>
       <div
         role="button"
+        draggable
+        onDragStart={handleDragStart}
         onClick={handleNavigate}
         className={cn(
-          "group flex items-center gap-1 rounded-sm py-1 pr-1 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors",
+          "group flex items-center gap-1 rounded-sm py-1 pr-1 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors cursor-grab active:cursor-grabbing",
           isActive && "bg-accent text-accent-foreground"
         )}
         style={{ paddingLeft: `${12 + level * 12}px` }}
@@ -165,6 +188,26 @@ function DocumentItem({ id, title, icon, childCount, level }: DocumentItemProps)
                 <Copy className="mr-2 h-4 w-4" />
                 Duplicar
               </DropdownMenuItem>
+
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <FolderOpen className="mr-2 h-4 w-4" />
+                  Mover para...
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  {projects.length > 0 ? (
+                    projects.map(project => (
+                      <DropdownMenuItem key={project.id} onClick={() => handleMoveToProject(project.id)}>
+                        <span className="mr-2">{project.icon}</span>
+                        {project.name}
+                      </DropdownMenuItem>
+                    ))
+                  ) : (
+                    <DropdownMenuItem disabled>Sem projetos</DropdownMenuItem>
+                  )}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
               <DropdownMenuItem disabled>
                 <Sparkles className="mr-2 h-4 w-4" />
                 Pedir à IA para resumir

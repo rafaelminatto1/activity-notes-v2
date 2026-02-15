@@ -33,8 +33,8 @@ export function AIBlockView({ node, deleteNode, editor }: NodeViewProps) {
 
   if (status === "loading") {
     return (
-      <NodeViewWrapper className="ai-block my-3 rounded-md border border-purple-300 bg-purple-50 p-4 dark:border-purple-700 dark:bg-purple-950/30" contentEditable={false}>
-        <div className="flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400">
+      <NodeViewWrapper className="ai-block my-3 rounded-md border border-emerald-300 bg-emerald-50 p-4 dark:border-emerald-700 dark:bg-emerald-950/30" contentEditable={false}>
+        <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
           <Sparkles className="h-4 w-4 animate-pulse" />
           <span>IA gerando conteúdo...</span>
         </div>
@@ -71,8 +71,8 @@ export function AIBlockView({ node, deleteNode, editor }: NodeViewProps) {
 
   // status === "done"
   return (
-    <NodeViewWrapper className="ai-block my-3 rounded-md border border-purple-300 bg-purple-50 p-4 dark:border-purple-700 dark:bg-purple-950/30" contentEditable={false}>
-      <div className="mb-2 flex items-center gap-2 text-xs text-purple-600 dark:text-purple-400">
+    <NodeViewWrapper className="ai-block my-3 rounded-md border border-emerald-300 bg-emerald-50 p-4 dark:border-emerald-700 dark:bg-emerald-950/30" contentEditable={false}>
+      <div className="mb-2 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
         <Sparkles className="h-3.5 w-3.5" />
         <span>Gerado por IA</span>
       </div>

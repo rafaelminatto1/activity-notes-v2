@@ -25,6 +25,9 @@ export const AI_PROMPTS = {
 
   generateFromPrompt: (prompt: string) =>
     `Você é um assistente de escrita inteligente. Siga esta instrução do usuário:\n\n${prompt}\n\nResponda no mesmo idioma da instrução acima. Seja conciso e direto.`,
+
+  extractTasks:
+    "Analise o texto a seguir e extraia tarefas acionáveis. Retorne APENAS um array JSON de strings, onde cada string é uma descrição de tarefa. Se não encontrar tarefas, retorne um array vazio []. Não inclua formatação markdown (```json), apenas o array cru.",
 } as const;
 
 export const SYSTEM_PROMPT =

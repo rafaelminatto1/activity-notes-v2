@@ -117,6 +117,16 @@ export async function generateText(
   });
 }
 
+export async function generateEmbedding(text: string): Promise<number[]> {
+  const ai = getGenAI();
+  const model = ai.getGenerativeModel({ model: "text-embedding-004" });
+
+  return withRetryAndTimeout(async () => {
+    const result = await model.embedContent(text);
+    return result.embedding.values;
+  });
+}
+
 export async function generateChat(
   systemPrompt: string,
   userMessage: string,

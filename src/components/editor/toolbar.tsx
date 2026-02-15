@@ -68,7 +68,7 @@ const textColors = [
   { label: "Amarelo", value: "#eab308" },
   { label: "Verde", value: "#22c55e" },
   { label: "Azul", value: "#3b82f6" },
-  { label: "Roxo", value: "#a855f7" },
+  { label: "Índigo", value: "#6366f1" },
   { label: "Rosa", value: "#ec4899" },
 ];
 
@@ -77,7 +77,7 @@ const highlightColors = [
   { label: "Amarelo", value: "#fef08a" },
   { label: "Verde", value: "#bbf7d0" },
   { label: "Azul", value: "#bfdbfe" },
-  { label: "Roxo", value: "#e9d5ff" },
+  { label: "Índigo", value: "#e0e7ff" },
   { label: "Rosa", value: "#fce7f3" },
   { label: "Laranja", value: "#fed7aa" },
   { label: "Vermelho", value: "#fecaca" },

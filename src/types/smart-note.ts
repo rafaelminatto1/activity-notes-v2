@@ -92,6 +92,9 @@ export interface Template {
   createdAt: Timestamp;
 }
 
+export type TaskStatus = "todo" | "in_progress" | "done" | "cancelled";
+export type TaskPriority = "low" | "medium" | "high" | "urgent";
+
 /**
  * Task (independent or embedded in notes)
  */
@@ -99,8 +102,8 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  status: "todo" | "in_progress" | "done" | "cancelled";
-  priority: "low" | "medium" | "high" | "urgent";
+  status: TaskStatus;
+  priority: TaskPriority;
   dueDate?: Timestamp;
   assigneeId?: string;
   documentId?: string; // If embedded in a note
