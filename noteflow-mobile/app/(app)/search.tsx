@@ -23,11 +23,21 @@ export default function SearchScreen() {
   const results = query.trim() ? searchDocuments(query) : [];
   const recentDocs = documents.slice(0, 5);
 
-  const highlightText = (text: string, search: string) => {
-    if (!search.trim()) return text;
-    const index = text.toLowerCase().indexOf(search.toLowerCase());
-    if (index === -1) return text;
-    return text;
+  const HighlightedText = ({ text, search, style }: { text: string; search: string; style: object }) => {
+    if (!search.trim()) return <Text style={style} numberOfLines={1}>{text}</Text>;
+    const lower = text.toLowerCase();
+    const idx = lower.indexOf(search.toLowerCase());
+    if (idx === -1) return <Text style={style} numberOfLines={1}>{text}</Text>;
+    const before = text.slice(0, idx);
+    const match = text.slice(idx, idx + search.length);
+    const after = text.slice(idx + search.length);
+    return (
+      <Text style={style} numberOfLines={1}>
+        {before}
+        <Text style={{ backgroundColor: colors.primary + '30', fontWeight: '700' }}>{match}</Text>
+        {after}
+      </Text>
+    );
   };
 
   const renderItem = useCallback(
@@ -45,24 +55,22 @@ export default function SearchScreen() {
       >
         <Text style={{ fontSize: 24, marginRight: 12 }}>{item.icon || '📝'}</Text>
         <View style={{ flex: 1 }}>
-          <Text
+          <HighlightedText
+            text={item.title || 'Sem título'}
+            search={query}
             style={{
               fontSize: 16,
               fontWeight: '500',
               color: colors.text,
               marginBottom: 2,
             }}
-            numberOfLines={1}
-          >
-            {item.title || 'Sem título'}
-          </Text>
+          />
           {item.plainText ? (
-            <Text
+            <HighlightedText
+              text={item.plainText.substring(0, 80)}
+              search={query}
               style={{ fontSize: 14, color: colors.textMuted }}
-              numberOfLines={1}
-            >
-              {item.plainText.substring(0, 80)}
-            </Text>
+            />
           ) : null}
         </View>
         <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />

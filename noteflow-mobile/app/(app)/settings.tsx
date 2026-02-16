@@ -281,7 +281,7 @@ export default function SettingsScreen() {
               icon="trash-outline"
               title="Lixeira"
               subtitle="Documentos arquivados"
-              onPress={() => Alert.alert('Lixeira', 'Em breve!')}
+              onPress={() => router.push('/(app)/trash')}
             />
             <SettingRow
               icon="log-out-outline"

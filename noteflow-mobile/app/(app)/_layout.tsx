@@ -75,6 +75,12 @@ export default function AppLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="trash"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }

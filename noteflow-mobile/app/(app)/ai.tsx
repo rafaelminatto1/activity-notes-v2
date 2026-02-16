@@ -68,7 +68,7 @@ export default function AIScreen() {
         >
           <View
             style={{
-              backgroundColor: isUser ? colors.surface : '#eef2ff',
+              backgroundColor: isUser ? colors.surface : colors.primary + '15',
               borderRadius: 16,
               borderBottomRightRadius: isUser ? 4 : 16,
               borderBottomLeftRadius: isUser ? 16 : 4,
@@ -79,7 +79,7 @@ export default function AIScreen() {
             <Text
               style={{
                 fontSize: 15,
-                color: isUser ? colors.text : '#1e1b4b',
+                color: colors.text,
                 lineHeight: 22,
               }}
             >
