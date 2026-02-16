@@ -15,7 +15,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { Project, ProjectCreate, ProjectUpdate } from "@/types/project";
-import { Document } from "@/types/document";
+// import { Document } from "@/types/document";
 
 const PROJECTS_COLLECTION = "projects";
 const DOCUMENTS_COLLECTION = "documents";

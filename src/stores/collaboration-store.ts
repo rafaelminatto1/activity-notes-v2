@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { inviteUserToDocument, subscribeToCollaborators, updatePresence } from "@/lib/firebase/collaboration";
 import { toast } from "sonner";
+import type { User } from "firebase/auth";
 
 export interface Collaborator {
   id: string;
@@ -15,9 +16,9 @@ export interface CollaborationStore {
   documentId: string | null;
   collaborators: Collaborator[];
   isCollaborativeMode: boolean;
-  
+
   // Actions
-  init: (documentId: string, currentUser: any) => () => void; // Returns cleanup function
+  init: (documentId: string, currentUser: User | null) => () => void; // Returns cleanup function
   addCollaborator: (email: string, role: "editor" | "viewer", invitedBy: string) => Promise<void>;
   updateMyPresence: (userId: string, data: Partial<Collaborator>) => Promise<void>;
 }
@@ -29,7 +30,7 @@ export const useCollaborationStore = create<CollaborationStore>((set, get) => ({
 
   init: (documentId, currentUser) => {
     set({ documentId, isCollaborativeMode: true });
-    
+
     // Subscribe to collaborators
     const unsubscribe = subscribeToCollaborators(documentId, (collaborators) => {
       set({ collaborators });
@@ -40,7 +41,7 @@ export const useCollaborationStore = create<CollaborationStore>((set, get) => ({
       updatePresence(documentId, currentUser.uid, {
         name: currentUser.displayName || "Anonymous",
         email: currentUser.email || "",
-        avatar: currentUser.photoURL,
+        avatar: currentUser.photoURL || undefined,
         role: "editor", // default for now
       });
     }

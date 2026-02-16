@@ -7,7 +7,9 @@ export type AIActionType =
   | "changeTone"
   | "translate"
   | "continueWriting"
-  | "generateFromPrompt";
+  | "generateFromPrompt"
+  | "format"
+  | "checkConsistency";
 
 export interface AIRequest {
   action: AIActionType;

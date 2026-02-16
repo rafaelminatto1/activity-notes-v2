@@ -26,6 +26,9 @@ import {
   proofreadFlow,
   extractCodeFlow,
   formatNoteFlow,
+  contextualSearchFlow,
+  generateGraphDataFlow,
+  checkConsistencyFlow,
 } from './flows/ai-flows';
 import {
   checkRateLimit,
@@ -582,6 +585,83 @@ export const genkitFormatNote = onCall(async (request) => {
   } catch (error) {
     console.error('Erro ao formatar nota:', error);
     throw new HttpsError('internal', 'Falha ao formatar nota.');
+  }
+});
+
+// ============================================================
+// 21. Contextual Search (Related Notes)
+// ============================================================
+
+export const genkitContextualSearch = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Autenticação necessária.');
+  }
+
+  const { text, documentId, maxResults = 5 } = request.data;
+
+  if (!text) {
+    throw new HttpsError('invalid-argument', 'Texto é obrigatório.');
+  }
+
+  try {
+    const result = await contextualSearchFlow({
+      text,
+      documentId,
+      userId: request.auth.uid,
+      maxResults,
+    });
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Erro na busca contextual:', error);
+    throw new HttpsError('internal', 'Falha na busca contextual.');
+  }
+});
+
+// ============================================================
+// 22. Generate Graph Data
+// ============================================================
+
+export const genkitGenerateGraphData = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Autenticação necessária.');
+  }
+
+  try {
+    const result = await generateGraphDataFlow({
+      userId: request.auth.uid,
+    });
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Erro ao gerar grafo:', error);
+    throw new HttpsError('internal', 'Falha ao gerar dados do grafo.');
+  }
+});
+
+// ============================================================
+// 23. Check Consistency
+// ============================================================
+
+export const genkitCheckConsistency = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Autenticação necessária.');
+  }
+
+  const { text, documentId } = request.data;
+
+  if (!text) {
+    throw new HttpsError('invalid-argument', 'Texto é obrigatório.');
+  }
+
+  try {
+    const result = await checkConsistencyFlow({
+      text,
+      documentId,
+      userId: request.auth.uid,
+    });
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Erro ao verificar consistência:', error);
+    throw new HttpsError('internal', 'Falha ao verificar consistência.');
   }
 });
 

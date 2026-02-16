@@ -6,6 +6,8 @@ export interface Document {
   title: string;
   content: JSONContent | null;
   plainText: string;
+  summary?: string;
+  location?: { latitude: number; longitude: number };
   icon: string;
   color: string;
   coverImage: string;

@@ -1,17 +1,1122 @@
 
-> activitynotes@0.1.0 start
-> next start
+> activitynotes@0.1.0 dev
+> next dev
 
-▲ Next.js 16.1.6
-- Local:         http://localhost:3000
-- Network:       http://192.168.31.49:3000
-
-✓ Starting...
 ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
  We detected multiple lockfiles and selected the directory of /home/rafael/package-lock.json as the root directory.
- To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
-   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
  Detected additional lockfiles: 
    * /home/rafael/Documentos/Claude/Activity-notes/activitynotes/package-lock.json
 
-✓ Ready in 517ms
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.31.60:3000
+- Environments: .env.local
+- Experiments (use with caution):
+  ✓ useCache
+
+✓ Starting...
+✓ Ready in 986ms
+ GET / 200 in 2.3s (compile: 2.0s, render: 299ms)
+ GET / 200 in 34ms (compile: 3ms, render: 31ms)
+ GET /login 200 in 482ms (compile: 224ms, render: 258ms)
+ GET /login 200 in 488ms (compile: 248ms, render: 239ms)
+ GET /login 200 in 481ms (compile: 206ms, render: 276ms)
+ GET /login 200 in 487ms (compile: 261ms, render: 227ms)
+ GET /login 200 in 479ms (compile: 175ms, render: 304ms)
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+ GET /documents 500 in 3.0s (compile: 2.8s, render: 195ms)
+ GET /documents 500 in 3.0s (compile: 2.9s, render: 188ms)
+ GET /documents 500 in 3.0s (compile: 2.9s, render: 187ms)
+ GET /documents 500 in 3.0s (compile: 2.9s, render: 187ms)
+ GET /documents 500 in 3.0s (compile: 2.9s, render: 186ms)
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+ GET /documents 500 in 129ms (compile: 45ms, render: 84ms)
+ GET /documents 500 in 127ms (compile: 56ms, render: 71ms)
+ GET /documents 500 in 127ms (compile: 69ms, render: 59ms)
+ GET /documents 500 in 127ms (compile: 83ms, render: 44ms)
+ GET /documents 500 in 130ms (compile: 104ms, render: 26ms)
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+ GET /documents 500 in 106ms (compile: 44ms, render: 63ms)
+ GET /documents 500 in 106ms (compile: 59ms, render: 47ms)
+ GET /documents 500 in 107ms (compile: 73ms, render: 35ms)
+ GET /documents 500 in 107ms (compile: 87ms, render: 20ms)
+ GET /documents 500 in 118ms (compile: 79ms, render: 39ms)
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+ GET /documents 500 in 54ms (compile: 28ms, render: 26ms)
+ GET /documents 500 in 62ms (compile: 37ms, render: 25ms)
+ GET /documents 500 in 57ms (compile: 42ms, render: 15ms)
+⨯ ./Documentos/Claude/Activity-notes/activitynotes/src/components/graph/semantic-graph.tsx:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useEffect[33m,[39m useRef[33m,[39m useState } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { [33mLoader2[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 7 |[39m [36mimport[39m { useRouter } [36mfrom[39m [32m"next/navigation"[39m[33m;[39m
+ [90m 8 |[39m[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/graph/semantic-graph.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/graph/page.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/graph/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/graph/semantic-graph.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/graph/page.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/graph/page.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/components/graph/semantic-graph.tsx:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useEffect[33m,[39m useRef[33m,[39m useState } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { [33mLoader2[39m } [36mfrom[39m [32m"lucide-react"[39m[33m;[39m
+ [90m 7 |[39m [36mimport[39m { useRouter } [36mfrom[39m [32m"next/navigation"[39m[33m;[39m
+ [90m 8 |[39m[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/graph/semantic-graph.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/graph/page.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/graph/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/graph/semantic-graph.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/graph/page.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/graph/page.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-client] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts:5:1
+Export functions doesn't exist in target module
+[0m [90m 3 |[39m [36mimport[39m { useState[33m,[39m useCallback } [36mfrom[39m [32m"react"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { httpsCallable } [36mfrom[39m [32m"firebase/functions"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { functions } [36mfrom[39m [32m"@/lib/firebase/config"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [36mimport[39m { toast } [36mfrom[39m [32m"sonner"[39m[33m;[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36minterface[39m [33mSource[39m {[0m
+
+The export functions was not found in module [project]/Documentos/Claude/Activity-notes/activitynotes/src/lib/firebase/config.ts [app-ssr] (ecmascript).
+Did you mean to import analytics?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/hooks/use-global-qa.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(main)/layout.tsx [Server Component]
+
+
+ GET /graph 500 in 1171ms (compile: 1164ms, render: 7ms)
+ HEAD / 200 in 67ms (compile: 7ms, render: 60ms)
+ GET / 200 in 39ms (compile: 3ms, render: 36ms)
+ GET / 200 in 27ms (compile: 1731µs, render: 25ms)
+ GET /login 200 in 283ms (compile: 4ms, render: 279ms)
+ GET /login 200 in 262ms (compile: 5ms, render: 257ms)
+ GET /login 200 in 244ms (compile: 9ms, render: 235ms)
+ GET /login 200 in 241ms (compile: 48ms, render: 193ms)
+ GET /login 200 in 200ms (compile: 32ms, render: 169ms)
+ GET / 200 in 34ms (compile: 4ms, render: 30ms)
+ GET / 200 in 25ms (compile: 1715µs, render: 23ms)
+ GET /login 200 in 270ms (compile: 4ms, render: 266ms)
+ GET /login 200 in 252ms (compile: 3ms, render: 249ms)
+ GET /login 200 in 256ms (compile: 25ms, render: 231ms)
+ GET /login 200 in 239ms (compile: 25ms, render: 214ms)
+ GET /login 200 in 220ms (compile: 32ms, render: 187ms)

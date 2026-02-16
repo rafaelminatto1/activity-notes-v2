@@ -12,6 +12,8 @@ import { uploadImage } from "@/lib/firebase/storage";
 import { toast } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAutoEmbedding } from "@/hooks/use-auto-embedding";
+import { useCollaboration } from "@/hooks/use-collaboration";
+import { Collaborators } from "@/components/collaboration/collaborators";
 
 interface EditorProps {
   documentId: string;
@@ -33,6 +35,8 @@ export function Editor({
   onEditorReady,
 }: EditorProps) {
   useAutoEmbedding(documentId);
+  const { collaborators, updateCursor } = useCollaboration(documentId);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initialContentSet = useRef(false);
 
@@ -94,6 +98,10 @@ export function Editor({
       const json = e.getJSON();
       const text = e.getText().slice(0, 10000);
       onUpdate(json, text);
+    },
+    onSelectionUpdate: ({ editor: e }) => {
+      const { from, to } = e.state.selection;
+      updateCursor(from, to - from);
     },
   });
 
@@ -220,6 +228,7 @@ export function Editor({
       <div className="editor-wrapper relative">
         <Toolbar
           editor={editor}
+          documentId={documentId}
           onImageUpload={handleImageUpload}
           aiProps={{
             onSummarize: ai.summarizeSelection,
@@ -227,6 +236,8 @@ export function Editor({
             onImprove: ai.improveSelection,
             onSimplify: ai.simplifySelection,
             onFixSpelling: ai.fixSpelling,
+            onFormat: ai.formatNote,
+            onCheckConsistency: ai.checkConsistency,
             onTranslate: ai.translateSelection,
             onChangeTone: ai.changeTone,
             onFreePrompt: ai.freePrompt,

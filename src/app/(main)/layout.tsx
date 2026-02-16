@@ -14,6 +14,9 @@ import { trackPageView } from "@/lib/firebase/analytics";
 import { Sidebar, MobileSidebar } from "@/components/layout/sidebar";
 import { SearchCommand } from "@/components/layout/search-command";
 import { TasksPanel } from "@/components/smart/tasks-panel";
+import { GlobalQAModal } from "@/components/ai/global-qa-modal";
+import { useGlobalQA } from "@/hooks/use-global-qa";
+import { Sidekick } from "@/components/ai/sidekick";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 
@@ -33,10 +36,20 @@ export default function MainLayout({
   const toggleMobile = useSidebarStore((s) => s.toggleMobile);
   const openSearch = useSearchStore((s) => s.open);
   const toggleAIPanel = useAIStore((s) => s.togglePanel);
-  
+
   const isTasksPanelOpen = useTasksStore((s) => s.isPanelOpen);
   const toggleTasksPanel = useTasksStore((s) => s.togglePanel);
   const closeTasksPanel = useTasksStore((s) => s.closePanel);
+
+  // Global Q&A State
+  const {
+    isOpen: isQAOpen,
+    openQA,
+    closeQA,
+    isLoading: isQALoading,
+    messages: qaMessages,
+    askQuestion: askQA,
+  } = useGlobalQA();
 
   const handleCreateDocument = useCallback(async () => {
     if (!user) return;
@@ -55,6 +68,13 @@ export default function MainLayout({
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         openSearch();
+        return;
+      }
+
+      // Ctrl+Q — Q&A Global (Ask AI)
+      if (e.key === "q" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        isQAOpen ? closeQA() : openQA();
         return;
       }
 
@@ -89,7 +109,7 @@ export default function MainLayout({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [openSearch, toggleSidebar, handleCreateDocument, toggleAIPanel, toggleTasksPanel]);
+  }, [openSearch, toggleSidebar, handleCreateDocument, toggleAIPanel, toggleTasksPanel, isQAOpen, openQA, closeQA]);
 
   // Track page views
   useEffect(() => {
@@ -131,17 +151,25 @@ export default function MainLayout({
 
         {/* Tasks Panel Overlay/Sidebar */}
         {isTasksPanelOpen && (
-           <div className="absolute top-0 right-0 h-full shadow-xl border-l z-20 bg-background w-80">
-              <TasksPanel 
-                isOpen={isTasksPanelOpen} 
-                onClose={closeTasksPanel} 
-                documentId={documentId}
-              />
-           </div>
+          <div className="absolute top-0 right-0 h-full shadow-xl border-l z-20 bg-background w-80">
+            <TasksPanel
+              isOpen={isTasksPanelOpen}
+              onClose={closeTasksPanel}
+              documentId={documentId}
+            />
+          </div>
         )}
       </div>
 
       <SearchCommand />
+      <Sidekick />
+      <GlobalQAModal
+        isOpen={isQAOpen}
+        onClose={closeQA}
+        isLoading={isQALoading}
+        messages={qaMessages}
+        onAsk={askQA}
+      />
     </div>
   );
 }

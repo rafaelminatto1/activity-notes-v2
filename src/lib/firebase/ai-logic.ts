@@ -6,7 +6,7 @@
  * a partir do cliente com segurança integrada via App Check
  */
 
-import app from './config';
+// import app from './config';
 import {
   GoogleGenerativeAI,
   HarmCategory,

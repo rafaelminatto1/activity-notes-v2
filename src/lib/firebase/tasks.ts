@@ -64,28 +64,28 @@ export function subscribeToTasks(
   callback: (tasks: Task[]) => void
 ) {
   const constraints = [where("userId", "==", userId)];
-  
+
   if (documentId) {
     constraints.push(where("documentId", "==", documentId));
   }
-  
+
   // Ordenação pode exigir índice composto se filtrar por documentId também
   // Por enquanto, ordenamos no cliente se falhar, ou criamos índice.
   // Vamos tentar sem orderBy na query composta para evitar erro imediato de índice
-  
+
   const q = query(collection(db, TASKS_COLLECTION), ...constraints);
 
   return onSnapshot(q, (snapshot) => {
-    const tasks = snapshot.docs.map((d) => ({ 
-      id: d.id, 
-      ...d.data() 
+    const tasks = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data()
     })) as Task[];
-    
+
     // Ordenação Client-side
     tasks.sort((a, b) => {
-        const dateA = a.createdAt ? (a.createdAt as any).seconds : 0;
-        const dateB = b.createdAt ? (b.createdAt as any).seconds : 0;
-        return dateB - dateA;
+      const dateA = a.createdAt && typeof (a.createdAt as any).toMillis === 'function' ? (a.createdAt as any).toMillis() : 0;
+      const dateB = b.createdAt && typeof (b.createdAt as any).toMillis === 'function' ? (b.createdAt as any).toMillis() : 0;
+      return dateB - dateA;
     });
 
     callback(tasks);

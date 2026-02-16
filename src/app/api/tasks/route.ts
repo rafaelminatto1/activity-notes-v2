@@ -21,7 +21,7 @@ export async function GET(req: Request) {
   const userId = user.uid;
 
   try {
-    let tasksQuery = query(
+    const tasksQuery = query(
       collection(db, "tasks"),
       where("userId", "==", userId),
       orderBy("createdAt", "desc"),

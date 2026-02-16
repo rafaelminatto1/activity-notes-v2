@@ -38,6 +38,8 @@ interface AIDropdownProps {
   onImprove: () => void;
   onSimplify: () => void;
   onFixSpelling: () => void;
+  onFormat?: () => void;
+  onCheckConsistency?: () => void;
   onTranslate: (language: string) => void;
   onChangeTone: (tone: string) => void;
   onFreePrompt: (prompt: string) => void;
@@ -69,6 +71,8 @@ export function AIDropdown({
   onImprove,
   onSimplify,
   onFixSpelling,
+  onFormat,
+  onCheckConsistency,
   onTranslate,
   onChangeTone,
   onFreePrompt,
@@ -123,8 +127,20 @@ export function AIDropdown({
             <Eraser className="mr-2 h-4 w-4" />
             Simplificar
           </DropdownMenuItem>
+          {onFormat && (
+            <DropdownMenuItem onClick={onFormat} disabled={loading}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Formatar (Smart Cleanup)
+            </DropdownMenuItem>
+          )}
+          {onCheckConsistency && (
+            <DropdownMenuItem onClick={onCheckConsistency} disabled={loading}>
+              <CheckCheck className="mr-2 h-4 w-4" />
+              Verificar Consistência
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={onFixSpelling} disabled={loading}>
-            <CheckCheck className="mr-2 h-4 w-4" />
+            <Type className="mr-2 h-4 w-4" />
             Corrigir ortografia
           </DropdownMenuItem>
           <DropdownMenuSub>

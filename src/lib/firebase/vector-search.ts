@@ -5,7 +5,7 @@
 
 import { db } from './config';
 import { getAIClient } from '../firebase/ai-logic';
-import { collection, query as firestoreQuery, where, getDocs, limit, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, query as firestoreQuery, where, getDocs, doc, getDoc, updateDoc, type QueryConstraint } from 'firebase/firestore';
 
 export interface VectorSearchResult {
   documentId: string;
@@ -241,7 +241,7 @@ export async function contextualSearch(
     const contextData = contextDoc.data();
 
     // 2. Buscar documentos do mesmo workspace ou categoria
-    const whereClauses: any[] = [
+    const whereClauses: QueryConstraint[] = [
       where('userId', '==', userId),
       where('vectorEmbedding', '!=', null),
     ];
@@ -409,7 +409,7 @@ export async function batchUpdateEmbeddings(
   console.log(`[VectorSearch] Updated embeddings for ${documents.length} documents`);
 }
 
-export default {
+const vectorSearchUtils = {
   vectorSearch,
   hybridSearch,
   contextualSearch,
@@ -417,3 +417,5 @@ export default {
   updateDocumentEmbedding,
   batchUpdateEmbeddings,
 };
+
+export default vectorSearchUtils;

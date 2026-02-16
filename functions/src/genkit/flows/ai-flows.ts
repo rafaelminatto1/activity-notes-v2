@@ -667,6 +667,136 @@ export const extractCodeFlow = ai.defineFlow({
 });
 
 // ============================================================
+// 23. Check Consistency Flow
+// ============================================================
+
+export const checkConsistencyFlow = ai.defineFlow({
+  name: 'checkConsistencyFlow',
+  inputSchema: z.object({
+    text: z.string(),
+    userId: z.string(),
+    documentId: z.string().optional(),
+  }),
+  outputSchema: z.object({
+    consistent: z.boolean(),
+    issues: z.array(z.object({
+      claim: z.string(),
+      contradiction: z.string(),
+      sourceDocumentId: z.string(),
+      sourceTitle: z.string(),
+    })),
+  }),
+}, async ({ text, userId, documentId }) => {
+  // 1. Encontrar notas relacionadas (usando contextual search logic)
+  const related = await contextualSearchFlow({
+    text,
+    documentId,
+    userId,
+    maxResults: 3, // Comparar com top 3 mais relevantes
+  });
+
+  if (related.relatedDocuments.length === 0) {
+    return { consistent: true, issues: [] };
+  }
+
+  // 2. Construir contexto para LLM verificar
+  const comparisonContext = related.relatedDocuments
+    .map(doc => `Nota "${doc.title}" (ID: ${doc.documentId}):\n${doc.excerpt}`)
+    .join('\n\n');
+
+  // 3. Perguntar ao LLM
+  const { output } = await ai.generate({
+    prompt: `Analise o texto atual e compare com as notas relacionadas abaixo. Identifique se há CONTRADIÇÕES factuais diretas (ex: datas, valores, nomes diferentes para a mesma coisa).
+    
+    Texto Atual:
+    ${text}
+
+    Notas Relacionadas:
+    ${comparisonContext}
+
+    Retorne apenas contradições claras. Se não houver, retorne consistent: true.
+    Formato JSON: consistent (bool), issues (array de objetos: claim (no texto atual), contradiction (na nota antiga), sourceDocumentId, sourceTitle).`,
+    output: { format: 'json' },
+  });
+
+  return output || { consistent: true, issues: [] };
+});
+
+export const generateGraphDataFlow = ai.defineFlow({
+  name: 'generateGraphDataFlow',
+  inputSchema: z.object({
+    userId: z.string(),
+  }),
+  outputSchema: z.object({
+    nodes: z.array(z.object({
+      id: z.string(),
+      label: z.string(),
+      group: z.string().optional(),
+    })),
+    edges: z.array(z.object({
+      source: z.string(),
+      target: z.string(),
+      value: z.number(),
+    })),
+  }),
+}, async ({ userId }) => {
+  // 1. Buscar todos os documentos com embeddings
+  const snapshot = await db
+    .collection('documents')
+    .where('userId', '==', userId)
+    .where('vectorEmbedding', '!=', null)
+    .limit(100) // Limite para evitar timeout/memória
+    .get();
+
+  const docs = snapshot.docs.map(doc => ({
+    id: doc.id,
+    data: doc.data(),
+    embedding: doc.data().vectorEmbedding as number[],
+  }));
+
+  const nodes = docs.map(doc => ({
+    id: doc.id,
+    label: doc.data.title || 'Sem título',
+    group: doc.data.category || 'general',
+  }));
+
+  const edges: { source: string; target: string; value: number }[] = [];
+
+  // 2. Calcular similaridade todos-contra-todos (O(n^2) simplificado)
+  // Em produção, usar algoritmos mais eficientes ou pré-processamento
+  for (let i = 0; i < docs.length; i++) {
+    for (let j = i + 1; j < docs.length; j++) {
+      const docA = docs[i];
+      const docB = docs[j];
+
+      // Cosine similarity
+      let dotProduct = 0;
+      let magnitudeA = 0;
+      let magnitudeB = 0;
+
+      for (let k = 0; k < docA.embedding.length; k++) {
+        dotProduct += docA.embedding[k] * docB.embedding[k];
+        magnitudeA += docA.embedding[k] * docA.embedding[k];
+        magnitudeB += docB.embedding[k] * docB.embedding[k];
+      }
+
+      const similarity = dotProduct / (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB));
+
+      // Se similaridade > 0.75, criar aresta
+      if (similarity > 0.75) {
+        edges.push({
+          source: docA.id,
+          target: docB.id,
+          value: similarity,
+        });
+      }
+    }
+  }
+
+  return { nodes, edges };
+});
+
+// ============================================================
 // 20. Format Note Flow
 // ============================================================
 
@@ -690,5 +820,90 @@ export const formatNoteFlow = ai.defineFlow({
     formatted: text,
     structure: [],
     suggestions: [],
+  };
+});
+
+// ============================================================
+// 21. Contextual Search Flow
+// ============================================================
+
+export const contextualSearchFlow = ai.defineFlow({
+  name: 'contextualSearchFlow',
+  inputSchema: z.object({
+    text: z.string(),
+    documentId: z.string().optional(),
+    userId: z.string(),
+    maxResults: z.number().default(5),
+  }),
+  outputSchema: z.object({
+    relatedDocuments: z.array(z.object({
+      documentId: z.string(),
+      title: z.string(),
+      excerpt: z.string(),
+      relevanceScore: z.number(),
+      reason: z.string().optional(),
+    })),
+  }),
+}, async ({ text, documentId, userId, maxResults }) => {
+  // 1. Gerar embedding
+  const { text: embeddingJson } = await ai.generate({
+    prompt: `Converta o texto abaixo em um vetor de embedding numérico. Retorne apenas um array JSON de números com 768 dimensões.
+
+Texto: ${text.slice(0, 1000)}`, // Limitar tamanho do texto para embedding
+  });
+
+  let embedding: number[] = [];
+  try {
+    embedding = JSON.parse(embeddingJson.trim());
+  } catch (e) {
+    // Fallback simplificado
+    embedding = new Array(768).fill(0);
+    const hash = text.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    for (let i = 0; i < embedding.length; i++) {
+      embedding[i] = ((hash * (i + 1)) % 100) / 100 - 0.5;
+    }
+  }
+
+  const documentsSnapshot = await db
+    .collection('documents')
+    .where('userId', '==', userId)
+    .where('vectorEmbedding', '!=', null)
+    .limit(20) // Buscar mais para filtrar depois
+    .get();
+
+  // Calcular similaridade
+  const relatedDocs = documentsSnapshot.docs
+    .map(doc => {
+      if (doc.id === documentId) return null; // Excluir documento atual
+
+      const data = doc.data();
+      const docEmbedding = data.vectorEmbedding as number[];
+
+      // Cosine similarity
+      let dotProduct = 0;
+      let magnitudeA = 0;
+      let magnitudeB = 0;
+
+      for (let i = 0; i < Math.min(embedding.length, docEmbedding.length); i++) {
+        dotProduct += embedding[i] * docEmbedding[i];
+        magnitudeA += embedding[i] * embedding[i];
+        magnitudeB += docEmbedding[i] * docEmbedding[i];
+      }
+
+      const similarity = dotProduct / (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB));
+
+      return {
+        documentId: doc.id,
+        title: data.title || 'Sem título',
+        excerpt: (data.plainText || '').slice(0, 150) + '...',
+        relevanceScore: similarity,
+      };
+    })
+    .filter((doc): doc is NonNullable<typeof doc> => doc !== null && doc.relevanceScore > 0.6)
+    .sort((a, b) => b.relevanceScore - a.relevanceScore)
+    .slice(0, maxResults);
+
+  return {
+    relatedDocuments: relatedDocs,
   };
 });

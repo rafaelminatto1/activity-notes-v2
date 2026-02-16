@@ -33,6 +33,9 @@ import {
   Lightbulb,
   Languages,
   PenLine,
+  Mail,
+  Calendar,
+  Network,
 } from "lucide-react";
 
 interface SlashCommandItem {
@@ -147,6 +150,74 @@ function getSlashCommandItems(onImageUpload: () => void): SlashCommandItem[] {
       icon: Minus,
       category: "AVANÇADO",
       command: (editor) => editor.chain().focus().setHorizontalRule().run(),
+    },
+    // AÇÕES
+    {
+      title: "Email",
+      description: "Rascunho de email",
+      icon: Mail,
+      category: "AÇÕES",
+      command: (editor) => {
+        editor.chain().focus().insertContent(`
+          <h3>Assunto: [Assunto do Email]</h3>
+          <p>Olá [Nome],</p>
+          <p>[Corpo do email...]</p>
+          <p>Atenciosamente,<br/>[Seu Nome]</p>
+        `).run();
+      },
+    },
+    {
+      title: "Agenda",
+      description: "Pauta de reunião",
+      icon: Calendar,
+      category: "AÇÕES",
+      command: (editor) => {
+        editor.chain().focus().insertContent(`
+          <h3>📅 Pauta da Reunião</h3>
+          <p><strong>Data:</strong> [Data]</p>
+          <p><strong>Participantes:</strong> [Nomes]</p>
+          <h4>Tópicos:</h4>
+          <ul>
+            <li>[Tópico 1]</li>
+            <li>[Tópico 2]</li>
+          </ul>
+          <h4>Ações:</h4>
+          <ul data-type="taskList">
+            <li data-type="taskItem" data-checked="false"><div>[Ação 1]</div></li>
+          </ul>
+        `).run();
+      },
+    },
+    {
+      title: "Conectar Agenda",
+      description: "Importar evento do Calendar",
+      icon: Calendar,
+      category: "AÇÕES",
+      command: (editor) => {
+        // Placeholder para integração real
+        // Idealmente abriria um modal para selecionar o evento
+        editor.chain().focus().insertContent(`
+          <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 my-4">
+            <h3 class="text-blue-800 font-bold flex items-center gap-2">
+              📅 Reunião: [Nome do Evento]
+            </h3>
+            <p class="text-sm text-blue-600">Conecte sua conta Google para sincronizar eventos.</p>
+            <ul class="list-disc pl-5 mt-2 space-y-1 text-sm text-blue-800">
+              <li><strong>Participantes:</strong> ...</li>
+              <li><strong>Data:</strong> ${new Date().toLocaleDateString()}</li>
+            </ul>
+          </div>
+        `).run();
+      },
+    },
+    {
+      title: "Ver Grafo",
+      description: "Abrir visualização de grafo",
+      icon: Network,
+      category: "AÇÕES",
+      command: () => {
+        window.open("/graph", "_blank");
+      },
     },
     // IA
     {

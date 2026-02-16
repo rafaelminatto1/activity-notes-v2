@@ -24,7 +24,7 @@ export async function saveEmbedding(userId: string, documentId: string, vector: 
     userId,
     vector,
     model: "text-embedding-004",
-    updatedAt: serverTimestamp() as any,
+    updatedAt: serverTimestamp() as unknown as any, // Type assertion for compatibility
   };
 
   const docRef = doc(db, EMBEDDINGS_COLLECTION, documentId);
@@ -34,7 +34,7 @@ export async function saveEmbedding(userId: string, documentId: string, vector: 
 export async function getEmbedding(documentId: string): Promise<Embedding | null> {
   const docRef = doc(db, EMBEDDINGS_COLLECTION, documentId);
   const snap = await getDoc(docRef);
-  
+
   if (!snap.exists()) return null;
   return { id: snap.id, ...snap.data() } as Embedding;
 }

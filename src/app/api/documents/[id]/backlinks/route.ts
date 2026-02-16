@@ -32,7 +32,7 @@ export async function PATCH(
     const body: BacklinkRequest = await req.json();
     const currentBacklinks = docSnap.data().backlinks || [];
 
-    let updateData: any = {};
+    const updateData: any = {};
 
     if (body.addBacklink) {
       // Add backlink if not already present

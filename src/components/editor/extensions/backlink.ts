@@ -4,15 +4,6 @@ import { PluginKey } from "@tiptap/pm/state";
 
 const mentionPluginKey = new PluginKey("mention");
 
-// ============================================================
-// Backlink Extension - Bi-directional linking using [[note]]
-// ============================================================
-
-export interface MentionNodeAttrs {
-  id: string;
-  label: string;
-}
-
 export const BacklinkExtension = Node.create({
   name: "mention",
 
@@ -42,13 +33,6 @@ export const BacklinkExtension = Node.create({
           label: node.getAttribute("data-label"),
         }),
       },
-      {
-        tag: "span[data-type=mention]",
-        getAttrs: (node: any) => ({
-          id: node.getAttribute("data-id"),
-          label: node.getAttribute("data-label"),
-        }),
-      },
     ];
   },
 
@@ -56,13 +40,12 @@ export const BacklinkExtension = Node.create({
     return [
       "span",
       mergeAttributes({
-        class: "mention bg-primary/10 text-primary px-1.5 py-0.5 rounded cursor-pointer hover:bg-primary/20 transition-colors",
+        class: "mention bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-1.5 py-0.5 rounded cursor-pointer hover:bg-emerald-200 transition-colors font-medium border border-emerald-200 dark:border-emerald-800",
         "data-mention": "true",
-        "data-type": "mention",
         "data-id": node.attrs.id,
         "data-label": node.attrs.label,
       }),
-      node.attrs.label || node.attrs.id,
+      `@${node.attrs.label}`,
     ];
   },
 
@@ -72,17 +55,12 @@ export const BacklinkExtension = Node.create({
         char: "[[",
         pluginKey: mentionPluginKey,
         editor: this.editor,
-        allow: ({ editor }: { editor: any }) => {
-          const isCodeBlock = editor.state.doc.firstChild?.type.name === "codeBlock";
-          const isWithinCodeBlock = editor.state.selection.$from.parent.type.name === "codeBlock";
-          return !isCodeBlock && !isWithinCodeBlock;
-        },
-        command: ({ editor, range, props }: { editor: any; range: any; props: any }) => {
+        command: ({ editor, range, props }) => {
           editor
             .chain()
             .focus()
             .deleteRange(range)
-            .insertContentAt(range, [
+            .insertContent([
               {
                 type: this.name,
                 attrs: props,
@@ -94,25 +72,17 @@ export const BacklinkExtension = Node.create({
             ])
             .run();
         },
-        items: async ({ query }: { query: string }) => {
-          if (!query || query.length < 2) return [];
-
+        items: async ({ query }) => {
+          if (!query) return [];
           try {
-            const response = await fetch(`/api/search?type=semantic&search=${encodeURIComponent(query)}`);
+            const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&type=basic`);
             if (!response.ok) return [];
-
-            const result = await response.json();
-            const docs = result.data || [];
-
-            return docs
-              .filter((doc: any) => doc.documentTitle?.toLowerCase().includes(query.toLowerCase()))
-              .slice(0, 10)
-              .map((doc: any) => ({
-                id: doc.id || doc.documentId,
-                label: doc.documentTitle || "Sem titulo",
-              }));
-          } catch (error) {
-            console.error("Failed to fetch mentions:", error);
+            const json = await response.json();
+            return json.results.map((item: any) => ({
+              id: item.documentId,
+              label: item.title,
+            }));
+          } catch (e) {
             return [];
           }
         },
@@ -123,22 +93,19 @@ export const BacklinkExtension = Node.create({
             onStart: (props: any) => {
               component = document.createElement("div");
               component.className = "absolute z-50 bg-popover border rounded-md shadow-lg p-1 max-h-60 overflow-y-auto w-64";
-              props.clientRect && component.style.setProperty("top", `${props.clientRect.top + 30}px`);
-              props.clientRect && component.style.setProperty("left", `${props.clientRect.left}px`);
+              if (props.clientRect) {
+                const rect = props.clientRect();
+                component.style.setProperty("top", `${rect.bottom + 5}px`);
+                component.style.setProperty("left", `${rect.left}px`);
+              }
               document.body.appendChild(component);
             },
             onUpdate: (props: any) => {
               if (component && props.clientRect) {
-                component.style.setProperty("top", `${props.clientRect.top + 30}px`);
-                component.style.setProperty("left", `${props.clientRect.left}px`);
+                const rect = props.clientRect();
+                component.style.setProperty("top", `${rect.bottom + 5}px`);
+                component.style.setProperty("left", `${rect.left}px`);
               }
-            },
-            onKeyDown: (props: any) => {
-              if (props.event.key === "Escape") {
-                props.editor.view.focus();
-                return true;
-              }
-              return false;
             },
             onExit: () => {
               if (component) {

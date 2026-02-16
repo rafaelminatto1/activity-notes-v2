@@ -8,6 +8,10 @@ import {
 } from "firebase/firestore";
 import { getStorage, connectStorageEmulator, type FirebaseStorage } from "firebase/storage";
 import { getAnalytics, type Analytics } from "firebase/analytics";
+import { getDatabase, connectDatabaseEmulator, type Database } from "firebase/database";
+import { getRemoteConfig, type RemoteConfig } from "firebase/remote-config";
+import { getMessaging, type Messaging } from "firebase/messaging";
+import { getFunctions, connectFunctionsEmulator, type Functions } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,6 +20,7 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
 };
 
 function getFirebaseApp(): FirebaseApp | null {
@@ -35,6 +40,10 @@ const app = getFirebaseApp();
 export const auth: Auth | null = app ? getAuth(app) : null;
 export const db: Firestore | null = app ? initializeFirestore(app, firestoreSettings) : null;
 export const storage: FirebaseStorage | null = app ? getStorage(app) : null;
+export const rtdb: Database | null = app ? getDatabase(app) : null;
+export const remoteConfig: RemoteConfig | null = app && typeof window !== 'undefined' ? getRemoteConfig(app) : null;
+export const messaging: Messaging | null = app && typeof window !== 'undefined' ? getMessaging(app) : null;
+export const functions: Functions | null = app ? getFunctions(app, "southamerica-east1") : null;
 
 // Analytics — browser-only, only if measurement ID is configured
 export const analytics: Analytics | null =
@@ -49,6 +58,7 @@ if (typeof window !== "undefined" && app) {
   const authHost = process.env.NEXT_PUBLIC_AUTH_EMULATOR_HOST;
   const firestoreHost = process.env.NEXT_PUBLIC_FIRESTORE_EMULATOR_HOST;
   const storageHost = process.env.NEXT_PUBLIC_STORAGE_EMULATOR_HOST;
+  const functionsHost = process.env.NEXT_PUBLIC_FUNCTIONS_EMULATOR_HOST;
 
   if (authHost && auth) {
     connectAuthEmulator(auth, `http://${authHost}`, { disableWarnings: true });
@@ -60,6 +70,10 @@ if (typeof window !== "undefined" && app) {
   if (storageHost && storage) {
     const [host, port] = storageHost.split(":");
     connectStorageEmulator(storage, host, parseInt(port, 10));
+  }
+  if (functionsHost && functions) {
+    const [host, port] = functionsHost.split(":");
+    connectFunctionsEmulator(functions, host, parseInt(port, 10));
   }
 }
 

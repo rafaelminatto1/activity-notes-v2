@@ -8,6 +8,7 @@ import { subscribeToDocument, updateDocument, restoreDocument } from "@/lib/fire
 import { useAuth } from "@/hooks/use-auth";
 import { useEditorStore } from "@/stores/editor-store";
 import { CoverImage, AddCoverButton } from "@/components/shared/cover-image";
+import { ExecutiveSummary } from "@/components/ai/executive-summary";
 import { IconPicker } from "@/components/shared/icon-picker";
 import { DocumentToolbar } from "@/components/shared/document-toolbar";
 import { AIPanel } from "@/components/ai/ai-panel";
@@ -18,6 +19,7 @@ import type { Document } from "@/types/document";
 import type { JSONContent, Editor as TiptapEditor } from "@tiptap/core";
 import type { useEditorAI } from "@/hooks/use-editor-ai";
 import { useCollaborationStore } from "@/stores/collaboration-store";
+import { ContextualSidebar } from "@/components/ai/contextual-sidebar";
 
 const Editor = dynamic(
   () => import("@/components/editor/editor").then((mod) => mod.Editor),
@@ -45,6 +47,7 @@ export default function DocumentPage() {
 
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentText, setCurrentText] = useState("");
 
   // Local editable state
   const [title, setTitle] = useState("");
@@ -168,6 +171,7 @@ export default function DocumentPage() {
     (json: JSONContent, plainText: string) => {
       if (contentSaveTimerRef.current) clearTimeout(contentSaveTimerRef.current);
       contentSaveTimerRef.current = setTimeout(() => saveContent(json, plainText), AUTO_SAVE_DELAY);
+      setCurrentText(plainText);
     },
     [saveContent]
   );
@@ -233,65 +237,80 @@ export default function DocumentPage() {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      {/* Toolbar */}
-      <DocumentToolbar document={document} />
+    <div className="flex h-full flex-col bg-background/50">
+      {/* Header Fixo / Toolbar Superior */}
+      <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b">
+        <DocumentToolbar document={document} />
+      </header>
 
-      {/* Archived banner */}
-      {document.isArchived && (
-        <div className="flex items-center justify-center gap-2 bg-yellow-500/10 px-4 py-2 text-sm">
-          <AlertTriangle className="h-4 w-4 text-yellow-600" />
-          <span className="text-yellow-700 dark:text-yellow-400">
-            Este documento está na lixeira.
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-xs"
-            onClick={handleRestore}
-          >
-            <Undo2 className="mr-1 h-3.5 w-3.5" />
-            Restaurar
-          </Button>
+      {/* Área de Conteúdo Scrollable */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {/* Banner de Arquivamento */}
+        {document.isArchived && (
+          <div className="flex items-center justify-center gap-2 bg-yellow-500/10 px-4 py-2 text-sm border-b border-yellow-500/20">
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+            <span className="text-yellow-700 dark:text-yellow-400 font-medium">
+              Este documento está na lixeira.
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs bg-background hover:bg-yellow-500/10"
+              onClick={handleRestore}
+            >
+              <Undo2 className="mr-1 h-3.5 w-3.5" />
+              Restaurar
+            </Button>
+          </div>
+        )}
+
+        {/* Cover & Summary Layer */}
+        <div className="relative group">
+          <CoverImage
+            documentId={document.id}
+            coverImage={document.coverImage}
+          />
+          
+          <div className="transition-all duration-500 transform translate-y-[-20px] opacity-0 group-hover:opacity-100 group-hover:translate-y-0">
+             <ExecutiveSummary 
+                documentId={document.id} 
+                summary={document.summary} 
+                content={currentText}
+              />
+          </div>
         </div>
-      )}
 
-      {/* Content area */}
-      <div className="flex-1 overflow-y-auto">
-        {/* Cover Image */}
-        <CoverImage
-          documentId={document.id}
-          coverImage={document.coverImage}
-        />
+        <div className="mx-auto max-w-4xl px-6 sm:px-12 py-12 min-h-screen">
+          {/* Header do Documento (Icon + Title) */}
+          <div className="space-y-4 mb-8">
+            <div className="flex items-center gap-4 group/icon">
+              <IconPicker icon={document.icon} onChange={handleIconChange} />
+              {!document.coverImage && (
+                <div className="opacity-0 group-hover/icon:opacity-100 transition-opacity">
+                  <AddCoverButton documentId={document.id} />
+                </div>
+              )}
+            </div>
 
-        <div className="mx-auto max-w-6xl px-4 py-8">
-          {/* Icon + Action buttons */}
-          <div className="flex items-end gap-2 mb-2">
-            <IconPicker icon={document.icon} onChange={handleIconChange} />
-            {!document.coverImage && (
-              <AddCoverButton documentId={document.id} />
-            )}
+            <textarea
+              ref={titleRef}
+              value={title}
+              onChange={handleTitleChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  focusEditor();
+                }
+              }}
+              placeholder="Sem título"
+              className="w-full resize-none overflow-hidden bg-transparent text-5xl font-black tracking-tight outline-none placeholder:text-muted-foreground/20 focus:placeholder:text-muted-foreground/10 transition-all"
+              rows={1}
+              disabled={document.isArchived}
+            />
           </div>
 
-          {/* Title */}
-          <textarea
-            ref={titleRef}
-            value={title}
-            onChange={handleTitleChange}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                focusEditor();
-              }
-            }}
-            placeholder="Sem título"
-            className="w-full resize-none overflow-hidden bg-transparent text-4xl font-bold outline-none placeholder:text-muted-foreground/50"
-            rows={1}
-            disabled={document.isArchived}
-          />
-
-          {/* Rich text editor */}
-          <div ref={editorRef} className="mt-4">
+          {/* Editor Central */}
+          <div ref={editorRef} className="relative">
             {user && (
               <Editor
                 documentId={document.id}
@@ -307,7 +326,7 @@ export default function DocumentPage() {
         </div>
       </div>
 
-      {/* AI Panel */}
+      {/* Floating AI / Panels */}
       {aiRef.current && (
         <AIPanel
           onChat={handleChatWithAI}
@@ -317,6 +336,12 @@ export default function DocumentPage() {
           usage={aiRef.current.usage}
         />
       )}
+
+      <ContextualSidebar 
+        documentId={params.documentId} 
+        currentText={currentText}
+        editor={tiptapEditorRef.current}
+      />
     </div>
   );
 }

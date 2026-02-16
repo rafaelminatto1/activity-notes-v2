@@ -43,9 +43,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { AIDropdown } from "@/components/ai/editor-ai";
+import { AudioRecorder } from "./audio-recorder";
+import { ScanButton } from "./scan-button";
 
 interface ToolbarProps {
   editor: Editor;
+  documentId?: string;
   onImageUpload: () => void;
   aiProps: {
     onSummarize: () => void;
@@ -53,6 +56,8 @@ interface ToolbarProps {
     onImprove: () => void;
     onSimplify: () => void;
     onFixSpelling: () => void;
+    onFormat?: () => void;
+    onCheckConsistency?: () => void;
     onTranslate: (language: string) => void;
     onChangeTone: (tone: string) => void;
     onFreePrompt: (prompt: string) => void;
@@ -83,7 +88,7 @@ const highlightColors = [
   { label: "Vermelho", value: "#fecaca" },
 ];
 
-export function Toolbar({ editor, onImageUpload, aiProps }: ToolbarProps) {
+export function Toolbar({ editor, documentId, onImageUpload, aiProps }: ToolbarProps) {
   const editorState = useEditorState({
     editor,
     selector: (ctx) => ({
@@ -360,6 +365,27 @@ export function Toolbar({ editor, onImageUpload, aiProps }: ToolbarProps) {
       </Popover>
 
       <Separator orientation="vertical" className="mx-1 h-6" />
+
+      {/* Audio Recorder */}
+      {documentId && (
+        <>
+          <AudioRecorder
+            documentId={documentId}
+            onTranscriptionComplete={(data) => {
+              if (data.summary) {
+                editor.chain().focus().insertContent(`
+                  <blockquote>
+                    <strong>Resumo da Transcrição:</strong><br/>
+                    ${data.summary}
+                  </blockquote>
+                `).run();
+              }
+            }}
+          />
+          <ScanButton editor={editor} />
+          <Separator orientation="vertical" className="mx-1 h-6" />
+        </>
+      )}
 
       {/* AI */}
       <AIDropdown {...aiProps} />

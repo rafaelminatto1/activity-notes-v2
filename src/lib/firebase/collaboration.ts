@@ -3,15 +3,15 @@ import {
   doc,
   addDoc,
   updateDoc,
-  deleteDoc,
-  getDocs,
+  // deleteDoc,
+  // getDocs,
   query,
   where,
   serverTimestamp,
   getFirestore,
   onSnapshot,
-  arrayUnion,
-  arrayRemove,
+  // arrayUnion,
+  // arrayRemove,
   runTransaction,
 } from "firebase/firestore";
 import type { Collaborator } from "@/stores/collaboration-store";
@@ -19,7 +19,7 @@ import type { Collaborator } from "@/stores/collaboration-store";
 const db = getFirestore();
 
 // Interfaces
-interface Invitation {
+export interface Invitation {
   documentId: string;
   email: string;
   role: "editor" | "viewer";
@@ -38,7 +38,7 @@ export async function inviteUserToDocument(
   // Check if already invited or collaborator
   // For MVP, just add to a 'invitations' collection or update document 'collaborators' list directly if we assume trusted environment
   // A robust system would send an email. Here we'll simulate by adding to a subcollection 'invitations'
-  
+
   const invitationsRef = collection(db, "documents", documentId, "invitations");
   await addDoc(invitationsRef, {
     email,
@@ -78,10 +78,10 @@ export async function updatePresence(documentId: string, userId: string, userDat
   }).catch(async () => {
     // If doesn't exist, set it
     await runTransaction(db, async (t) => {
-       t.set(presenceDoc, {
-         ...userData,
-         lastActive: serverTimestamp(),
-       });
+      t.set(presenceDoc, {
+        ...userData,
+        lastActive: serverTimestamp(),
+      });
     });
   });
 }

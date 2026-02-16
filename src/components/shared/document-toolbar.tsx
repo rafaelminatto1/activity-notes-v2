@@ -25,6 +25,7 @@ import {
   archiveDocument,
 } from "@/lib/firebase/firestore";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -46,6 +47,10 @@ import { trackDocumentPublished } from "@/lib/firebase/analytics";
 import { toast } from "sonner";
 import { ShareDialog } from "@/components/collaboration/share-dialog";
 import type { Document } from "@/types/document";
+import { AutoTagButton } from "@/components/ai/auto-tag-button";
+import { LocationBadge } from "./location-badge";
+import { Collaborators } from "@/components/collaboration/collaborators";
+import { useCollaboration } from "@/hooks/use-collaboration";
 
 interface DocumentToolbarProps {
   document: Document;
@@ -54,6 +59,7 @@ interface DocumentToolbarProps {
 export function DocumentToolbar({ document }: DocumentToolbarProps) {
   const router = useRouter();
   const { user, userProfile, refreshProfile } = useAuth();
+  const { collaborators } = useCollaboration(document.id);
   const saveStatus = useEditorStore((s) => s.saveStatus);
   const toggleAIPanel = useAIStore((s) => s.togglePanel);
   const [shareOpen, setShareOpen] = useState(false);
@@ -171,6 +177,16 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
         {/* Share Button (Collaboration) */}
         <ShareDialog />
 
+        {/* Location */}
+        <LocationBadge documentId={document.id} initialLocation={(document as any).location} />
+
+        <Separator orientation="vertical" className="mx-2 h-4" />
+
+        {/* Presence Indicators */}
+        <Collaborators users={collaborators} />
+
+        <Separator orientation="vertical" className="mx-2 h-4" />
+
         {/* Publish */}
         <Button
           variant="ghost"
@@ -184,6 +200,9 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
           <Globe className="mr-1 h-3.5 w-3.5" />
           {document.isPublished ? "Publicado" : "Publicar"}
         </Button>
+
+        {/* Auto Tag */}
+        <AutoTagButton documentId={document.id} content={document.plainText || ""} />
 
         {/* AI Panel toggle */}
         <Button

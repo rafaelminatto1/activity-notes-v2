@@ -12,9 +12,11 @@ import {
   ReCaptchaV3Provider,
   getToken,
   onTokenChanged,
+  AppCheck,
+  AppCheckTokenResult,
 } from 'firebase/app-check';
 
-let appCheckInstance: any = null;
+let appCheckInstance: AppCheck | null = null;
 
 /**
  * Inicializa o Firebase App Check
@@ -72,7 +74,7 @@ export function onAppCheckTokenChanged(
     return;
   }
 
-  onTokenChanged(appCheckInstance, (token: any) => {
+  onTokenChanged(appCheckInstance, (token: AppCheckTokenResult) => {
     const tokenValue = token ? token.token : null;
     callback(tokenValue);
   });
@@ -106,10 +108,12 @@ export function isAppCheckAvailable(): boolean {
   return appCheckInstance !== null;
 }
 
-export default {
+const appCheckUtils = {
   initializeAppCheck,
   getAppCheckToken,
   onAppCheckTokenChanged,
   fetchWithAppCheck,
   isAppCheckAvailable,
 };
+
+export default appCheckUtils;

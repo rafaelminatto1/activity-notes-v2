@@ -109,7 +109,7 @@ export async function GET(req: Request) {
 
       case "filters": {
         // Filter documents by tags, status, priority, due date
-        let queryBuilder = collection(db, "documents");
+        const queryBuilder = collection(db, "documents");
         const filters: any[] = [];
 
         filters.push(where("userId", "==", userId));
