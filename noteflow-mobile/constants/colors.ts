@@ -1,0 +1,46 @@
+export const Colors = {
+  light: {
+    primary: '#6366f1',
+    primaryLight: '#818cf8',
+    primaryDark: '#4f46e5',
+    background: '#ffffff',
+    surface: '#f5f5f5',
+    surfaceSecondary: '#fafafa',
+    text: '#1a1a1a',
+    textSecondary: '#525252',
+    textMuted: '#a1a1aa',
+    border: '#e5e5e5',
+    borderLight: '#f0f0f0',
+    success: '#22c55e',
+    warning: '#f59e0b',
+    error: '#ef4444',
+    card: '#ffffff',
+    icon: '#71717a',
+    tabBar: '#ffffff',
+    tabBarBorder: '#e5e5e5',
+  },
+  dark: {
+    primary: '#818cf8',
+    primaryLight: '#a5b4fc',
+    primaryDark: '#6366f1',
+    background: '#0a0a0a',
+    surface: '#171717',
+    surfaceSecondary: '#1a1a1a',
+    text: '#f5f5f5',
+    textSecondary: '#d4d4d4',
+    textMuted: '#71717a',
+    border: '#333333',
+    borderLight: '#262626',
+    success: '#22c55e',
+    warning: '#f59e0b',
+    error: '#ef4444',
+    card: '#171717',
+    icon: '#a1a1aa',
+    tabBar: '#0a0a0a',
+    tabBarBorder: '#262626',
+  },
+} as const;
+
+export type ThemeColors = {
+  [K in keyof typeof Colors.light]: string;
+};
