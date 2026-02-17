@@ -53,20 +53,14 @@ service cloud.firestore {
     function checkPermission(workspaceId, resource, action) {
       let member = getMemberData(workspaceId, request.auth.uid);
       let roleId = member.roleId;
-      // Admin check
-      if (roleId == "admin") { return true; }
-      // Editor check (simple implementation for rules)
-      if (roleId == "editor") {
-        return (resource == "documents" && (action in ["read", "create", "update"]))
-               || (resource == "tasks" && (action in ["read", "create", "update", "delete"]))
-               || (resource == "projects" && (action in ["read", "update"]));
-      }
-      // Viewer check
-      if (roleId == "viewer") {
-        return action == "read";
-      }
-      // Fallback or custom roles would require more complex get() calls
-      return false;
+      
+      return (roleId == "admin")
+        || (roleId == "editor" && (
+             (resource == "documents" && (action in ["read", "create", "update"]))
+             || (resource == "tasks" && (action in ["read", "create", "update", "delete"]))
+             || (resource == "projects" && (action in ["read", "update"]))
+           ))
+        || (roleId == "viewer" && action == "read");
     }
 
     // Allow admins full access
@@ -410,6 +404,38 @@ service cloud.firestore {
     // ============================================================
     match /users/{userId}/aiUsage/{usageId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ============================================================
+    // API Keys Collection
+    // ============================================================
+    match /api_keys/{keyId} {
+      allow read, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // ============================================================
+    // Webhooks Collection
+    // ============================================================
+    match /webhooks/{webhookId} {
+      allow read, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    match /webhook_logs/{logId} {
+      allow read: if isAuthenticated() && get(/databases/$(database)/documents/webhooks/$(resource.data.webhookId)).data.userId == request.auth.uid;
+      allow create: if isAuthenticated(); // Triggered by API
+    }
+
+    // ============================================================
+    // Portfolios Collection
+    // ============================================================
+    match /portfolios/{portfolioId} {
+      allow read, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
   }
 }

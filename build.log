@@ -1,0 +1,80 @@
+
+> activitynotes@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /home/rafael/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /home/rafael/Documentos/Claude/Activity-notes/activitynotes/package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+- Experiments (use with caution):
+  ✓ useCache
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 13.5s
+  Running TypeScript ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/31) ...
+  Generating static pages using 15 workers (7/31) 
+  Generating static pages using 15 workers (15/31) 
+  Generating static pages using 15 workers (23/31) 
+✓ Generating static pages using 15 workers (31/31) in 499.7ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/ai
+├ ƒ /api/ai/search
+├ ƒ /api/documents/[id]/backlinks
+├ ƒ /api/documents/[id]/mentioned-by
+├ ƒ /api/genkit
+├ ƒ /api/search
+├ ƒ /api/tags
+├ ƒ /api/tasks
+├ ƒ /api/tasks/[id]
+├ ƒ /api/templates
+├ ƒ /api/v1/documents
+├ ƒ /api/v1/documents/[id]
+├ ƒ /api/v1/projects
+├ ƒ /api/v1/projects/[id]
+├ ƒ /api/v1/tasks
+├ ƒ /api/v1/tasks/[id]
+├ ƒ /api/webclip
+├ ○ /canvas
+├ ○ /dashboard
+├ ○ /documents
+├ ƒ /documents/[documentId]
+├ ○ /goals
+├ ƒ /goals/[goalId]
+├ ○ /graph
+├ ○ /invite
+├ ○ /login
+├ ○ /portfolios
+├ ƒ /portfolios/[portfolioId]
+├ ƒ /preview/[documentId]
+├ ƒ /projects/[projectId]/automations
+├ ƒ /projects/[projectId]/chat
+├ ƒ /projects/[projectId]/gantt
+├ ƒ /projects/[projectId]/sprints
+├ ○ /register
+├ ○ /settings
+├ ○ /settings/api
+├ ○ /settings/appearance
+├ ○ /settings/roles
+├ ○ /settings/templates
+├ ○ /settings/webhooks
+├ ƒ /spaces/[spaceId]/lists/[listId]
+└ ○ /trash
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

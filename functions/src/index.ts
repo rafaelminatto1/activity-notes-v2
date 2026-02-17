@@ -379,8 +379,3 @@ async function deleteStorageUrl(url: string): Promise<void> {
   }
 }
 
-// ============================================================
-// Search Sync (Algolia)
-// ============================================================
-export * from "./search-sync";
-

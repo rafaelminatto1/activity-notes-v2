@@ -21,6 +21,8 @@ vi.mock("next/navigation", () => ({
     refresh: vi.fn(),
     prefetch: vi.fn(),
   }),
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => "/",
 }));
 
 vi.mock("@/lib/firebase/firestore", () => ({
@@ -113,7 +115,7 @@ describe("DocumentsPage", () => {
     await user.click(screen.getByText("Nova página"));
 
     await waitFor(() => {
-      expect(mockCreateDocument).toHaveBeenCalledWith("test-user-123");
+      expect(mockCreateDocument).toHaveBeenCalledWith("test-user-123", expect.objectContaining({ projectId: null }));
       expect(mockPush).toHaveBeenCalledWith("/documents/new-doc-id");
     });
   });
