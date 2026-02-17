@@ -93,9 +93,9 @@ export default function AppearanceSettingsPage() {
         aiEnabled: userProfile?.settings?.aiEnabled ?? true,
         aiPreferredModel: (userProfile?.settings?.aiPreferredModel as "flash" | "pro") || "flash",
         aiResponseLanguage: userProfile?.settings?.aiResponseLanguage || "pt-BR",
-        colorPalette: currentPalette,
-        density: currentDensity,
-        editorFont: currentFont,
+        colorPalette: currentPalette as any,
+        density: currentDensity as any,
+        editorFont: currentFont as any,
       };
       
       await updateUserProfile(user.uid, { settings: newSettings });

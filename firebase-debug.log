@@ -1,0 +1,400 @@
+[debug] [2026-02-17T21:25:41.348Z] ----------------------------------------------------------------------
+[debug] [2026-02-17T21:25:41.351Z] Command:       /home/rafael/.nvm/versions/node/v20.20.0/bin/node /home/rafael/.local/share/pnpm/global/5/.pnpm/firebase-tools@15.5.1_@types+node@25.0.10_encoding@0.1.13_hono@4.11.5_typescript@5.9.3/node_modules/firebase-tools/lib/bin/firebase.js deploy --only firestore,hosting
+[debug] [2026-02-17T21:25:41.351Z] CLI Version:   15.5.1
+[debug] [2026-02-17T21:25:41.351Z] Platform:      linux
+[debug] [2026-02-17T21:25:41.351Z] Node Version:  v20.20.0
+[debug] [2026-02-17T21:25:41.351Z] Time:          Tue Feb 17 2026 18:25:41 GMT-0300 (Horário Padrão de Brasília)
+[debug] [2026-02-17T21:25:41.352Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-02-17T21:25:42.312Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-02-17T21:25:42.313Z] > authorizing via signed-in user (activityfisioterapiamooca@gmail.com)
+[debug] [2026-02-17T21:25:42.313Z] [iam] checking project fisioflow-migration for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-02-17T21:25:42.314Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:42.314Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:42.315Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions [none]
+[debug] [2026-02-17T21:25:42.315Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions  x-goog-user-project=fisioflow-migration
+[debug] [2026-02-17T21:25:42.315Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-02-17T21:25:43.536Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions 200
+[debug] [2026-02-17T21:25:43.536Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-02-17T21:25:43.536Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:43.537Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:43.537Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration [none]
+[debug] [2026-02-17T21:25:44.245Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration 200
+[debug] [2026-02-17T21:25:44.245Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration {"projectId":"fisioflow-migration","projectNumber":"412418905255","displayName":"fisioflow-migration","name":"projects/fisioflow-migration","resources":{"hostingSite":"fisioflow-migration","realtimeDatabaseInstance":"fisioflow-migration-default-rtdb"},"state":"ACTIVE","etag":"1_79894793-5f3a-401d-a486-4cbc96856fb3"}
+[debug] [2026-02-17T21:25:45.798Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:45.798Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:45.798Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites pageToken=&pageSize=10
+[debug] [2026-02-17T21:25:47.421Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites 200
+[debug] [2026-02-17T21:25:47.421Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites {"sites":[{"name":"projects/fisioflow-migration/sites/fisioflow-activity-lab","defaultUrl":"https://fisioflow-activity-lab.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes","defaultUrl":"https://fisioflow-activity-notes.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes-v2","defaultUrl":"https://fisioflow-activity-notes-v2.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-migration","defaultUrl":"https://fisioflow-migration.web.app","type":"DEFAULT_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-notes-legacy","defaultUrl":"https://fisioflow-notes-legacy.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-patient","defaultUrl":"https://fisioflow-patient.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-professional","defaultUrl":"https://fisioflow-professional.web.app","type":"USER_SITE"}]}
+[debug] [2026-02-17T21:25:47.422Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:47.422Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:47.422Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites 
+[debug] [2026-02-17T21:25:48.042Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites 200
+[debug] [2026-02-17T21:25:48.042Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites {"sites":[{"name":"projects/fisioflow-migration/sites/fisioflow-activity-lab","defaultUrl":"https://fisioflow-activity-lab.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes","defaultUrl":"https://fisioflow-activity-notes.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes-v2","defaultUrl":"https://fisioflow-activity-notes-v2.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-migration","defaultUrl":"https://fisioflow-migration.web.app","type":"DEFAULT_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-notes-legacy","defaultUrl":"https://fisioflow-notes-legacy.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-patient","defaultUrl":"https://fisioflow-patient.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-professional","defaultUrl":"https://fisioflow-professional.web.app","type":"USER_SITE"}]}
+[debug] [2026-02-17T21:25:48.042Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:48.042Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:48.042Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration/webApps/-/config [none]
+[debug] [2026-02-17T21:25:48.649Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration/webApps/-/config 200
+[debug] [2026-02-17T21:25:48.649Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration/webApps/-/config {"projectId":"fisioflow-migration","databaseURL":"https://fisioflow-migration-default-rtdb.firebaseio.com","storageBucket":"fisioflow-migration.firebasestorage.app","apiKey":"AIzaSyA59PyvjZrqUtB1UuYkM0mmFvey_SSlYmI","authDomain":"fisioflow-migration.firebaseapp.com","messagingSenderId":"412418905255","projectNumber":"412418905255","version":"2"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+   The integration is known to work with Next.js version 12 - 15.0. You may encounter errors.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[debug] [2026-02-17T21:25:52.052Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:52.053Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:25:52.053Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites/fisioflow-migration [none]
+[debug] [2026-02-17T21:25:52.642Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites/fisioflow-migration 200
+[debug] [2026-02-17T21:25:52.642Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites/fisioflow-migration {"name":"projects/fisioflow-migration/sites/fisioflow-migration","defaultUrl":"https://fisioflow-migration.web.app","type":"DEFAULT_SITE"}
+[info] ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /home/rafael/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /home/rafael/Documentos/Claude/Activity-notes/activitynotes/package-lock.json
+
+
+[info] ▲ Next.js 16.1.6 (Turbopack)
+
+[info] - Environments: .env.local
+- Experiments (use with caution):
+  ✓ useCache
+
+
+[info] ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+
+[info]   Creating an optimized production build ...
+
+[info] 
+
+[info] > Build error occurred
+
+[info] Error: Turbopack build failed with 6 errors:
+./Documentos/Claude/Activity-notes/activitynotes/node_modules/@tiptap/html/dist/server/index.js:7:1
+Module not found: Can't resolve 'happy-dom'
+   5 | // src/server/getHTMLFromFragment.ts
+   6 | import { DOMSerializer } from "@tiptap/pm/model";
+>  7 | import { Window } from "happy-dom";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 | function getHTMLFromFragment(doc, schema, options) {
+   9 |   if (options == null ? void 0 : options.document) {
+  10 |     const wrap = options.document.createElement("div");
+
+
+
+Import trace:
+  App Route:
+    ./Documentos/Claude/Activity-notes/activitynotes/node_modules/@tiptap/html/dist/server/index.js
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/api/webclip/route.ts
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./Documentos/Claude/Activity-notes/activitynotes/node_modules/@tiptap/html/dist/server/index.js:53:1
+Module not found: Can't resolve 'happy-dom'
+  51 | import { getSchema as getSchema2 } from "@tiptap/core";
+  52 | import { DOMParser as PMDOMParser } from "@tiptap/pm/model";
+> 53 | import { Window as Window2 } from "happy-dom";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  54 | function generateJSON(html, extensions, options) {
+  55 |   const isNode = typeof process !== "undefined" && process.versions != null && process.versions.node != null;
+  56 |   if (!isNode) {
+
+
+
+Import trace:
+  App Route:
+    ./Documentos/Claude/Activity-notes/activitynotes/node_modules/@tiptap/html/dist/server/index.js
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/api/webclip/route.ts
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx:23:1
+Module not found: Can't resolve 'react-pdf/dist/esm/Page/AnnotationLayer.css'
+  21 | import { cn } from "@/lib/utils";
+  22 | import { toast } from "sonner";
+> 23 | import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  24 | import "react-pdf/dist/esm/Page/TextLayer.css";
+  25 |
+  26 | // Configure PDF worker
+
+
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/index.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/content-renderer.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Server Component]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/index.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/content-renderer.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Server Component]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx:10:1
+Module not found: Can't resolve 'react-pdf/dist/esm/Page/AnnotationLayer.css'
+   8 | import { cn } from "@/lib/utils";
+   9 | import { toast } from "sonner";
+> 10 | import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  11 | import "react-pdf/dist/esm/Page/TextLayer.css";
+  12 |
+  13 | // Configure PDF worker
+
+
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/index.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/content-renderer.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Server Component]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/index.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/content-renderer.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Server Component]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx:24:1
+Module not found: Can't resolve 'react-pdf/dist/esm/Page/TextLayer.css'
+  22 | import { toast } from "sonner";
+  23 | import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+> 24 | import "react-pdf/dist/esm/Page/TextLayer.css";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  25 |
+  26 | // Configure PDF worker
+  27 | pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/index.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/content-renderer.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Server Component]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/index.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/content-renderer.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Server Component]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx:11:1
+Module not found: Can't resolve 'react-pdf/dist/esm/Page/TextLayer.css'
+   9 | import { toast } from "sonner";
+  10 | import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+> 11 | import "react-pdf/dist/esm/Page/TextLayer.css";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  12 |
+  13 | // Configure PDF worker
+  14 | pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+
+
+Import traces:
+  Client Component Browser:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/index.ts [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/content-renderer.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Client Component Browser]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Server Component]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/index.ts [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/content-renderer.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Client Component SSR]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/preview-client.tsx [Server Component]
+    ./Documentos/Claude/Activity-notes/activitynotes/src/app/(public)/preview/[documentId]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at ./Documentos/Claude/Activity-notes/activitynotes/node_modules/ (tiptap/html/dist/server/index.js:7:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at ./Documentos/Claude/Activity-notes/activitynotes/node_modules/ (tiptap/html/dist/server/index.js:53:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx:23:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx:10:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx:24:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./Documentos/Claude/Activity-notes/activitynotes/src/components/editor/extensions/pdf-annotator.tsx:11:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+
+[debug] [2026-02-17T21:26:08.207Z] Error: ENOENT: no such file or directory, open '/home/rafael/Documentos/Claude/Activity-notes/activitynotes/.next/server/middleware-manifest.json'
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2026-02-17T21:26:59.752Z] ----------------------------------------------------------------------
+[debug] [2026-02-17T21:26:59.754Z] Command:       /home/rafael/.nvm/versions/node/v20.20.0/bin/node /home/rafael/.local/share/pnpm/global/5/.pnpm/firebase-tools@15.5.1_@types+node@25.0.10_encoding@0.1.13_hono@4.11.5_typescript@5.9.3/node_modules/firebase-tools/lib/bin/firebase.js deploy --only firestore,hosting
+[debug] [2026-02-17T21:26:59.754Z] CLI Version:   15.5.1
+[debug] [2026-02-17T21:26:59.755Z] Platform:      linux
+[debug] [2026-02-17T21:26:59.755Z] Node Version:  v20.20.0
+[debug] [2026-02-17T21:26:59.755Z] Time:          Tue Feb 17 2026 18:26:59 GMT-0300 (Horário Padrão de Brasília)
+[debug] [2026-02-17T21:26:59.755Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-02-17T21:27:00.612Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-02-17T21:27:00.612Z] > authorizing via signed-in user (activityfisioterapiamooca@gmail.com)
+[debug] [2026-02-17T21:27:00.612Z] [iam] checking project fisioflow-migration for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-02-17T21:27:00.613Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:00.613Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:00.614Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions [none]
+[debug] [2026-02-17T21:27:00.614Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions  x-goog-user-project=fisioflow-migration
+[debug] [2026-02-17T21:27:00.614Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-02-17T21:27:01.567Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions 200
+[debug] [2026-02-17T21:27:01.567Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-02-17T21:27:01.567Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:01.567Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:01.567Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration [none]
+[debug] [2026-02-17T21:27:02.069Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration 200
+[debug] [2026-02-17T21:27:02.069Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration {"projectId":"fisioflow-migration","projectNumber":"412418905255","displayName":"fisioflow-migration","name":"projects/fisioflow-migration","resources":{"hostingSite":"fisioflow-migration","realtimeDatabaseInstance":"fisioflow-migration-default-rtdb"},"state":"ACTIVE","etag":"1_79894793-5f3a-401d-a486-4cbc96856fb3"}
+[debug] [2026-02-17T21:27:03.558Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:03.559Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:03.559Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites pageToken=&pageSize=10
+[debug] [2026-02-17T21:27:05.043Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites 200
+[debug] [2026-02-17T21:27:05.043Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites {"sites":[{"name":"projects/fisioflow-migration/sites/fisioflow-activity-lab","defaultUrl":"https://fisioflow-activity-lab.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes","defaultUrl":"https://fisioflow-activity-notes.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes-v2","defaultUrl":"https://fisioflow-activity-notes-v2.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-migration","defaultUrl":"https://fisioflow-migration.web.app","type":"DEFAULT_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-notes-legacy","defaultUrl":"https://fisioflow-notes-legacy.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-patient","defaultUrl":"https://fisioflow-patient.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-professional","defaultUrl":"https://fisioflow-professional.web.app","type":"USER_SITE"}]}
+[debug] [2026-02-17T21:27:05.043Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:05.043Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:05.043Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites 
+[debug] [2026-02-17T21:27:05.658Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites 200
+[debug] [2026-02-17T21:27:05.658Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites {"sites":[{"name":"projects/fisioflow-migration/sites/fisioflow-activity-lab","defaultUrl":"https://fisioflow-activity-lab.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes","defaultUrl":"https://fisioflow-activity-notes.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes-v2","defaultUrl":"https://fisioflow-activity-notes-v2.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-migration","defaultUrl":"https://fisioflow-migration.web.app","type":"DEFAULT_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-notes-legacy","defaultUrl":"https://fisioflow-notes-legacy.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-patient","defaultUrl":"https://fisioflow-patient.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-professional","defaultUrl":"https://fisioflow-professional.web.app","type":"USER_SITE"}]}
+[debug] [2026-02-17T21:27:05.658Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:05.658Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:05.658Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration/webApps/-/config [none]
+[debug] [2026-02-17T21:27:06.476Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration/webApps/-/config 200
+[debug] [2026-02-17T21:27:06.476Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration/webApps/-/config {"projectId":"fisioflow-migration","databaseURL":"https://fisioflow-migration-default-rtdb.firebaseio.com","storageBucket":"fisioflow-migration.firebasestorage.app","apiKey":"AIzaSyA59PyvjZrqUtB1UuYkM0mmFvey_SSlYmI","authDomain":"fisioflow-migration.firebaseapp.com","messagingSenderId":"412418905255","projectNumber":"412418905255","version":"2"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+   The integration is known to work with Next.js version 12 - 15.0. You may encounter errors.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[debug] [2026-02-17T21:27:09.967Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:09.967Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:09.967Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites/fisioflow-migration [none]
+[debug] [2026-02-17T21:27:10.494Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites/fisioflow-migration 200
+[debug] [2026-02-17T21:27:10.494Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites/fisioflow-migration {"name":"projects/fisioflow-migration/sites/fisioflow-migration","defaultUrl":"https://fisioflow-migration.web.app","type":"DEFAULT_SITE"}
+[info] ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /home/rafael/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /home/rafael/Documentos/Claude/Activity-notes/activitynotes/package-lock.json
+
+
+[info] ⨯ Unable to acquire lock at /home/rafael/Documentos/Claude/Activity-notes/activitynotes/.next/lock, is another instance of next build running?
+
+[info]   Suggestion: If you intended to restart next build, terminate the other process, and then try again.
+
+[debug] [2026-02-17T21:27:12.929Z] Error: ENOENT: no such file or directory, open '/home/rafael/Documentos/Claude/Activity-notes/activitynotes/.next/server/middleware-manifest.json'
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2026-02-17T21:27:28.665Z] ----------------------------------------------------------------------
+[debug] [2026-02-17T21:27:28.686Z] Command:       /home/rafael/.nvm/versions/node/v20.20.0/bin/node /home/rafael/.local/share/pnpm/global/5/.pnpm/firebase-tools@15.5.1_@types+node@25.0.10_encoding@0.1.13_hono@4.11.5_typescript@5.9.3/node_modules/firebase-tools/lib/bin/firebase.js deploy --only firestore,hosting
+[debug] [2026-02-17T21:27:28.687Z] CLI Version:   15.5.1
+[debug] [2026-02-17T21:27:28.687Z] Platform:      linux
+[debug] [2026-02-17T21:27:28.687Z] Node Version:  v20.20.0
+[debug] [2026-02-17T21:27:28.687Z] Time:          Tue Feb 17 2026 18:27:28 GMT-0300 (Horário Padrão de Brasília)
+[debug] [2026-02-17T21:27:28.687Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-02-17T21:27:34.287Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-02-17T21:27:34.288Z] > authorizing via signed-in user (activityfisioterapiamooca@gmail.com)
+[debug] [2026-02-17T21:27:34.288Z] [iam] checking project fisioflow-migration for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-02-17T21:27:34.289Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:34.289Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:34.290Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions [none]
+[debug] [2026-02-17T21:27:34.290Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions  x-goog-user-project=fisioflow-migration
+[debug] [2026-02-17T21:27:34.290Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-02-17T21:27:35.308Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions 200
+[debug] [2026-02-17T21:27:35.308Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/fisioflow-migration:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-02-17T21:27:35.309Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:35.309Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:35.309Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration [none]
+[debug] [2026-02-17T21:27:35.865Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration 200
+[debug] [2026-02-17T21:27:35.865Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration {"projectId":"fisioflow-migration","projectNumber":"412418905255","displayName":"fisioflow-migration","name":"projects/fisioflow-migration","resources":{"hostingSite":"fisioflow-migration","realtimeDatabaseInstance":"fisioflow-migration-default-rtdb"},"state":"ACTIVE","etag":"1_79894793-5f3a-401d-a486-4cbc96856fb3"}
+[debug] [2026-02-17T21:27:41.561Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:41.562Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:41.562Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites pageToken=&pageSize=10
+[debug] [2026-02-17T21:27:43.034Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites 200
+[debug] [2026-02-17T21:27:43.034Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites {"sites":[{"name":"projects/fisioflow-migration/sites/fisioflow-activity-lab","defaultUrl":"https://fisioflow-activity-lab.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes","defaultUrl":"https://fisioflow-activity-notes.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes-v2","defaultUrl":"https://fisioflow-activity-notes-v2.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-migration","defaultUrl":"https://fisioflow-migration.web.app","type":"DEFAULT_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-notes-legacy","defaultUrl":"https://fisioflow-notes-legacy.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-patient","defaultUrl":"https://fisioflow-patient.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-professional","defaultUrl":"https://fisioflow-professional.web.app","type":"USER_SITE"}]}
+[debug] [2026-02-17T21:27:43.034Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:43.034Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:43.035Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites 
+[debug] [2026-02-17T21:27:43.587Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites 200
+[debug] [2026-02-17T21:27:43.588Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites {"sites":[{"name":"projects/fisioflow-migration/sites/fisioflow-activity-lab","defaultUrl":"https://fisioflow-activity-lab.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes","defaultUrl":"https://fisioflow-activity-notes.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-activity-notes-v2","defaultUrl":"https://fisioflow-activity-notes-v2.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-migration","defaultUrl":"https://fisioflow-migration.web.app","type":"DEFAULT_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-notes-legacy","defaultUrl":"https://fisioflow-notes-legacy.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-patient","defaultUrl":"https://fisioflow-patient.web.app","type":"USER_SITE"},{"name":"projects/fisioflow-migration/sites/fisioflow-professional","defaultUrl":"https://fisioflow-professional.web.app","type":"USER_SITE"}]}
+[debug] [2026-02-17T21:27:43.588Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:43.588Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:43.588Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration/webApps/-/config [none]
+[debug] [2026-02-17T21:27:44.257Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration/webApps/-/config 200
+[debug] [2026-02-17T21:27:44.257Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/fisioflow-migration/webApps/-/config {"projectId":"fisioflow-migration","databaseURL":"https://fisioflow-migration-default-rtdb.firebaseio.com","storageBucket":"fisioflow-migration.firebasestorage.app","apiKey":"AIzaSyA59PyvjZrqUtB1UuYkM0mmFvey_SSlYmI","authDomain":"fisioflow-migration.firebaseapp.com","messagingSenderId":"412418905255","projectNumber":"412418905255","version":"2"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+   The integration is known to work with Next.js version 12 - 15.0. You may encounter errors.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[debug] [2026-02-17T21:27:48.263Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:48.263Z] Checked if tokens are valid: true, expires at: 1771365575133
+[debug] [2026-02-17T21:27:48.263Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites/fisioflow-migration [none]
+[debug] [2026-02-17T21:27:48.769Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites/fisioflow-migration 200
+[debug] [2026-02-17T21:27:48.769Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/fisioflow-migration/sites/fisioflow-migration {"name":"projects/fisioflow-migration/sites/fisioflow-migration","defaultUrl":"https://fisioflow-migration.web.app","type":"DEFAULT_SITE"}
+[info] ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /home/rafael/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /home/rafael/Documentos/Claude/Activity-notes/activitynotes/package-lock.json
+
+
+[info] ⨯ Unable to acquire lock at /home/rafael/Documentos/Claude/Activity-notes/activitynotes/.next/lock, is another instance of next build running?
+
+[info]   Suggestion: If you intended to restart next build, terminate the other process, and then try again.
+
+[debug] [2026-02-17T21:27:51.021Z] Error: ENOENT: no such file or directory, open '/home/rafael/Documentos/Claude/Activity-notes/activitynotes/.next/export-marker.json'
+[error] 
+[error] Error: An unexpected error has occurred.

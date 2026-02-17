@@ -21,6 +21,7 @@
     "@google-cloud/firestore": "^8.3.0",
     "@google/generative-ai": "^0.24.1",
     "algoliasearch": "^5.48.2",
+    "axios": "^1.13.5",
     "firebase-admin": "^13.0.0",
     "firebase-functions": "^6.3.0",
     "genkit": "^1.28.0",

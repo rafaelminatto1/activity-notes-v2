@@ -20,6 +20,9 @@ export const mockUserProfile: UserProfile = {
   plan: "free",
   settings: {
     theme: "system",
+    colorPalette: "default",
+    density: "normal",
+    editorFont: "sans",
     defaultView: "list",
     fontSize: "medium",
     contentWidth: "medium",
@@ -28,6 +31,7 @@ export const mockUserProfile: UserProfile = {
     aiResponseLanguage: "pt-BR",
   },
   favoriteIds: [],
+  favoriteTemplateIds: [],
   recentDocIds: ["doc-1", "doc-2"],
   createdAt: Timestamp.now(),
   updatedAt: Timestamp.now(),

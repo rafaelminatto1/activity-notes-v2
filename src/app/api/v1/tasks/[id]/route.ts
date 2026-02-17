@@ -5,13 +5,13 @@ import { triggerWebhooks } from "@/lib/firebase/webhooks";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId, error } = await authenticateApi(request);
   if (error) return error;
 
+  const { id } = await params;
   const body = await request.json();
-  const { id } = params;
 
   try {
     await updateTask(id, body);
@@ -24,12 +24,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId, error } = await authenticateApi(request);
   if (error) return error;
 
-  const { id } = params;
+  const { id } = await params;
 
   try {
     await deleteTask(id);

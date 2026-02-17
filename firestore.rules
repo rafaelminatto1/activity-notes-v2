@@ -82,21 +82,11 @@ service cloud.firestore {
     }
 
     // ============================================================
-    // Projects Collection (for organizing documents)
+    // Projects Collection (Legacy - for compatibility)
     // ============================================================
     match /projects/{projectId} {
       allow create: if isAuthenticated()
-                    && request.resource.data.userId == request.auth.uid
-                    && (
-                      (
-                        request.resource.data.workspaceId is string
-                        && canAccessWorkspace(request.resource.data.workspaceId)
-                      )
-                      || (
-                        request.resource.data.workspaceId == null
-                        && isMember(request.resource.data.memberIds)
-                      )
-                    );
+                    && request.resource.data.userId == request.auth.uid;
       allow read: if isAuthenticated()
                   && (
                     resource.data.userId == request.auth.uid
@@ -104,11 +94,37 @@ service cloud.firestore {
                       resource.data.workspaceId is string
                       && canAccessWorkspace(resource.data.workspaceId)
                     )
-                    || (
-                      resource.data.workspaceId == null
-                      && isMember(resource.data.memberIds)
-                    )
                   );
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // ============================================================
+    // Spaces, Folders and Lists (Flexible Hierarchy)
+    // ============================================================
+    match /spaces/{spaceId} {
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        (resource.data.workspaceId is string && canAccessWorkspace(resource.data.workspaceId))
+      );
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    match /folders/{folderId} {
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        get(/databases/$(database)/documents/spaces/$(resource.data.spaceId)).data.userId == request.auth.uid
+      );
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    match /lists/{listId} {
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        get(/databases/$(database)/documents/spaces/$(resource.data.spaceId)).data.userId == request.auth.uid
+      );
       allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
 
@@ -123,10 +139,6 @@ service cloud.firestore {
                         || (
                           resource.data.workspaceId is string
                           && (canAccessWorkspace(resource.data.workspaceId) && checkPermission(resource.data.workspaceId, "documents", "read"))
-                        )
-                        || (
-                          resource.data.workspaceId == null
-                          && isMember(resource.data.allowedUserIds)
                         )
                       ))
                   || resource.data.isPublished == true;

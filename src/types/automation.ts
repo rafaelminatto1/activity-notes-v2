@@ -1,53 +1,66 @@
 import { Timestamp } from "firebase/firestore";
 
-export type TriggerType =
-  | "task_created"
-  | "status_changed"
-  | "priority_changed"
+export type TriggerType = 
+  | "task_created" 
+  | "status_changed" 
+  | "priority_changed" 
   | "assignee_changed"
-  | "comment_added"
-  | "due_date_reached";
+  | "document_created" 
+  | "comment_added";
 
-export type ActionType =
-  | "update_status"
-  | "update_priority"
-  | "assign_to"
-  | "add_comment"
-  | "send_notification"
-  | "create_subtask"
+export type ActionType = 
+  | "update_status" 
+  | "update_priority" 
+  | "assign_to" 
+  | "add_comment" 
   | "add_tag"
-  | "remove_tag";
+  | "send_notification" 
+  | "send_webhook"
+  | "ai_summarize";
 
 export interface AutomationTrigger {
   type: TriggerType;
-  config: Record<string, any>; // e.g., { status: 'done' }
+  config?: {
+    status?: string;
+    priority?: string;
+    field?: string;
+    matchValue?: any;
+  };
 }
 
 export interface AutomationAction {
-  id: string;
+  id?: string; // Optional for UI tracking
   type: ActionType;
-  config: Record<string, any>; // e.g., { assigneeId: 'user123' }
+  config: {
+    value?: any;
+    url?: string; // For webhooks
+    template?: string; // For messages/comments
+  };
 }
 
 export interface Automation {
   id: string;
   name: string;
-  projectId: string;
-  userId: string;
+  description?: string;
+  workspaceId: string;
+  spaceId?: string;
+  listId?: string;
+  projectId?: string; // Legacy support
   active: boolean;
   trigger: AutomationTrigger;
   actions: AutomationAction[];
   lastRunAt?: Timestamp;
   createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdBy: string;
 }
 
 export interface AutomationLog {
   id: string;
   automationId: string;
   automationName: string;
-  triggerEvent: string;
   status: "success" | "error";
   details: string;
   executedAt: Timestamp;
+  triggerEvent: string;
+  entityId: string; // Task ID or Doc ID
 }

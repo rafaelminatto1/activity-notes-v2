@@ -8,6 +8,7 @@ export interface Space {
   userId: string;
   isPrivate: boolean;
   memberIds?: string[];
+  order?: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -18,6 +19,7 @@ export interface SpaceCreate {
   color: string;
   userId: string;
   isPrivate: boolean;
+  order?: number;
 }
 
 export type SpaceUpdate = Partial<SpaceCreate>;

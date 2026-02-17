@@ -36,22 +36,98 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { useRouter, useParams } from "next/navigation";
+import { useSpaceStore } from "@/stores/space-store";
+
+// DND Kit Imports
+import {
+  DndContext, 
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface HierarchyTreeProps {
   spaces: Space[];
 }
 
 export function HierarchyTree({ spaces }: HierarchyTreeProps) {
+  const { reorderSpaces } = useSpaceStore();
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = spaces.findIndex((s) => s.id === active.id);
+      const newIndex = spaces.findIndex((s) => s.id === over.id);
+      
+      const newOrder = arrayMove(spaces, oldIndex, newIndex);
+      reorderSpaces(newOrder);
+    }
+  };
+
   return (
-    <div className="space-y-1">
-      {spaces.map((space) => (
-        <SpaceItem key={space.id} space={space} />
-      ))}
+    <DndContext 
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext 
+        items={spaces.map(s => s.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="space-y-1">
+          {spaces.map((space) => (
+            <SortableSpaceItem key={space.id} space={space} />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
+  );
+}
+
+function SortableSpaceItem({ space }: { space: Space }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: space.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : 1
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <SpaceItem space={space} dragListeners={listeners} />
     </div>
   );
 }
 
-function SpaceItem({ space }: { space: Space }) {
+function SpaceItem({ space, dragListeners }: { space: Space, dragListeners: any }) {
   const { user } = useAuth();
   const params = useParams();
   const router = useRouter();
@@ -131,6 +207,13 @@ function SpaceItem({ space }: { space: Space }) {
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
+        <div 
+          className="p-1 -ml-1 rounded-sm hover:bg-accent cursor-grab active:cursor-grabbing text-muted-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity"
+          {...dragListeners}
+        >
+          <GripVertical className="h-3 w-3" />
+        </div>
+
         <div className="p-0.5 rounded-sm hover:bg-accent transition-transform duration-200">
           {isOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
         </div>
@@ -201,10 +284,11 @@ function FolderItem({ folder, spaceColor }: { folder: FolderType, spaceColor: st
 
   useEffect(() => {
     if (isOpen) {
-      const unsub = subscribeToLists(folder.spaceId, (data) => {
+      const unsub = subscribeToFolders(folder.spaceId, () => {}); // Just to trigger subscription if needed
+      const unsubLists = subscribeToLists(folder.spaceId, (data) => {
         setLists(data.filter(l => l.folderId === folder.id));
       });
-      return () => unsub();
+      return () => unsubLists();
     }
   }, [isOpen, folder.spaceId, folder.id]);
 

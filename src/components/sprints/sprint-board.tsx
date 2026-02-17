@@ -9,6 +9,8 @@ import {
   useSensor,
   useSensors,
   DragOverlay,
+  DragStartEvent,
+  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -54,17 +56,17 @@ export function SprintBoard({
     })
   );
 
-  const handleDragStart = (event: { active: { id: string } }) => {
-    setActiveId(event.active.id);
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id.toString());
   };
 
-  const handleDragEnd = async (event: { active: { id: string }; over: { id: string } | null }) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
 
     if (over && active.id !== over.id) {
-      const taskId = active.id;
-      const overId = over.id as string;
+      const taskId = active.id.toString();
+      const overId = over.id.toString();
 
       let newStatus: TaskStatus | null = null;
       

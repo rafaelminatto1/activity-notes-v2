@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { subscribeToSpaces, createSpace } from "@/lib/firebase/spaces";
+import { subscribeToSpaces, createSpace, updateSpaceOrder } from "@/lib/firebase/spaces";
 import { Space } from "@/types/space";
 
 interface SpaceStore {
@@ -8,6 +8,7 @@ interface SpaceStore {
   initSubscription: (userId: string) => void;
   cleanupSubscription: () => void;
   createSpace: (userId: string, name: string) => Promise<void>;
+  reorderSpaces: (spaces: Space[]) => Promise<void>;
 }
 
 export const useSpaceStore = create<SpaceStore>((set, get) => ({
@@ -40,7 +41,17 @@ export const useSpaceStore = create<SpaceStore>((set, get) => ({
       name,
       icon: "🪐",
       color: "#6366f1",
-      isPrivate: true
+      isPrivate: true,
+      order: get().spaces.length // Append to end
     });
+  },
+
+  reorderSpaces: async (spaces: Space[]) => {
+    set({ spaces }); // Optimistic update
+    try {
+      await updateSpaceOrder(spaces);
+    } catch (error) {
+      console.error("Failed to persist space order:", error);
+    }
   }
 }));

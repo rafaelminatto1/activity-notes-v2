@@ -26,7 +26,7 @@ export function BurndownChart({ sprint, tasks }: BurndownChartProps) {
 
     const start = sprint.startDate.toDate();
     const end = sprint.endDate.toDate();
-    const totalDays = Math.ceil((end.getTime() - start.toDateString() === start.toDateString() ? 0 : end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const totalDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     
     const days = [];
     for (let i = 0; i < totalDays; i++) {

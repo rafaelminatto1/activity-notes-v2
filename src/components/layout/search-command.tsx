@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import Fuse from "fuse.js";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  FileText, 
-  Search, 
-  CheckCircle2, 
-  MessageSquare, 
+import {
+  FileText,
+  Search,
+  CheckCircle2,
+  MessageSquare,
   Clock,
-  X
+  X,
 } from "lucide-react";
 import {
   CommandDialog,
@@ -22,76 +23,57 @@ import { useSearchStore } from "@/stores/search-store";
 import { useSidebarStore } from "@/stores/sidebar-store";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
-import { searchClient, INDEX_NAME } from "@/lib/search/algolia-client";
-import { InstantSearch, useInstantSearch, useSearchBox, useHits, Configure } from "react-instantsearch";
+import { trackSearchPerformed } from "@/lib/firebase/analytics";
+import {
+  subscribeToRealtimeSearchIndex,
+  type RealtimeSearchRecord,
+} from "@/lib/search/realtime-search";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-// Tipos do Algolia
-interface AlgoliaRecord {
-  objectID: string;
-  type: "document" | "task" | "comment";
-  title?: string;
-  content?: string;
-  icon?: string;
-  path?: string[]; 
-  url: string;
-  createdAt: number;
-  status?: string; 
-  userName?: string; 
-  _highlightResult?: any;
-}
+type SearchFilter = "all" | "document" | "task" | "comment";
 
-// Componente para sincronizar query
-function CustomSearchBox({ query, refine }: { query: string; refine: (value: string) => void }) {
-  useEffect(() => {
-    refine(query);
-  }, [query, refine]);
-  return null;
-}
-
-// Componente para exibir Highlighting seguro
-function Highlight({ attribute, hit, className }: { attribute: string, hit: any, className?: string }) {
-  const highlightResult = hit._highlightResult?.[attribute];
-  
-  if (!highlightResult) {
-    return <span className={className}>{hit[attribute]}</span>;
+function readRecentSearches(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const value = window.localStorage.getItem("recent_searches");
+    return value ? (JSON.parse(value) as string[]) : [];
+  } catch {
+    return [];
   }
-
-  return (
-    <span 
-      className={className}
-      dangerouslySetInnerHTML={{ __html: highlightResult.value }} 
-    />
-  );
 }
 
-function SearchResults({ onSelect }: { onSelect: (url: string) => void }) {
-  const { hits } = useHits<AlgoliaRecord>();
-  const { status } = useInstantSearch();
-  const isLoading = status === 'loading' || status === 'stalled';
+function SearchResults({
+  hits,
+  onSelect,
+  isLoading,
+}: {
+  hits: RealtimeSearchRecord[];
+  onSelect: (url: string) => void;
+  isLoading: boolean;
+}) {
+  const hasResults = hits.length > 0;
 
   // Grouping
   const groupedHits = useMemo(() => {
-    const groups: Record<string, AlgoliaRecord[]> = {
+    const groups: Record<string, RealtimeSearchRecord[]> = {
       document: [],
       task: [],
-      comment: []
+      comment: [],
     };
-    hits.forEach(hit => {
+    hits.forEach((hit) => {
       if (groups[hit.type]) {
         groups[hit.type].push(hit);
-      } else {
-        if (!groups['other']) groups['other'] = [];
-        groups['other'].push(hit);
       }
     });
     return groups;
   }, [hits]);
 
-  const hasResults = hits.length > 0;
+  if (!hasResults && isLoading) {
+    return <CommandEmpty>Atualizando índice de busca...</CommandEmpty>;
+  }
 
-  if (!hasResults && !isLoading) {
+  if (!hasResults) {
     return <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>;
   }
 
@@ -111,7 +93,9 @@ function SearchResults({ onSelect }: { onSelect: (url: string) => void }) {
                   {hit.icon || <FileText className="h-4 w-4 text-muted-foreground" />}
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <Highlight attribute="title" hit={hit} className="truncate font-medium text-sm" />
+                  <span className="truncate font-medium text-sm">
+                    {hit.title || "Sem título"}
+                  </span>
                   {hit.path && hit.path.length > 0 && (
                     <span className="text-[10px] text-muted-foreground truncate">
                       {hit.path.join(" > ")}
@@ -136,14 +120,16 @@ function SearchResults({ onSelect }: { onSelect: (url: string) => void }) {
                 className="cursor-pointer"
               >
                 <div className="flex items-center gap-3 w-full overflow-hidden">
-                   <div className={cn(
+                  <div className={cn(
                      "flex h-8 w-8 items-center justify-center rounded-md shrink-0",
                      hit.status === "done" ? "bg-green-100 dark:bg-green-900/30 text-green-600" : "bg-muted/50 text-muted-foreground"
                    )}>
                     <CheckCircle2 className="h-4 w-4" />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <Highlight attribute="title" hit={hit} className="truncate font-medium text-sm" />
+                    <span className="truncate font-medium text-sm">
+                      {hit.title || "Sem título"}
+                    </span>
                     <span className="text-[10px] text-muted-foreground truncate">
                        Tarefa
                     </span>
@@ -171,9 +157,17 @@ function SearchResults({ onSelect }: { onSelect: (url: string) => void }) {
                     <MessageSquare className="h-4 w-4" />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <Highlight attribute="content" hit={hit} className="truncate font-medium text-sm" />
+                    <span className="truncate font-medium text-sm">
+                      {hit.content || "Sem conteúdo"}
+                    </span>
                     <span className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
-                      {hit.userName} • {hit.createdAt ? formatDistanceToNow(hit.createdAt, { addSuffix: true, locale: ptBR }) : ""}
+                      {hit.userName || "Usuário"} •{" "}
+                      {hit.createdAt
+                        ? formatDistanceToNow(hit.createdAt, {
+                            addSuffix: true,
+                            locale: ptBR,
+                          })
+                        : "agora"}
                     </span>
                   </div>
                 </div>
@@ -186,53 +180,24 @@ function SearchResults({ onSelect }: { onSelect: (url: string) => void }) {
   );
 }
 
-function SearchContent({ 
-  query, 
-  onSelect, 
-  recentSearches,
-  onRecentSelect
-}: { 
-  query: string; 
-  onSelect: (url: string) => void;
-  recentSearches: string[];
-  onRecentSelect: (term: string) => void;
+function FilterButton({
+  active,
+  onClick,
+  label,
+  icon,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  icon?: React.ReactNode;
 }) {
-  const { refine } = useSearchBox();
-  
-  return (
-    <>
-      <CustomSearchBox query={query} refine={refine} />
-      {query ? (
-         <SearchResults onSelect={onSelect} />
-      ) : (
-         recentSearches.length > 0 && (
-          <CommandGroup heading="Recentes">
-            {recentSearches.map((term, i) => (
-              <CommandItem 
-                key={`recent-${i}`} 
-                value={`recent-${term}`} 
-                onSelect={() => onRecentSelect(term)}
-                className="cursor-pointer"
-              >
-                <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
-                {term}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-         )
-      )}
-    </>
-  );
-}
-
-function FilterButton({ active, onClick, label, icon }: { active: boolean, onClick: () => void, label: string, icon?: React.ReactNode }) {
   return (
     <button
       onClick={onClick}
       className={cn(
         "flex items-center px-2.5 py-1 rounded-full text-xs font-medium transition-colors border",
-        active 
-          ? "bg-primary/10 text-primary border-primary/20" 
+        active
+          ? "bg-primary/10 text-primary border-primary/20"
           : "bg-background text-muted-foreground border-transparent hover:bg-muted"
       )}
     >
@@ -244,24 +209,69 @@ function FilterButton({ active, onClick, label, icon }: { active: boolean, onCli
 
 export function SearchCommand() {
   const router = useRouter();
+  const { user } = useAuth();
   const { isOpen, close } = useSearchStore();
   const closeMobile = useSidebarStore((s) => s.closeMobile);
+
   const [query, setQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<string>("all");
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  
+  const [activeFilter, setActiveFilter] = useState<SearchFilter>("all");
+  const [recentSearches, setRecentSearches] =
+    useState<string[]>(readRecentSearches);
+  const [records, setRecords] = useState<RealtimeSearchRecord[]>([]);
+  const [isIndexReady, setIsIndexReady] = useState(false);
+
   useEffect(() => {
-    const saved = localStorage.getItem("recent_searches");
-    if (saved) {
-      setRecentSearches(JSON.parse(saved));
-    }
-  }, []);
+    if (!user) return;
+    return subscribeToRealtimeSearchIndex(user.uid, (state) => {
+      setRecords(state.records);
+      setIsIndexReady(state.isReady);
+    });
+  }, [user]);
+
+  const indexedRecords = useMemo(() => (user ? records : []), [user, records]);
+  const indexReady = user ? isIndexReady : true;
+
+  const fuse = useMemo(() => {
+    return new Fuse(indexedRecords, {
+      includeScore: true,
+      threshold: 0.35,
+      ignoreLocation: true,
+      minMatchCharLength: 2,
+      keys: [
+        { name: "title", weight: 0.45 },
+        { name: "content", weight: 0.3 },
+        { name: "pathText", weight: 0.1 },
+        { name: "status", weight: 0.1 },
+        { name: "userName", weight: 0.05 },
+      ],
+    });
+  }, [indexedRecords]);
+
+  const results = useMemo(() => {
+    const term = query.trim();
+    if (!term) return [];
+
+    const matched = fuse.search(term, { limit: 50 }).map((result) => result.item);
+    if (activeFilter === "all") return matched;
+    return matched.filter((result) => result.type === activeFilter);
+  }, [query, fuse, activeFilter]);
+
+  useEffect(() => {
+    const term = query.trim();
+    if (term.length < 2) return;
+    const timeoutId = window.setTimeout(() => {
+      trackSearchPerformed();
+    }, 400);
+    return () => window.clearTimeout(timeoutId);
+  }, [query]);
 
   const saveToHistory = (term: string) => {
     if (!term.trim()) return;
-    const newHistory = [term, ...recentSearches.filter(t => t !== term)].slice(0, 5);
+    const newHistory = [term, ...recentSearches.filter((t) => t !== term)].slice(0, 5);
     setRecentSearches(newHistory);
-    localStorage.setItem("recent_searches", JSON.stringify(newHistory));
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("recent_searches", JSON.stringify(newHistory));
+    }
   };
 
   const handleSelect = (url: string) => {
@@ -317,20 +327,33 @@ export function SearchCommand() {
           />
         </div>
       </div>
-      
+
       <CommandList className="max-h-[60vh]">
-        <InstantSearch searchClient={searchClient} indexName={INDEX_NAME} future={{ preserveSharedStateOnUnmount: true }}>
-          <Configure 
-            hitsPerPage={20} 
-            filters={activeFilter !== "all" ? `type:${activeFilter}` : undefined}
-          />
-          <SearchContent 
-            query={query} 
+        {query ? (
+          <SearchResults
+            hits={results}
+            isLoading={!indexReady}
             onSelect={handleSelect}
-            recentSearches={recentSearches}
-            onRecentSelect={(term) => setQuery(term)}
           />
-        </InstantSearch>
+        ) : recentSearches.length > 0 ? (
+          <CommandGroup heading="Recentes">
+            {recentSearches.map((term, i) => (
+              <CommandItem
+                key={`recent-${i}`}
+                value={`recent-${term}`}
+                onSelect={() => setQuery(term)}
+                className="cursor-pointer"
+              >
+                <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                {term}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        ) : (
+          <CommandEmpty>
+            Digite para buscar documentos, tarefas e comentários.
+          </CommandEmpty>
+        )}
       </CommandList>
     </CommandDialog>
   );

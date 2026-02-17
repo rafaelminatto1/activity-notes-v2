@@ -115,6 +115,11 @@ function SidebarContent() {
       {/* Quick Actions */}
       <div className="space-y-0.5 px-2 py-1">
         <SidebarButton
+          icon={<LayoutDashboard className="h-4 w-4" />}
+          label="Dashboard"
+          onClick={() => navigateTo("/dashboard")}
+        />
+        <SidebarButton
           icon={<Search className="h-4 w-4" />}
           label="Buscar"
           shortcut="Ctrl+K"

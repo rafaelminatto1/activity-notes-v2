@@ -157,7 +157,7 @@ export function AutomationBuilder({ onSave, onCancel }: AutomationBuilderProps) 
                   
                   <Select 
                     value={action.type} 
-                    onValueChange={(v: ActionType) => updateAction(action.id, { type: v })}
+                    onValueChange={(v: ActionType) => action.id && updateAction(action.id, { type: v, config: {} })}
                   >
                     <SelectTrigger className="w-64 bg-background">
                       <SelectValue />
@@ -174,16 +174,70 @@ export function AutomationBuilder({ onSave, onCancel }: AutomationBuilderProps) 
                     </SelectContent>
                   </Select>
 
-                  <Input 
-                    placeholder="Configuração da ação..." 
-                    className="flex-1 bg-background"
-                    onChange={(e) => updateAction(action.id, { config: { value: e.target.value } })}
-                  />
+                  {action.type === "update_status" && (
+                    <Select 
+                      value={action.config.value} 
+                      onValueChange={(v) => action.id && updateAction(action.id, { config: { value: v } })}
+                    >
+                      <SelectTrigger className="flex-1 bg-background">
+                        <SelectValue placeholder="Escolha o status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">Pendente</SelectItem>
+                        <SelectItem value="in_progress">Em Progresso</SelectItem>
+                        <SelectItem value="done">Concluído</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+
+                  {action.type === "update_priority" && (
+                    <Select 
+                      value={action.config.value} 
+                      onValueChange={(v) => action.id && updateAction(action.id, { config: { value: v } })}
+                    >
+                      <SelectTrigger className="flex-1 bg-background">
+                        <SelectValue placeholder="Escolha a prioridade" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Baixa</SelectItem>
+                        <SelectItem value="medium">Média</SelectItem>
+                        <SelectItem value="high">Alta</SelectItem>
+                        <SelectItem value="urgent">Urgente</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+
+                  {action.type === "add_comment" && (
+                    <Input 
+                      placeholder="Texto do comentário..." 
+                      className="flex-1 bg-background"
+                      value={action.config.value || ""}
+                      onChange={(e) => action.id && updateAction(action.id, { config: { value: e.target.value } })}
+                    />
+                  )}
+
+                  {action.type === "send_notification" && (
+                    <Input 
+                      placeholder="Mensagem da notificação..." 
+                      className="flex-1 bg-background"
+                      value={action.config.value || ""}
+                      onChange={(e) => action.id && updateAction(action.id, { config: { value: e.target.value } })}
+                    />
+                  )}
+
+                  {["assign_to", "add_tag"].includes(action.type) && (
+                    <Input 
+                      placeholder="Valor..." 
+                      className="flex-1 bg-background"
+                      value={action.config.value || ""}
+                      onChange={(e) => action.id && updateAction(action.id, { config: { value: e.target.value } })}
+                    />
+                  )}
 
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    onClick={() => removeAction(action.id)}
+                    onClick={() => action.id && removeAction(action.id)}
                     className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <Trash2 className="w-4 h-4" />

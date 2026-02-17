@@ -34,6 +34,9 @@ const AuthContext = createContext<AuthContextValue>({
 
 const DEFAULT_SETTINGS: UserProfile["settings"] = {
   theme: "system",
+  colorPalette: "default",
+  density: "normal",
+  editorFont: "sans",
   defaultView: "list",
   fontSize: "medium",
   contentWidth: "medium",
@@ -75,6 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               plan: "free",
               settings: DEFAULT_SETTINGS,
               favoriteIds: [],
+              favoriteTemplateIds: [],
               recentDocIds: [],
             });
             profile = await getUserProfile(firebaseUser.uid);

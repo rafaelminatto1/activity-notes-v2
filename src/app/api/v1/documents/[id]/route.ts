@@ -5,12 +5,12 @@ import { triggerWebhooks } from "@/lib/firebase/webhooks";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId, error } = await authenticateApi(request);
   if (error) return error;
 
-  const { id } = params;
+  const { id } = await params;
   const doc = await getDocument(id);
 
   if (!doc || doc.userId !== userId) {
@@ -22,13 +22,13 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId, error } = await authenticateApi(request);
   if (error) return error;
 
   const body = await request.json();
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const doc = await getDocument(id);
@@ -46,12 +46,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId, error } = await authenticateApi(request);
   if (error) return error;
 
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const doc = await getDocument(id);

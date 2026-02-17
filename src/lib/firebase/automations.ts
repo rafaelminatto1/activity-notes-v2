@@ -4,27 +4,23 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
-  getDocs,
   query,
   where,
-  orderBy,
+  getDocs,
   serverTimestamp,
   onSnapshot,
+  orderBy,
+  limit
 } from "firebase/firestore";
 import { db } from "./config";
-import type { Automation, AutomationLog } from "@/types/automation";
-
-function getDb() {
-  if (!db) throw new Error("Firestore não inicializado.");
-  return db;
-}
+import { Automation, AutomationLog } from "@/types/automation";
 
 const AUTOMATIONS_COLLECTION = "automations";
 const LOGS_COLLECTION = "automation_logs";
 
 export async function createAutomation(userId: string, projectId: string, data: Partial<Automation>): Promise<string> {
-  const colRef = collection(getDb(), AUTOMATIONS_COLLECTION);
-  const docRef = await addDoc(colRef, {
+  if (!db) throw new Error("Firestore not initialized");
+  const docRef = await addDoc(collection(db, AUTOMATIONS_COLLECTION), {
     ...data,
     userId,
     projectId,
@@ -35,48 +31,39 @@ export async function createAutomation(userId: string, projectId: string, data: 
   return docRef.id;
 }
 
-export async function updateAutomation(id: string, updates: Partial<Automation>): Promise<void> {
-  const docRef = doc(getDb(), AUTOMATIONS_COLLECTION, id);
-  await updateDoc(docRef, {
-    ...updates,
-    updatedAt: serverTimestamp(),
-  });
+export async function updateAutomation(id: string, data: Partial<Automation>): Promise<void> {
+  if (!db) throw new Error("Firestore not initialized");
+  await updateDoc(doc(db, AUTOMATIONS_COLLECTION, id), { ...data, updatedAt: serverTimestamp() });
 }
 
 export async function deleteAutomation(id: string): Promise<void> {
-  const docRef = doc(getDb(), AUTOMATIONS_COLLECTION, id);
-  await deleteDoc(docRef);
+  if (!db) throw new Error("Firestore not initialized");
+  await deleteDoc(doc(db, AUTOMATIONS_COLLECTION, id));
 }
 
 export function subscribeToAutomations(projectId: string, callback: (automations: Automation[]) => void) {
+  if (!db) return () => {};
   const q = query(
-    collection(getDb(), AUTOMATIONS_COLLECTION),
+    collection(db, AUTOMATIONS_COLLECTION),
     where("projectId", "==", projectId),
     orderBy("createdAt", "desc")
   );
-
   return onSnapshot(q, (snapshot) => {
-    const automations = snapshot.docs.map((d) => ({
-      id: d.id,
-      ...d.data()
-    })) as Automation[];
+    const automations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Automation));
     callback(automations);
   });
 }
 
 export function subscribeToAutomationLogs(projectId: string, callback: (logs: AutomationLog[]) => void) {
+  if (!db) return () => {};
   const q = query(
-    collection(getDb(), LOGS_COLLECTION),
-    where("projectId", "==", projectId), // Assuming logs have projectId for easier filtering
+    collection(db, LOGS_COLLECTION),
+    where("projectId", "==", projectId),
     orderBy("executedAt", "desc"),
-    where("executedAt", ">", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) // Last 7 days
+    limit(50)
   );
-
   return onSnapshot(q, (snapshot) => {
-    const logs = snapshot.docs.map((d) => ({
-      id: d.id,
-      ...d.data()
-    })) as AutomationLog[];
+    const logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as AutomationLog));
     callback(logs);
   });
 }

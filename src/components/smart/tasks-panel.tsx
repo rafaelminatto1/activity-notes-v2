@@ -33,17 +33,28 @@ import { TaskModal } from "@/components/tasks/task-modal";
 import { usePermission } from "@/hooks/use-permission";
 
 interface TasksPanelProps {
-  documentId?: string;
-  isOpen: boolean;
-  onClose: () => void;
-  workspaceId?: string; // Add workspaceId prop
+  documentId?: string | null;
+  listId?: string | null;
+  isOpen?: boolean;
+  onClose?: () => void;
+  workspaceId?: string;
+  forcedTasks?: Task[];
+  isInline?: boolean;
 }
 
-export function TasksPanel({ documentId, isOpen, onClose, workspaceId }: TasksPanelProps) {
+export function TasksPanel({ 
+  documentId, 
+  listId,
+  isOpen = true, 
+  onClose, 
+  workspaceId,
+  forcedTasks,
+  isInline = false
+}: TasksPanelProps) {
   const { user } = useAuth();
   const { can } = usePermission(workspaceId);
   const { 
-    tasks, 
+    tasks: storeTasks, 
     isLoading, 
     subscribe, 
     createTask, 
@@ -53,27 +64,29 @@ export function TasksPanel({ documentId, isOpen, onClose, workspaceId }: TasksPa
     setFilter,
     activeViewId
   } = useTasksStore();
+  
+  const tasks = forcedTasks || storeTasks;
+
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [activeTab, setActiveTab] = useState<"all" | "document">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "document" | "list">("all");
   const [isExtracting, setIsExtracting] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   useEffect(() => {
-    if (user) {
-      // Se estiver na aba "document", filtra por docId, senão carrega todas
-      const filterDocId = activeTab === "document" ? documentId : undefined;
-      subscribe(user.uid, filterDocId);
+    if (user && !forcedTasks) {
+      // Logic for subscription
+      if (listId) {
+        // subscribe to list tasks if we had that method in store
+        // for now let's assume we can pass filter to store
+        subscribe(user.uid, documentId || undefined);
+      } else {
+        subscribe(user.uid, documentId || undefined);
+      }
     }
-  }, [user, documentId, activeTab, subscribe, filter.advanced]);
+  }, [user, documentId, listId, forcedTasks, subscribe, filter.advanced]);
 
-  // Se mudar de aba para "document" e não tiver documentId (dashboard), voltar para "all"
-  useEffect(() => {
-    if (activeTab === "document" && !documentId) {
-      setActiveTab("all");
-    }
-  }, [documentId, activeTab]);
-
+  // Handle create task with listId
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTaskTitle.trim() || !user) return;
@@ -81,7 +94,8 @@ export function TasksPanel({ documentId, isOpen, onClose, workspaceId }: TasksPa
     try {
       await createTask(user.uid, {
         title: newTaskTitle.trim(),
-        documentId: activeTab === "document" ? documentId : undefined,
+        documentId: documentId || undefined,
+        listId: listId || undefined,
       });
       setNewTaskTitle("");
     } catch (error) {
@@ -162,10 +176,10 @@ export function TasksPanel({ documentId, isOpen, onClose, workspaceId }: TasksPa
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen && !isInline) return null;
 
-  return (
-    <div className="fixed inset-y-0 right-0 z-50 flex w-80 flex-col border-l bg-background shadow-lg transition-transform duration-300 ease-in-out">
+  const content = (
+    <>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b">
         <h2 className="text-lg font-semibold">Tarefas</h2>
@@ -190,9 +204,11 @@ export function TasksPanel({ documentId, isOpen, onClose, workspaceId }: TasksPa
               <Sparkles className={cn("h-4 w-4 text-purple-500", isExtracting && "animate-pulse")} />
             </Button>
           )}
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
+          {onClose && (
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -214,9 +230,11 @@ export function TasksPanel({ documentId, isOpen, onClose, workspaceId }: TasksPa
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
           <TabsList className="w-full h-8">
             <TabsTrigger value="all" className="flex-1 text-xs">Coleção</TabsTrigger>
-            <TabsTrigger value="document" className="flex-1 text-xs" disabled={!documentId}>
-              Nota Atual
-            </TabsTrigger>
+            {(documentId || listId) && (
+              <TabsTrigger value="document" className="flex-1 text-xs">
+                {listId ? "Nesta Lista" : "Nota Atual"}
+              </TabsTrigger>
+            )}
           </TabsList>
         </Tabs>
       </div>
@@ -238,8 +256,8 @@ export function TasksPanel({ documentId, isOpen, onClose, workspaceId }: TasksPa
       </form>
 
       {/* Task List */}
-      <ScrollArea className="flex-1 px-4 py-2">
-        {isLoading ? (
+      <ScrollArea className={cn("flex-1 px-4 py-2", isInline ? "h-[400px]" : "")}>
+        {isLoading && !forcedTasks ? (
           <div className="space-y-2">
             <Skeleton className="h-8 w-full" />
             <Skeleton className="h-8 w-full" />
@@ -276,6 +294,16 @@ export function TasksPanel({ documentId, isOpen, onClose, workspaceId }: TasksPa
         isOpen={!!selectedTask}
         onClose={() => setSelectedTask(null)}
       />
+    </>
+  );
+
+  if (isInline) {
+    return <div className="flex flex-col w-full">{content}</div>;
+  }
+
+  return (
+    <div className="fixed inset-y-0 right-0 z-50 flex w-80 flex-col border-l bg-background shadow-lg transition-transform duration-300 ease-in-out">
+      {content}
     </div>
   );
 }

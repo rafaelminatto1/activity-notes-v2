@@ -1,4 +1,7 @@
 import { Timestamp } from "firebase/firestore";
+import { List } from "./list";
+
+export type { List };
 
 /**
  * Enhanced Document type with AI and collaboration features
@@ -109,6 +112,7 @@ export interface Task {
   assigneeId?: string;
   documentId?: string; // If embedded in a note
   projectId?: string | null; // Direct association with a project
+  listId?: string | null; // Direct association with a list
   userId: string;
   completedAt?: Timestamp;
   createdAt: Timestamp;

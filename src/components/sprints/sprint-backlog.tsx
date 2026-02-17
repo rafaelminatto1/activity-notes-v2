@@ -10,6 +10,8 @@ import {
   useSensors,
   DragOverlay,
   defaultDropAnimationSideEffects,
+  DragStartEvent,
+  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -54,18 +56,18 @@ export function SprintBacklog({
 
   const unassignedTasks = tasks.filter((t) => !t.sprintId);
 
-  const handleDragStart = (event: { active: { id: string } }) => {
-    setActiveId(event.active.id);
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id.toString());
   };
 
-  const handleDragEnd = async (event: { active: { id: string }; over: { id: string } | null }) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
 
     if (over && active.id !== over.id) {
       // Logic to move task to a different sprint
-      const taskId = active.id;
-      const overId = over.id as string;
+      const taskId = active.id.toString();
+      const overId = over.id.toString();
 
       // If over is a sprint container or a task in a sprint
       let targetSprintId: string | null = null;

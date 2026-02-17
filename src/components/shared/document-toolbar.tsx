@@ -41,6 +41,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { MenuItemWithIconColor } from "./menu-item-with-icon-color";
@@ -49,12 +53,14 @@ import { trackDocumentPublished } from "@/lib/firebase/analytics";
 import { toast } from "sonner";
 import { ShareDialog } from "@/components/collaboration/share-dialog";
 import { TemplateEditor } from "@/components/smart/template-editor";
+import { exportToMarkdown, exportToJson } from "@/lib/export/utils";
 import type { Document } from "@/types/document";
 import { AutoTagButton } from "@/components/ai/auto-tag-button";
 import { LocationBadge } from "./location-badge";
 import { Collaborators } from "@/components/collaboration/collaborators";
 import { useCollaboration } from "@/hooks/use-collaboration";
 import { SyncStatusIcon } from "@/components/layout/offline-indicator";
+import { usePermission } from "@/hooks/use-permission";
 
 interface DocumentToolbarProps {
   document: Document;
@@ -63,6 +69,7 @@ interface DocumentToolbarProps {
 export function DocumentToolbar({ document }: DocumentToolbarProps) {
   const router = useRouter();
   const { user, userProfile, refreshProfile } = useAuth();
+  const { can } = usePermission(document.workspaceId);
   const { collaborators } = useCollaboration(document.id);
   const saveStatus = useEditorStore((s) => s.saveStatus);
   const toggleAIPanel = useAIStore((s) => s.togglePanel);
@@ -212,18 +219,20 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
         <Separator orientation="vertical" className="mx-2 h-4" />
 
         {/* Publish */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={document.isPublished ? () => setShareOpen(true) : handlePublishToggle}
-          className={cn(
-            "h-7 text-xs",
-            document.isPublished && "text-blue-500"
-          )}
-        >
-          <Globe className="mr-1 h-3.5 w-3.5" />
-          {document.isPublished ? "Publicado" : "Publicar"}
-        </Button>
+        {can("documents", "share") && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={document.isPublished ? () => setShareOpen(true) : handlePublishToggle}
+            className={cn(
+              "h-7 text-xs",
+              document.isPublished && "text-blue-500"
+            )}
+          >
+            <Globe className="mr-1 h-3.5 w-3.5" />
+            {document.isPublished ? "Publicado" : "Publicar"}
+          </Button>
+        )}
 
         {/* Auto Tag */}
         <AutoTagButton documentId={document.id} content={document.plainText || ""} />
@@ -258,6 +267,24 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
               <Layout className="mr-2 h-4 w-4" />
               Salvar como Template
             </DropdownMenuItem>
+
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Copy className="mr-2 h-4 w-4" />
+                Exportar
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => exportToMarkdown(document)}>
+                    Markdown (.md)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => exportToJson(document)}>
+                    JSON (.json)
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+
             <DropdownMenuItem onClick={toggleAIPanel}>
               <Sparkles className="mr-2 h-4 w-4" />
               Assistente IA

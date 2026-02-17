@@ -107,11 +107,7 @@ export function TemplateEditor({
           <div className="flex items-center gap-4">
             <div className="flex flex-col gap-2">
               <Label>Ícone</Label>
-              <IconPicker value={icon} onChange={setIcon}>
-                <Button variant="outline" className="h-12 w-12 text-2xl p-0">
-                  {icon}
-                </Button>
-              </IconPicker>
+              <IconPicker icon={icon} onChange={setIcon} />
             </div>
             <div className="flex-1 space-y-2">
               <Label htmlFor="name">Nome do Template</Label>

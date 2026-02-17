@@ -2,7 +2,7 @@ import { Timestamp } from "firebase/firestore";
 
 export interface UserSettings {
   theme: "light" | "dark" | "system";
-  colorPalette: "default" | "ocean" | "forest" | "sunset" | "lavender" | "midnight";
+  colorPalette: "default" | "ocean" | "forest" | "sunset" | "lavender" | "midnight" | "custom";
   density: "compact" | "normal" | "comfortable";
   editorFont: "sans" | "serif" | "mono";
   defaultView: "list" | "grid";

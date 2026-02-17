@@ -101,6 +101,9 @@ export default function SettingsPage() {
 
   const settings: UserSettings = userProfile?.settings || {
     theme: "system",
+    colorPalette: "default",
+    density: "normal",
+    editorFont: "sans",
     defaultView: "list",
     fontSize: "medium",
     contentWidth: "medium",

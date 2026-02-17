@@ -1,14 +1,35 @@
 import { render, screen, waitFor } from "@/test/test-utils";
+import { act } from "@testing-library/react";
 import { SearchCommand } from "./search-command";
 import { useSearchStore } from "@/stores/search-store";
 
-const { mockPush, mockSearchFn, mockClearFn } = vi.hoisted(() => ({
-  mockPush: vi.fn(),
-  mockSearchFn: vi.fn(),
-  mockClearFn: vi.fn(),
-}));
+const {
+  mockPush,
+  mockCloseMobile,
+  mockUser,
+  mockSubscribeToRealtimeSearchIndex,
+  emitSearchState,
+} = vi.hoisted(() => {
+  let callback:
+    | ((state: { records: unknown[]; isReady: boolean }) => void)
+    | null = null;
 
-let mockResults: unknown[] = [];
+  return {
+    mockPush: vi.fn(),
+    mockCloseMobile: vi.fn(),
+    mockUser: { uid: "user-1" },
+    mockSubscribeToRealtimeSearchIndex: vi.fn(
+      (_userId: string, cb: (state: { records: unknown[]; isReady: boolean }) => void) => {
+        callback = cb;
+        cb({ records: [], isReady: true });
+        return vi.fn();
+      }
+    ),
+    emitSearchState: (state: { records: unknown[]; isReady: boolean }) => {
+      callback?.(state);
+    },
+  };
+});
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -20,59 +41,102 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("@/hooks/use-search", () => ({
-  useSearch: () => ({
-    results: mockResults,
-    loading: false,
-    search: mockSearchFn,
-    clear: mockClearFn,
+vi.mock("@/hooks/use-auth", () => ({
+  useAuth: () => ({
+    user: mockUser,
   }),
 }));
 
 vi.mock("@/stores/sidebar-store", () => ({
-  useSidebarStore: () => vi.fn(),
+  useSidebarStore: (
+    selector: (state: { closeMobile: () => void }) => unknown
+  ) =>
+    selector({
+      closeMobile: mockCloseMobile,
+    }),
+}));
+
+vi.mock("@/lib/search/realtime-search", () => ({
+  subscribeToRealtimeSearchIndex: (
+    userId: string,
+    cb: (state: { records: unknown[]; isReady: boolean }) => void
+  ) => mockSubscribeToRealtimeSearchIndex(userId, cb),
 }));
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockResults = [];
   useSearchStore.setState({ isOpen: true });
 });
 
 describe("SearchCommand", () => {
-  it("renders search input with placeholder", () => {
+  it("renders search input with current placeholder", () => {
     render(<SearchCommand />);
-    expect(screen.getByPlaceholderText("Buscar documentos...")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Buscar em todo o workspace...")
+    ).toBeInTheDocument();
   });
 
-  it("calls search when 2+ chars typed", async () => {
-    const { user } = render(<SearchCommand />);
-    const input = screen.getByPlaceholderText("Buscar documentos...");
-    await user.type(input, "te");
-    await waitFor(() => {
-      expect(mockSearchFn).toHaveBeenCalled();
-    });
-  });
-
-  it("shows empty state message", async () => {
-    const { user } = render(<SearchCommand />);
-    const input = screen.getByPlaceholderText("Buscar documentos...");
-    await user.type(input, "xyz");
-
-    await waitFor(() => {
-      expect(screen.getByText(/nenhum documento encontrado/i)).toBeInTheDocument();
-    });
-  });
-
-  it("renders results when available", async () => {
-    mockResults = [
-      { id: "doc-1", title: "Test Document", icon: "", plainText: "" },
-    ];
-
+  it("shows helper message when query is empty", () => {
     render(<SearchCommand />);
+    expect(
+      screen.getByText("Digite para buscar documentos, tarefas e comentários.")
+    ).toBeInTheDocument();
+  });
+
+  it("renders realtime results when query matches", async () => {
+    const { user } = render(<SearchCommand />);
+
+    act(() => {
+      emitSearchState({
+        isReady: true,
+        records: [
+          {
+            objectID: "document:doc-1",
+            type: "document",
+            title: "Test Document",
+            content: "some text",
+            url: "/documents/doc-1",
+            createdAt: Date.now(),
+          },
+        ],
+      });
+    });
+
+    const input = screen.getByPlaceholderText("Buscar em todo o workspace...");
+    await user.type(input, "Test");
 
     await waitFor(() => {
       expect(screen.getByText("Test Document")).toBeInTheDocument();
+    });
+  });
+
+  it("navigates when selecting a result", async () => {
+    const { user } = render(<SearchCommand />);
+
+    act(() => {
+      emitSearchState({
+        isReady: true,
+        records: [
+          {
+            objectID: "document:doc-1",
+            type: "document",
+            title: "Test Document",
+            content: "some text",
+            url: "/documents/doc-1",
+            createdAt: Date.now(),
+          },
+        ],
+      });
+    });
+
+    const input = screen.getByPlaceholderText("Buscar em todo o workspace...");
+    await user.type(input, "Test");
+
+    const result = await screen.findByText("Test Document");
+    await user.click(result);
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("/documents/doc-1");
     });
   });
 });

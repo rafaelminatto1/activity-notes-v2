@@ -328,6 +328,24 @@ export function subscribeToDocument(
   });
 }
 
+export function subscribeToListDocuments(
+  userId: string,
+  listId: string,
+  callback: (docs: Document[]) => void
+) {
+  const q = query(collection(getDb(), "documents"), where("userId", "==", userId));
+
+  return onSnapshot(q, (snapshot) => {
+    const docs = snapshot.docs
+      .map((d) => ({ id: d.id, ...d.data() } as Document))
+      .filter((d) => !d.isArchived && d.listId === listId)
+      .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+    callback(docs);
+  }, (error) => {
+    console.error("Error subscribing to list documents:", error);
+  });
+}
+
 // ---- Batch operations ----
 
 export async function batchArchiveChildren(parentDocumentId: string) {

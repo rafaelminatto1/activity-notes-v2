@@ -1,5 +1,5 @@
 import { Node, mergeAttributes } from "@tiptap/core";
-import { ReactNodeViewRenderer, NodeViewWrapper } from "@tiptap/react";
+import { NodeViewProps, ReactNodeViewRenderer, NodeViewWrapper } from "@tiptap/react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import * as fabric from "fabric"; // Fabric v6
@@ -20,8 +20,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-import "react-pdf/dist/esm/Page/TextLayer.css";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
 
 // Configure PDF worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -31,26 +31,15 @@ interface AnnotationData {
   version: string;
 }
 
-interface AnnotatorProps {
-  node: {
-    attrs: {
-      src: string;
-      type: "pdf" | "image";
-      title?: string;
-      page?: number;
-      annotations?: Record<number, AnnotationData>; // Page number -> Fabric JSON
-      width?: string | number;
-      height?: string | number;
-    };
-  };
-  updateAttributes: (attrs: any) => void;
-  deleteNode: () => void;
-}
-
 const COLORS = ["#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00"];
 
-function PdfAnnotatorComponent({ node, updateAttributes }: AnnotatorProps) {
-  const { src, type, page: initialPage = 1, annotations = {} } = node.attrs;
+function PdfAnnotatorComponent({ node, updateAttributes }: NodeViewProps) {
+  const { src, type, page: initialPage = 1, annotations = {} } = node.attrs as {
+    src: string;
+    type: "pdf" | "image";
+    page?: number;
+    annotations?: Record<number, AnnotationData>;
+  };
   
   const [numPages, setNumPages] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(initialPage);

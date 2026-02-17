@@ -11,7 +11,8 @@ import {
   writeBatch,
   getDoc,
   onSnapshot,
-  Unsubscribe
+  Unsubscribe,
+  orderBy
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { Space, SpaceCreate, SpaceUpdate } from "@/types/space";
@@ -56,11 +57,26 @@ export async function deleteSpace(id: string): Promise<void> {
   await batch.commit();
 }
 
+export async function updateSpaceOrder(spaces: Space[]): Promise<void> {
+  if (!db) throw new Error("Firestore not initialized");
+  const batch = writeBatch(db);
+  
+  spaces.forEach((space, index) => {
+    // db is guaranteed not null here because of the check above, but for TS:
+    const ref = doc(db!, SPACES_COLLECTION, space.id);
+    batch.update(ref, { order: index, updatedAt: serverTimestamp() });
+  });
+
+  await batch.commit();
+}
+
 export function subscribeToSpaces(userId: string, callback: (spaces: Space[]) => void): Unsubscribe {
   if (!db) return () => {};
   const q = query(
     collection(db, SPACES_COLLECTION),
-    where("userId", "==", userId)
+    where("userId", "==", userId),
+    orderBy("order", "asc"),
+    orderBy("createdAt", "asc")
   );
   return onSnapshot(q, (snapshot) => {
     const spaces = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Space));

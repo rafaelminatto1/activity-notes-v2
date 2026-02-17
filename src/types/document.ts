@@ -32,6 +32,8 @@ export interface Document {
   userId: string;
   isArchived: boolean;
   isPublished: boolean;
+  sourceUrl?: string;
+  tags?: string[];
   position: number;
   childCount: number;
   createdAt: Timestamp;

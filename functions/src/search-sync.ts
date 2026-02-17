@@ -1,132 +1,75 @@
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
-import * as functions from "firebase-functions"; // For config
+import * as admin from "firebase-admin";
 import { algoliasearch } from "algoliasearch";
 
+const db = admin.firestore();
+
 // Initialize Algolia
-const ALGOLIA_APP_ID = functions.config().algolia?.app_id || process.env.ALGOLIA_APP_ID;
-const ALGOLIA_ADMIN_KEY = functions.config().algolia?.admin_key || process.env.ALGOLIA_ADMIN_KEY;
+const ALGOLIA_APP_ID = process.env.ALGOLIA_APP_ID || "";
+const ALGOLIA_ADMIN_KEY = process.env.ALGOLIA_ADMIN_KEY || "";
+const client = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_ADMIN_KEY);
 
-if (!ALGOLIA_APP_ID || !ALGOLIA_ADMIN_KEY) {
-  console.warn("Algolia credentials not configured in Cloud Functions.");
-}
+/**
+ * Sync Documents to Algolia
+ */
+export const syncDocumentToSearch = onDocumentWritten("documents/{docId}", async (event) => {
+  const indexName = "documents";
+  const docId = event.params.docId;
+  const snap = event.data?.after;
 
-const client = algoliasearch(ALGOLIA_APP_ID || "", ALGOLIA_ADMIN_KEY || "");
+  if (!snap || !snap.exists) {
+    // Deleted
+    await client.deleteObject({ indexName, objectID: docId });
+    return;
+  }
 
-// --- Documents Sync ---
+  const data = snap.data();
+  if (!data || data.isArchived || !data.userId) {
+    await client.deleteObject({ indexName, objectID: docId });
+    return;
+  }
 
-export const onDocumentWrite = onDocumentWritten("documents/{docId}", async (event) => {
-    const docId = event.params.docId;
-    const change = event.data;
-
-    if (!change) return; // Should not happen for onWritten but for safety
-
-    if (!change.after.exists) {
-      // Deleted
-      try {
-        await client.deleteObject({ indexName: "activity_notes_unified", objectID: docId });
-      } catch (e) {
-        console.error("Error deleting from Algolia", e);
-      }
-      return;
-    }
-
-    const data = change.after.data();
-    if (!data) return;
-
-    const record = {
+  // Update index
+  await client.saveObject({
+    indexName,
+    body: {
       objectID: docId,
-      type: "document",
       title: data.title,
-      content: data.plainText || "", 
-      icon: data.icon,
-      projectId: data.projectId,
+      plainText: data.plainText?.slice(0, 5000),
+      userId: data.userId,
       workspaceId: data.workspaceId,
-      userId: data.userId,
-      createdAt: data.createdAt?.toMillis(),
+      type: data.type || "document",
       updatedAt: data.updatedAt?.toMillis(),
-      path: data.path || [], 
-      url: `/documents/${docId}`
-    };
-
-    try {
-      await client.saveObject({ indexName: "activity_notes_unified", body: record });
-    } catch (e) {
-      console.error("Error saving to Algolia", e);
     }
+  });
 });
 
-// --- Tasks Sync ---
+/**
+ * Sync Tasks to Algolia
+ */
+export const syncTaskToSearch = onDocumentWritten("tasks/{taskId}", async (event) => {
+  const indexName = "tasks";
+  const taskId = event.params.taskId;
+  const snap = event.data?.after;
 
-export const onTaskWrite = onDocumentWritten("tasks/{taskId}", async (event) => {
-    const taskId = event.params.taskId;
-    const change = event.data;
-    if (!change) return;
+  if (!snap || !snap.exists) {
+    await client.deleteObject({ indexName, objectID: taskId });
+    return;
+  }
 
-    if (!change.after.exists) {
-      try {
-        await client.deleteObject({ indexName: "activity_notes_unified", objectID: taskId });
-      } catch (e) {
-        console.error("Error deleting task from Algolia", e);
-      }
-      return;
-    }
+  const data = snap.data();
+  if (!data) return;
 
-    const data = change.after.data();
-    if (!data) return;
-
-    const record = {
+  await client.saveObject({
+    indexName,
+    body: {
       objectID: taskId,
-      type: "task",
-      title: data.content, 
+      title: data.title,
       status: data.status,
-      projectId: data.projectId,
-      assigneeId: data.assigneeId,
-      userId: data.userId, 
-      createdAt: data.createdAt?.toMillis(),
-      updatedAt: data.updatedAt?.toMillis(),
-      url: `/projects/${data.projectId}?task=${taskId}` 
-    };
-
-    try {
-      await client.saveObject({ indexName: "activity_notes_unified", body: record });
-    } catch (e) {
-      console.error("Error saving task to Algolia", e);
-    }
-});
-
-// --- Chat Messages (Comments) Sync ---
-
-export const onMessageWrite = onDocumentWritten("chats/{channelId}/messages/{messageId}", async (event) => {
-    const { channelId, messageId } = event.params;
-    const change = event.data;
-    if (!change) return;
-
-    if (!change.after.exists) {
-      try {
-        await client.deleteObject({ indexName: "activity_notes_unified", objectID: messageId });
-      } catch (e) {
-        console.error("Error deleting message from Algolia", e);
-      }
-      return;
-    }
-
-    const data = change.after.data();
-    if (!data) return;
-
-    const record = {
-      objectID: messageId,
-      type: "comment",
-      content: data.text,
-      channelId: channelId,
+      priority: data.priority,
       userId: data.userId,
-      userName: data.userName,
-      createdAt: data.createdAt?.toMillis(),
-      url: `/projects/${data.projectId || "unknown"}/chat` 
-    };
-
-    try {
-      await client.saveObject({ indexName: "activity_notes_unified", body: record });
-    } catch (e) {
-      console.error("Error saving message to Algolia", e);
+      projectId: data.projectId,
+      updatedAt: data.updatedAt?.toMillis(),
     }
+  });
 });

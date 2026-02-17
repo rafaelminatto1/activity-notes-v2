@@ -262,6 +262,31 @@ export function subscribeToProjectTasks(
   });
 }
 
+export function subscribeToListTasks(
+  userId: string,
+  listId: string,
+  callback: (tasks: Task[]) => void
+) {
+  const q = query(
+    collection(getDb(), TASKS_COLLECTION),
+    where("userId", "==", userId)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const tasks = snapshot.docs
+      .map((d) => ({ id: d.id, ...d.data() } as Task))
+      .filter((t) => t.listId === listId);
+    
+    tasks.sort((a, b) => {
+      const dateA = a.createdAt && typeof (a.createdAt as any).toMillis === 'function' ? (a.createdAt as any).toMillis() : 0;
+      const dateB = b.createdAt && typeof (b.createdAt as any).toMillis === 'function' ? (b.createdAt as any).toMillis() : 0;
+      return dateB - dateA;
+    });
+
+    callback(tasks);
+  });
+}
+
 // --- FILTER EVALUATION ---
 
 function evaluateFilterGroup(item: any, group: FilterGroup): boolean {
