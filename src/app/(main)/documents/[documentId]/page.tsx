@@ -36,6 +36,14 @@ const Editor = dynamic(
   }
 );
 
+const CanvasEditor = dynamic(
+  () => import("@/components/canvas/canvas-editor").then((mod) => mod.CanvasEditor),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[80vh] w-full rounded-xl" />,
+  }
+);
+
 const AUTO_SAVE_DELAY = 1500;
 
 export default function DocumentPage() {
@@ -311,7 +319,13 @@ export default function DocumentPage() {
 
           {/* Editor Central */}
           <div ref={editorRef} className="relative">
-            {user && (
+            {user && document.type === "canvas" ? (
+              <CanvasEditor 
+                documentId={document.id}
+                initialNodes={document.canvasData?.nodes}
+                initialEdges={document.canvasData?.edges}
+              />
+            ) : user && (
               <Editor
                 documentId={document.id}
                 content={initialContentRef.current}

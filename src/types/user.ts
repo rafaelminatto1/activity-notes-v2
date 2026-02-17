@@ -2,6 +2,9 @@ import { Timestamp } from "firebase/firestore";
 
 export interface UserSettings {
   theme: "light" | "dark" | "system";
+  colorPalette: "default" | "ocean" | "forest" | "sunset" | "lavender" | "midnight";
+  density: "compact" | "normal" | "comfortable";
+  editorFont: "sans" | "serif" | "mono";
   defaultView: "list" | "grid";
   fontSize: "small" | "medium" | "large";
   contentWidth: "narrow" | "medium" | "wide";
@@ -18,6 +21,7 @@ export interface UserProfile {
   plan: "free" | "pro";
   settings: UserSettings;
   favoriteIds: string[];
+  favoriteTemplateIds: string[];
   recentDocIds: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp;

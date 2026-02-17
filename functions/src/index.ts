@@ -29,6 +29,8 @@ export * from "./ai/vision-ocr";
 export * from "./ai/voice-transcription";
 export * from "./ai/document-analysis";
 export * from "./ai/whiteboard-ocr";
+export * from "./workspace-invitations";
+export * from "./automations";
 
 // Import GenKit AI functions
 export * from "./genkit/functions";
@@ -376,3 +378,9 @@ async function deleteStorageUrl(url: string): Promise<void> {
     console.warn("[deleteStorageUrl] Failed to delete:", url, err);
   }
 }
+
+// ============================================================
+// Search Sync (Algolia)
+// ============================================================
+export * from "./search-sync";
+

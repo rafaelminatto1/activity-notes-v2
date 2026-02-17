@@ -9,7 +9,10 @@ export type AIActionType =
   | "continueWriting"
   | "generateFromPrompt"
   | "format"
-  | "checkConsistency";
+  | "checkConsistency"
+  | "makeList"
+  | "autoFillTask"
+  | "generateDiagram";
 
 export interface AIRequest {
   action: AIActionType;

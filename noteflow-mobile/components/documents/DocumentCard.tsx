@@ -31,6 +31,8 @@ export function DocumentCard({ document, onPress }: DocumentCardProps) {
         marginBottom: 8,
         borderWidth: 1,
         borderColor: colors.borderLight,
+        borderLeftWidth: 4,
+        borderLeftColor: document.color || colors.primary,
       }}
     >
       <Text style={{ fontSize: 28, marginRight: 12 }}>
@@ -52,6 +54,11 @@ export function DocumentCard({ document, onPress }: DocumentCardProps) {
           {timeAgo}
           {document.plainText ? ` • ${document.plainText.substring(0, 40)}` : ''}
         </Text>
+        {document.allowedUserIds.length > 1 && (
+          <Text style={{ fontSize: 11, color: colors.primary, marginTop: 3, fontWeight: '600' }}>
+            Compartilhado
+          </Text>
+        )}
       </View>
       {document.isFavorite && (
         <Ionicons name="star" size={16} color="#f59e0b" style={{ marginLeft: 8 }} />

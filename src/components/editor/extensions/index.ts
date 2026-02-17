@@ -19,6 +19,9 @@ import { CalloutExtension } from "./callout";
 import { ToggleExtension } from "./toggle";
 import { AIBlockExtension } from "./ai-block";
 import { BacklinkExtension } from "./backlink";
+import { MathInline } from "./math-inline";
+import { MathBlock } from "./math-block";
+import { PdfAnnotatorExtension } from "./pdf-annotator";
 
 const lowlight = createLowlight(common);
 
@@ -71,6 +74,9 @@ export function getEditorExtensions(placeholder?: string) {
     ToggleExtension,
     AIBlockExtension,
     BacklinkExtension,
+    MathInline,
+    MathBlock,
+    PdfAnnotatorExtension,
   ];
 }
 

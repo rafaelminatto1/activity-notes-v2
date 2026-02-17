@@ -5,6 +5,7 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
+  Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -79,8 +80,16 @@ export default function SearchScreen() {
     [colors, router]
   );
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={dismissKeyboard}
+      style={{ flex: 1, backgroundColor: colors.background }}
+    >
       <View
         style={{
           paddingTop: insets.top + 8,
@@ -191,6 +200,6 @@ export default function SearchScreen() {
           ))}
         </View>
       )}
-    </View>
+    </TouchableOpacity>
   );
 }

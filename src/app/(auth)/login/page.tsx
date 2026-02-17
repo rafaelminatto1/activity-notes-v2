@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
 import { FileText, Eye, EyeOff } from "lucide-react";
 import { signInWithEmail, signInWithGoogle, resetPassword } from "@/lib/firebase/auth";
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,18 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 
+function resolveNextPath(nextValue: string | null): string {
+  if (!nextValue) return "/documents";
+  const trimmed = nextValue.trim();
+  if (!trimmed.startsWith("/") || trimmed.startsWith("//")) {
+    return "/documents";
+  }
+  return trimmed;
+}
+
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -32,6 +42,14 @@ export default function LoginPage() {
   const [resetOpen, setResetOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
+  const nextPath = useMemo(
+    () => resolveNextPath(searchParams.get("next")),
+    [searchParams]
+  );
+  const registerHref = useMemo(() => {
+    if (nextPath === "/documents") return "/register";
+    return `/register?next=${encodeURIComponent(nextPath)}`;
+  }, [nextPath]);
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -48,7 +66,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signInWithEmail(email, password);
-      router.push("/documents");
+      router.push(nextPath);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Falha ao entrar.");
     } finally {
@@ -60,7 +78,7 @@ export default function LoginPage() {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
-      router.push("/documents");
+      router.push(nextPath);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Falha ao entrar com Google.");
     } finally {
@@ -213,7 +231,7 @@ export default function LoginPage() {
         <p className="text-center text-sm text-muted-foreground">
           Não tem uma conta?{" "}
           <Link
-            href="/register"
+            href={registerHref}
             className="font-medium text-foreground hover:underline underline-offset-4"
           >
             Criar conta

@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
 import { FileText, Eye, EyeOff } from "lucide-react";
 import { signUpWithEmail, signInWithGoogle } from "@/lib/firebase/auth";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,18 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 
+function resolveNextPath(nextValue: string | null): string {
+  if (!nextValue) return "/documents";
+  const trimmed = nextValue.trim();
+  if (!trimmed.startsWith("/") || trimmed.startsWith("//")) {
+    return "/documents";
+  }
+  return trimmed;
+}
+
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +31,14 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const nextPath = useMemo(
+    () => resolveNextPath(searchParams.get("next")),
+    [searchParams]
+  );
+  const loginHref = useMemo(() => {
+    if (nextPath === "/documents") return "/login";
+    return `/login?next=${encodeURIComponent(nextPath)}`;
+  }, [nextPath]);
 
   function validate(): boolean {
     if (!name.trim()) {
@@ -50,7 +68,7 @@ export default function RegisterPage() {
     try {
       await signUpWithEmail(email, password, name.trim());
       toast.success("Conta criada com sucesso!");
-      router.push("/documents");
+      router.push(nextPath);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Falha ao criar conta.");
     } finally {
@@ -62,7 +80,7 @@ export default function RegisterPage() {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
-      router.push("/documents");
+      router.push(nextPath);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Falha ao entrar com Google.");
     } finally {
@@ -206,7 +224,7 @@ export default function RegisterPage() {
       <p className="text-center text-sm text-muted-foreground">
         Já tem uma conta?{" "}
         <Link
-          href="/login"
+          href={loginHref}
           className="font-medium text-foreground hover:underline underline-offset-4"
         >
           Entrar

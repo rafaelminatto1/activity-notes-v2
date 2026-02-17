@@ -9,6 +9,7 @@ import {
   Copy,
   Trash2,
   Sparkles,
+  Layout,
   Check,
   Loader2,
   AlertTriangle,
@@ -23,6 +24,7 @@ import {
   toggleFavorite,
   createDocument,
   archiveDocument,
+  createTemplate,
 } from "@/lib/firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -46,11 +48,13 @@ import { useEditorStore } from "@/stores/editor-store";
 import { trackDocumentPublished } from "@/lib/firebase/analytics";
 import { toast } from "sonner";
 import { ShareDialog } from "@/components/collaboration/share-dialog";
+import { TemplateEditor } from "@/components/smart/template-editor";
 import type { Document } from "@/types/document";
 import { AutoTagButton } from "@/components/ai/auto-tag-button";
 import { LocationBadge } from "./location-badge";
 import { Collaborators } from "@/components/collaboration/collaborators";
 import { useCollaboration } from "@/hooks/use-collaboration";
+import { SyncStatusIcon } from "@/components/layout/offline-indicator";
 
 interface DocumentToolbarProps {
   document: Document;
@@ -64,11 +68,25 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
   const toggleAIPanel = useAIStore((s) => s.togglePanel);
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [templateEditorOpen, setTemplateEditorOpen] = useState(false);
 
   const isFavorite = userProfile?.favoriteIds?.includes(document.id) ?? false;
   const publicUrl = typeof window !== "undefined"
     ? `${window.location.origin}/preview/${document.id}`
     : `/preview/${document.id}`;
+
+  async function handleSaveAsTemplate(data: any) {
+    if (!user) return;
+    try {
+      await createTemplate(user.uid, {
+        ...data,
+        content: document.content,
+      });
+      toast.success("Template criado com sucesso!");
+    } catch {
+      toast.error("Falha ao criar template.");
+    }
+  }
 
   async function handlePublishToggle() {
     try {
@@ -177,6 +195,12 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
         {/* Share Button (Collaboration) */}
         <ShareDialog />
 
+        <Separator orientation="vertical" className="mx-2 h-4" />
+
+        <SyncStatusIcon />
+
+        <Separator orientation="vertical" className="mx-2 h-4" />
+
         {/* Location */}
         <LocationBadge documentId={document.id} initialLocation={(document as any).location} />
 
@@ -229,6 +253,10 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
             <DropdownMenuItem onClick={handleDuplicate}>
               <Copy className="mr-2 h-4 w-4" />
               Duplicar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTemplateEditorOpen(true)}>
+              <Layout className="mr-2 h-4 w-4" />
+              Salvar como Template
             </DropdownMenuItem>
             <DropdownMenuItem onClick={toggleAIPanel}>
               <Sparkles className="mr-2 h-4 w-4" />
@@ -318,6 +346,16 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
           )}
         </DialogContent>
       </Dialog>
+
+      <TemplateEditor
+        isOpen={templateEditorOpen}
+        onClose={() => setTemplateEditorOpen(false)}
+        onSave={handleSaveAsTemplate}
+        template={{
+          name: document.title,
+          icon: document.icon || "📄",
+        }}
+      />
     </>
   );
 }

@@ -10,14 +10,15 @@ import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from './config';
 
 export async function signUp(email: string, password: string, displayName: string): Promise<User> {
-  const credential = await createUserWithEmailAndPassword(auth, email, password);
+  const normalizedEmail = email.trim().toLowerCase();
+  const credential = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
   const user = credential.user;
 
   await updateProfile(user, { displayName });
 
   await setDoc(doc(db, 'users', user.uid), {
     displayName,
-    email,
+    email: normalizedEmail,
     avatarUrl: '',
     settings: {
       theme: 'system',
@@ -35,7 +36,8 @@ export async function signUp(email: string, password: string, displayName: strin
 }
 
 export async function signIn(email: string, password: string): Promise<User> {
-  const credential = await signInWithEmailAndPassword(auth, email, password);
+  const normalizedEmail = email.trim().toLowerCase();
+  const credential = await signInWithEmailAndPassword(auth, normalizedEmail, password);
   return credential.user;
 }
 
@@ -44,5 +46,6 @@ export async function signOutUser(): Promise<void> {
 }
 
 export async function resetPassword(email: string): Promise<void> {
-  await sendPasswordResetEmail(auth, email);
+  const normalizedEmail = email.trim().toLowerCase();
+  await sendPasswordResetEmail(auth, normalizedEmail);
 }

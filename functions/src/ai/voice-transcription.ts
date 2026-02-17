@@ -92,14 +92,17 @@ export const transcribeAudioNote = functions.https.onCall(async (request) => {
     const transcriptionData = JSON.parse(response.text());
 
     // Update document with transcription data
-    await admin.firestore().collection("notes").doc(documentId).update({
+    await admin.firestore().collection("documents").doc(documentId).update({
       aiAnalysis: {
         summary: transcriptionData.summary,
         actionItems: transcriptionData.actionItems || [],
+        speakers: transcriptionData.speakers || [],
+        decisions: transcriptionData.decisions || [],
         generatedAt: admin.firestore.FieldValue.serverTimestamp(),
       },
       // You might also want to save the full transcript somewhere
-      plainText: (transcriptionData.transcript || ""),
+      plainText: transcriptionData.transcript || "",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     return {

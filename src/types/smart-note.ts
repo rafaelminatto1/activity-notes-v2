@@ -85,6 +85,7 @@ export interface Template {
   description: string;
   content: any; // Tiptap JSON content
   icon: string;
+  color: string;
   category: string;
   userId: string;
   isPublic: boolean;
@@ -107,11 +108,23 @@ export interface Task {
   dueDate?: Timestamp;
   assigneeId?: string;
   documentId?: string; // If embedded in a note
+  projectId?: string | null; // Direct association with a project
   userId: string;
   completedAt?: Timestamp;
   createdAt: Timestamp;
   updatedAt: Timestamp;
   labels?: string[]; // Additional labels
+  
+  // Dependencies
+  blocking?: string[]; // Task IDs that this task blocks
+  blockedBy?: string[]; // Task IDs that block this task
+  relatedTo?: string[]; // Related task IDs
+
+  // Agile / Sprints
+  sprintId?: string | null;
+  storyPoints?: number;
+
+  commentId?: string; // If created from a comment
 }
 
 /**
@@ -137,6 +150,7 @@ export interface Comment {
   userName: string;
   userAvatar?: string;
   content: string;
+  taskId?: string; // If converted to a task
   parentId?: string; // For threaded comments
   selection?: {
     from: number;

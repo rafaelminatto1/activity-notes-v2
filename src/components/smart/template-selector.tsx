@@ -1,266 +1,169 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { FileText, Sparkles, ChevronDown, Plus } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription 
+} from "@/components/ui/dialog";
+import { useTemplateStore } from "@/stores/template-store";
+import { TemplateGallery } from "./template-gallery";
+import { 
+  getSystemTemplates, 
+  getUserTemplates, 
+  createDocument,
+  incrementTemplateUsage 
+} from "@/lib/firebase/firestore";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Template } from "@/types/smart-note";
+import { FilePlus, Sparkles } from "lucide-react";
+import { PREDEFINED_TEMPLATES } from "@/lib/templates/predefined-templates";
+import { Button } from "@/components/ui/button";
 
-interface Template {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  content?: any;
-}
-
-interface TemplateSelectorProps {
-  onUseTemplate?: (template: Template) => void;
-}
-
-export function TemplateSelector({ onUseTemplate }: TemplateSelectorProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function TemplateSelectorModal() {
+  const { isOpen, onClose } = useTemplateStore();
+  const { user } = useAuth();
+  const router = useRouter();
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const loadTemplates = useCallback(async () => {
+    if (!user) return;
+    setIsLoading(true);
+    try {
+      const [systemTemplates, userTemplates] = await Promise.all([
+        getSystemTemplates(),
+        getUserTemplates(user.uid),
+      ]);
+      
+      let allTemplates = [...systemTemplates, ...userTemplates];
+      
+      if (systemTemplates.length === 0) {
+        const predefinedAsTemplates = PREDEFINED_TEMPLATES.map(t => ({
+          ...t,
+          userId: "system",
+          usageCount: 0,
+          createdAt: { seconds: Date.now() / 1000, nanoseconds: 0 },
+          updatedAt: { seconds: Date.now() / 1000, nanoseconds: 0 }
+        } as unknown as Template));
+        
+        allTemplates = [...predefinedAsTemplates, ...userTemplates];
+      }
+
+      setTemplates(allTemplates);
+    } catch (error) {
+      console.error("Error loading templates:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
-    loadTemplates();
-  }, []);
+    if (isOpen && user) {
+      loadTemplates();
+    }
+  }, [isOpen, user, loadTemplates]);
 
-  const loadTemplates = async () => {
+  const handleSelectTemplate = async (template: Template | null) => {
+    if (!user) return;
+    
     try {
-      const response = await fetch("/api/templates");
-      if (response.ok) {
-        const userTemplates = await response.json();
-        setTemplates(userTemplates);
+      const docData = template ? {
+        title: template.name,
+        content: template.content,
+        icon: template.icon,
+      } : {
+        title: "",
+        content: null,
+        icon: "",
+      };
+
+      const docId = await createDocument(user.uid, docData);
+      
+      if (template && !template.id.startsWith("system-")) {
+        const isSystem = template.userId === "system";
+        try {
+          await incrementTemplateUsage(template.id, isSystem, isSystem ? undefined : user.uid);
+        } catch (e) {
+          console.warn("Could not increment template usage:", e);
+        }
       }
+
+      toast.success(template ? `Criado: ${template.name}` : "Nova nota criada");
+      onClose();
+      router.push(`/documents/${docId}`);
     } catch (error) {
-      console.error("Failed to load templates:", error);
+      console.error("Error creating document from template:", error);
+      toast.error("Erro ao criar documento.");
     }
   };
-
-  const handleUseTemplate = async (template: Template) => {
-    try {
-      const response = await fetch("/api/documents", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: `${template.name} (copia)`,
-          content: template.content,
-          icon: template.icon,
-        }),
-      });
-
-      if (response.ok) {
-        const newDoc = await response.json();
-        window.location.href = `/documents/${newDoc.id}`;
-      }
-    } catch (error) {
-      console.error("Failed to use template:", error);
-    }
-  };
-
-  const BUILTIN_TEMPLATES: Template[] = [
-    {
-      id: "blank",
-      name: "Nota em branco",
-      description: "Nota vazia",
-      icon: "📝",
-      category: "general",
-      content: {
-        type: "doc",
-        content: [],
-      },
-    },
-    {
-      id: "meeting",
-      name: "Ata de Reunião",
-      description: "Estrutura para ata de reunião",
-      icon: "👥",
-      category: "meeting",
-      content: {
-        type: "doc",
-        content: [
-          {
-            type: "heading",
-            attrs: { level: 2 },
-            content: [{ type: "text", text: "Ata de Reunião" }],
-          },
-          {
-            type: "paragraph",
-            content: [
-              { type: "text", text: "Data: " },
-              { type: "text", marks: [{ type: "bold" }], text: "Hora: " },
-              { type: "text", text: "Local: " },
-              { type: "text", text: "Participantes: " },
-            ],
-          },
-          {
-            type: "heading",
-            attrs: { level: 3 },
-            content: [{ type: "text", text: "Pauta" }],
-          },
-          {
-            type: "heading",
-            attrs: { level: 3 },
-            content: [{ type: "text", text: "Decisões" }],
-          },
-          {
-            type: "heading",
-            attrs: { level: 3 },
-            content: [{ type: "text", text: "Próximos Passos" }],
-          },
-        ],
-      },
-    },
-    {
-      id: "daily-note",
-      name: "Diário",
-      description: "Template para diário diário",
-      icon: "📅",
-      category: "personal",
-      content: {
-        type: "doc",
-        content: [
-          {
-            type: "heading",
-            attrs: { level: 2 },
-            content: [{ type: "text", text: "{date}" }],
-          },
-          {
-            type: "heading",
-            attrs: { level: 3 },
-            content: [{ type: "text", text: "Humor" }],
-          },
-          {
-            type: "bulletList",
-            content: [
-              {
-                type: "listItem",
-                content: [
-                  { type: "paragraph", content: [{ type: "text", text: "Manhã:" }] },
-                  { type: "paragraph", content: [{ type: "text", text: "Tarde:" }] },
-                  { type: "paragraph", content: [{ type: "text", text: "Noite:" }] },
-                ],
-              },
-            ],
-          },
-          {
-            type: "heading",
-            attrs: { level: 3 },
-            content: [{ type: "text", text: "Acontecimentos do dia" }],
-          },
-        ],
-      },
-    },
-    {
-      id: "project-brief",
-      name: "Brief de Projeto",
-      description: "Brief inicial de projeto",
-      icon: "🚀",
-      category: "work",
-      content: {
-        type: "doc",
-        content: [
-          {
-            type: "heading",
-            attrs: { level: 2 },
-            content: [{ type: "text", text: "Nome do Projeto" }],
-          },
-          {
-            type: "heading",
-            attrs: { level: 3 },
-            content: [{ type: "text", text: "Descrição" }],
-          },
-          {
-            type: "heading",
-            attrs: { level: 3 },
-            content: [{ type: "text", text: "Objetivos" }],
-          },
-          {
-            type: "heading",
-            attrs: { level: 3 },
-            content: [{ type: "text", text: "Milestones" }],
-          },
-          {
-            type: "bulletList",
-            content: [
-              { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Objetivo 1" }] }] },
-              { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Objetivo 2" }] }] },
-              { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Objetivo 3" }] }] },
-            ],
-          },
-        ],
-      },
-    },
-  ];
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted transition-colors"
-      >
-        <FileText size={16} />
-        <span>Templates</span>
-        <ChevronDown
-          size={16}
-          className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full left-full mt-2 bg-popover p-4 rounded-lg shadow-lg border w-80 z-50">
-          <div className="text-xs font-semibold mb-3 text-muted-foreground">
-            Criar a partir de...
-          </div>
-          <div className="space-y-1">
-            <div className="text-xs font-medium text-muted-foreground mb-2">
-              Em branco
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto sm:rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-2xl flex items-center gap-2 font-bold">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Sparkles className="w-5 h-5 text-primary" />
             </div>
-            <button
-              onClick={() => onUseTemplate?.(BUILTIN_TEMPLATES[0])}
-              className="flex items-center gap-3 w-full px-3 py-2 text-sm hover:bg-muted rounded-md"
-            >
-              {BUILTIN_TEMPLATES[0].icon && (
-                <span className="text-xl">{BUILTIN_TEMPLATES[0].icon}</span>
-              )}
-              <span>{BUILTIN_TEMPLATES[0].name}</span>
-            </button>
+            O que vamos criar hoje?
+          </DialogTitle>
+          <DialogDescription className="text-base">
+            Escolha um template para começar com estrutura ou uma nota em branco.
+          </DialogDescription>
+        </DialogHeader>
 
-            <div className="text-xs font-medium text-muted-foreground mt-2 mb-2">
-              Usar Template
-            </div>
-            {templates.length > 0 && (
-              <div>
-                {templates.map((template) => (
-                  <button
-                    key={template.id}
-                    onClick={() => handleUseTemplate(template)}
-                    className="flex items-center gap-3 w-full px-3 py-2 text-sm hover:bg-muted rounded-md"
-                  >
-                    {template.icon && (
-                      <span className="text-xl">{template.icon}</span>
-                    )}
-                    <div className="flex-1">
-                      <span className="text-sm font-medium">{template.name}</span>
-                      <span className="text-xs text-muted-foreground ml-auto">
-                        ({template.category})
-                      </span>
-                    </div>
-                  </button>
-                ))}
+        <div className="py-2">
+          <div 
+            className="group mb-8 p-5 border-2 border-dashed rounded-2xl flex items-center justify-between hover:bg-accent/50 hover:border-primary/50 cursor-pointer transition-all active:scale-[0.98]"
+            onClick={() => handleSelectTemplate(null)}
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                <FilePlus className="w-6 h-6" />
               </div>
-            )}
-
-            <div className="mt-3 pt-2 border-t">
-              <button
-                onClick={() => setIsOpen(false)}
-                className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-              >
-                Gerenciar Templates
-              </button>
+              <div>
+                <h3 className="font-bold text-lg text-foreground">Nota em branco</h3>
+                <p className="text-sm text-muted-foreground">Comece do zero sem formatação prévia.</p>
+              </div>
             </div>
+            <div className="hidden sm:block text-xs font-bold text-primary px-4 py-1.5 bg-primary/10 rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+              Pular →
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-2">
+              Templates Disponíveis
+            </span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          <TemplateGallery 
+            templates={templates}
+            onSelect={handleSelectTemplate}
+            isLoading={isLoading}
+          />
+
+          <div className="mt-8 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => {
+                onClose();
+                router.push("/settings/templates");
+              }}
+              className="w-full text-xs font-bold uppercase tracking-widest py-6"
+            >
+              Gerenciar Meus Templates
+            </Button>
           </div>
         </div>
-      )}
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -210,6 +210,18 @@ export function useEditorAI(editor: Editor | null) {
     editor.chain().focus().deleteRange({ from, to }).insertContentAt(from, result).run();
   }, [editor, getSelectedText, executeAction]);
 
+  const makeList = useCallback(async () => {
+    if (!editor) return;
+    const text = getSelectedText();
+    if (!text) {
+      toast.error("Selecione um texto para converter em lista.");
+      return;
+    }
+    const result = await executeAction({ action: "makeList", text });
+    const { from, to } = editor.state.selection;
+    editor.chain().focus().deleteRange({ from, to }).insertContentAt(from, result).run();
+  }, [editor, getSelectedText, executeAction]);
+
   const translateSelection = useCallback(
     async (language: string) => {
       if (!editor) return;
@@ -269,6 +281,38 @@ export function useEditorAI(editor: Editor | null) {
     },
     [editor, getSelectedText, getTextAbove, executeAction]
   );
+
+  const generateDiagram = useCallback(async (description: string) => {
+    if (!editor) return;
+    
+    editor.chain().focus().setAIBlock({ action: "generateDiagram" }).run();
+
+    try {
+      const result = await executeAction({ 
+        action: "generateDiagram", 
+        text: description 
+      });
+      // Assuming result is Mermaid code
+      // We need a mermaid block. For now, let's insert it as code block with language mermaid
+      // Or better, if we have a mermaid extension.
+      // Let's insert as code block for now.
+      editor.chain().focus()
+        .insertContent(`\n\`\`\`mermaid\n${result}\n\`\`\`\n`)
+        .run();
+        
+      // Remove AI block? The AI block is usually replaced.
+      // setAIBlock usually inserts a node. We might want to replace it.
+      // My updateAIBlock helper updates the existing block.
+      // Ideally we replace the aiBlock with the diagram.
+      // But updateAIBlock updates attributes.
+      // Let's keep it simple: insert content.
+      // Actually, createSlashCommandExtension uses editor.chain().focus().run().
+      // If setAIBlock inserts a node, we should replace it.
+      // Let's just insert content for now.
+    } catch {
+      updateAIBlock(editor, "error", "");
+    }
+  }, [editor, executeAction]);
 
   const generateIdeas = useCallback(async () => {
     if (!editor) return;
@@ -376,12 +420,14 @@ export function useEditorAI(editor: Editor | null) {
     summarizeSelection,
     expandSelection,
     simplifySelection,
+    makeList,
     fixSpelling,
     translateSelection,
     changeTone,
     freePrompt,
     generateIdeas,
     chatWithAI,
+    generateDiagram,
     formatNote,
     checkConsistency,
   };

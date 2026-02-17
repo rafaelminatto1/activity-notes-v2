@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "katex/dist/katex.min.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -177,6 +178,102 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.3 0.04 260 / 0.2);
   --sidebar-ring: oklch(0.6 0.2 260 / 0.3);
+}
+
+[data-palette="custom"] {
+  --primary: var(--custom-primary, oklch(0.488 0.243 264.376));
+  --primary-foreground: var(--custom-primary-foreground, oklch(0.985 0 0));
+  --background: var(--custom-background, oklch(0.985 0.002 247.839));
+  --foreground: var(--custom-foreground, oklch(0.141 0.005 285.823));
+  --accent: var(--custom-accent, oklch(0.967 0.003 264.542));
+}
+
+.dark[data-palette="custom"] {
+  --background: var(--custom-background-dark, oklch(0.12 0.02 260));
+  --foreground: var(--custom-foreground-dark, oklch(0.985 0 0));
+}
+
+/* --- Density Helpers --- */
+
+[data-density="compact"] .tiptap p { margin-bottom: 0.125rem; line-height: 1.4; }
+[data-density="compact"] .tiptap h1 { margin-top: 0.75rem; }
+[data-density="compact"] .tiptap h2 { margin-top: 0.5rem; }
+
+[data-density="comfortable"] .tiptap p { margin-bottom: 1rem; line-height: 2; }
+[data-density="comfortable"] .tiptap h1 { margin-top: 2rem; }
+
+/* --- Theme Palettes --- */
+
+[data-palette="ocean"] {
+  --primary: oklch(0.55 0.18 240); /* Ocean Blue */
+  --primary-foreground: oklch(0.98 0.01 240);
+  --accent: oklch(0.9 0.05 240);
+}
+
+[data-palette="forest"] {
+  --primary: oklch(0.5 0.15 150); /* Forest Green */
+  --primary-foreground: oklch(0.98 0.01 150);
+  --accent: oklch(0.9 0.05 150);
+}
+
+[data-palette="sunset"] {
+  --primary: oklch(0.6 0.22 40); /* Sunset Orange/Red */
+  --primary-foreground: oklch(0.98 0.01 40);
+  --accent: oklch(0.9 0.05 40);
+}
+
+[data-palette="lavender"] {
+  --primary: oklch(0.55 0.18 300); /* Lavender Purple */
+  --primary-foreground: oklch(0.98 0.01 300);
+  --accent: oklch(0.92 0.04 300);
+}
+
+[data-palette="midnight"] {
+  --background: oklch(0.1 0 0); /* True Black */
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.13 0 0);
+  --popover: oklch(0.13 0 0);
+  --primary: oklch(0.7 0.25 250); /* Neon Blue */
+  --primary-foreground: oklch(0.1 0 0);
+  --secondary: oklch(0.18 0 0);
+  --muted: oklch(0.18 0 0);
+  --accent: oklch(0.2 0.2 250 / 0.2);
+  --border: oklch(0.25 0 0);
+  --sidebar: oklch(0.1 0 0);
+}
+
+/* --- Density --- */
+
+[data-density="compact"] {
+  --radius: 0.25rem;
+  --spacing-multiplier: 0.75;
+}
+
+[data-density="normal"] {
+  --radius: 0.75rem;
+  --spacing-multiplier: 1;
+}
+
+[data-density="comfortable"] {
+  --radius: 1rem;
+  --spacing-multiplier: 1.25;
+}
+
+/* Apply spacing multiplier to common paddings/margins if needed, 
+   but for now we'll focus on what tailwind 4 provides or custom classes */
+
+/* --- Fonts --- */
+
+[data-font="sans"] {
+  --font-geist-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+[data-font="serif"] {
+  --font-geist-sans: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+[data-font="mono"] {
+  --font-geist-sans: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 /* Glassmorphism Utilities */
@@ -687,4 +784,31 @@ html.transition-colors *::after {
 }
 ::-webkit-scrollbar-thumb:hover {
   opacity: 0.5;
+}
+
+/* Math Styles */
+.math-inline-container {
+  display: inline-block;
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  background-color: var(--muted);
+}
+
+.math-inline-container:hover {
+  background-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.math-block-container {
+  transition: all 0.2s;
+}
+
+.math-block-container:hover {
+  background-color: var(--accent);
+  border-color: var(--primary);
+}
+
+.katex-display {
+  margin: 0 !important;
 }

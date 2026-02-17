@@ -17,13 +17,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { AIMenu } from "./ai-menu";
 
 interface EditorBubbleMenuProps {
   editor: Editor;
-  onImproveWithAI?: () => void;
 }
 
-export function EditorBubbleMenu({ editor, onImproveWithAI }: EditorBubbleMenuProps) {
+export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
 
@@ -148,14 +148,17 @@ export function EditorBubbleMenu({ editor, onImproveWithAI }: EditorBubbleMenuPr
         <Highlighter className="h-4 w-4" />
       </BubbleButton>
 
-      {onImproveWithAI && (
-        <>
-          <Separator orientation="vertical" className="mx-1 h-6" />
-          <BubbleButton onClick={onImproveWithAI} title="Melhorar com IA">
-            <Sparkles className="h-4 w-4 text-emerald-500" />
-          </BubbleButton>
-        </>
-      )}
+      <Separator orientation="vertical" className="mx-1 h-6" />
+      
+      <AIMenu editor={editor}>
+        <button
+          type="button"
+          title="IA"
+          className="flex h-7 w-7 items-center justify-center rounded-sm hover:bg-accent text-emerald-600 dark:text-emerald-400"
+        >
+          <Sparkles className="h-4 w-4" />
+        </button>
+      </AIMenu>
     </BubbleMenu>
   );
 }

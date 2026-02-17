@@ -36,6 +36,9 @@ import {
   Mail,
   Calendar,
   Network,
+  Sigma,
+  Workflow,
+  FileUp,
 } from "lucide-react";
 
 interface SlashCommandItem {
@@ -107,6 +110,26 @@ function getSlashCommandItems(onImageUpload: () => void): SlashCommandItem[] {
       category: "MÍDIA",
       command: () => onImageUpload(),
     },
+    {
+      title: "PDF",
+      description: "Upload e anotação de PDF",
+      icon: FileUp,
+      category: "MÍDIA",
+      command: (editor) => {
+        window.dispatchEvent(new CustomEvent("slash-pdf"));
+        editor.chain().focus().run();
+      },
+    },
+    {
+      title: "Imagem (Anotar)",
+      description: "Imagem com ferramentas de desenho",
+      icon: Image,
+      category: "MÍDIA",
+      command: (editor) => {
+        window.dispatchEvent(new CustomEvent("slash-image-annotate"));
+        editor.chain().focus().run();
+      },
+    },
     // AVANÇADO
     {
       title: "Código",
@@ -129,6 +152,20 @@ function getSlashCommandItems(onImageUpload: () => void): SlashCommandItem[] {
       icon: Info,
       category: "AVANÇADO",
       command: (editor) => editor.chain().focus().setCallout("info").run(),
+    },
+    {
+      title: "Equação",
+      description: "Bloco de equação LaTeX",
+      icon: Sigma,
+      category: "AVANÇADO",
+      command: (editor) => editor.chain().focus().setMathBlock({ latex: "" }).run(),
+    },
+    {
+      title: "Equação Inline",
+      description: "LaTeX no meio do texto",
+      icon: Sigma,
+      category: "AVANÇADO",
+      command: (editor) => editor.chain().focus().setMathInline({ latex: "" }).run(),
     },
     {
       title: "Toggle",
@@ -220,6 +257,26 @@ function getSlashCommandItems(onImageUpload: () => void): SlashCommandItem[] {
       },
     },
     // IA
+    {
+      title: "AI Assistente",
+      description: "Pedir algo para a IA",
+      icon: Sparkles,
+      category: "IA",
+      command: (editor) => {
+        window.dispatchEvent(new CustomEvent("slash-ai", { detail: "freePrompt" }));
+        editor.chain().focus().run();
+      },
+    },
+    {
+      title: "Gerar Diagrama",
+      description: "Criar fluxograma com IA",
+      icon: Workflow,
+      category: "IA",
+      command: (editor) => {
+        window.dispatchEvent(new CustomEvent("slash-ai", { detail: "generateDiagram" }));
+        editor.chain().focus().run();
+      },
+    },
     {
       title: "Continuar escrevendo",
       description: "IA continua o texto",

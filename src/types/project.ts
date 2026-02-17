@@ -25,11 +25,33 @@ export interface ProjectCreate {
   userId: string;
 }
 
+export type ProjectUpdate = Partial<ProjectCreate>;
+
 /**
- * Dados para atualizar um projeto existente
+ * Sprint status
  */
-export interface ProjectUpdate {
-  name?: string;
-  icon?: string;
-  color?: string;
+export type SprintStatus = "planned" | "active" | "completed";
+
+/**
+ * Sprint Management
+ */
+export interface Sprint {
+  id: string;
+  projectId: string;
+  name: string;
+  goal: string;
+  startDate: Timestamp;
+  endDate: Timestamp;
+  status: SprintStatus;
+  userId: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  completedAt?: Timestamp;
 }
+
+/**
+ * Sprint create data
+ */
+export type SprintCreate = Omit<Sprint, "id" | "createdAt" | "updatedAt">;
+
+

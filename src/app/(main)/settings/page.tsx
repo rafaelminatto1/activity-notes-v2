@@ -13,8 +13,12 @@ import {
   Trash2,
   User,
   Palette,
+  Layout,
+  Key,
   Sparkles,
   Shield,
+  ChevronRight,
+  Globe,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -35,12 +39,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
 } from "@/components/ui/select";
 import {
   AlertDialog,
@@ -261,9 +266,17 @@ export default function SettingsPage() {
             <Palette className="h-4 w-4" />
             Aparência
           </TabsTrigger>
+          <TabsTrigger value="templates" className="flex-1 gap-1.5">
+            <Layout className="h-4 w-4" />
+            Templates
+          </TabsTrigger>
           <TabsTrigger value="ai" className="flex-1 gap-1.5">
             <Sparkles className="h-4 w-4" />
             IA
+          </TabsTrigger>
+          <TabsTrigger value="integrations" className="flex-1 gap-1.5">
+            <Globe className="h-4 w-4" />
+            Integrações
           </TabsTrigger>
           <TabsTrigger value="account" className="flex-1 gap-1.5">
             <Shield className="h-4 w-4" />
@@ -340,6 +353,16 @@ export default function SettingsPage() {
 
         {/* ===== Appearance Tab ===== */}
         <TabsContent value="appearance" className="mt-6 space-y-8">
+          <div className="flex items-center justify-between p-4 bg-primary/5 border border-primary/20 rounded-xl">
+            <div className="space-y-1">
+              <h3 className="font-bold">Personalização Avançada</h3>
+              <p className="text-sm text-muted-foreground">Paletas de cores, temas personalizados e densidade da interface.</p>
+            </div>
+            <Button onClick={() => router.push("/settings/appearance")}>
+              Configurar <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+
           {/* Theme */}
           <div className="space-y-3">
             <Label className="text-base font-medium">Tema da Interface</Label>
@@ -418,10 +441,24 @@ export default function SettingsPage() {
               ))}
             </div>
           </div>
-        </TabsContent>
+          </TabsContent>
 
-        {/* ===== AI Tab ===== */}
-        <TabsContent value="ai" className="mt-6 space-y-6">
+          {/* ===== Templates Tab ===== */}
+          <TabsContent value="templates" className="mt-6">
+            <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed rounded-2xl space-y-4">
+              <Layout className="h-12 w-12 text-muted-foreground opacity-20" />
+              <div className="text-center">
+                <h3 className="text-lg font-bold">Gerenciar Templates</h3>
+                <p className="text-sm text-muted-foreground">Clique no botão abaixo para acessar a gestão de templates.</p>
+              </div>
+              <Button onClick={() => router.push("/settings/templates")}>
+                Abrir Galeria de Templates
+              </Button>
+            </div>
+          </TabsContent>
+
+          {/* ===== AI Tab ===== */}
+          <TabsContent value="ai" className="mt-6 space-y-6">
           {/* AI enabled */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
@@ -505,6 +542,31 @@ export default function SettingsPage() {
                 />
               </div>
             </div>
+          </div>
+        </TabsContent>
+
+        {/* ===== Integrations Tab ===== */}
+        <TabsContent value="integrations" className="mt-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="cursor-pointer hover:border-primary/50 transition-all" onClick={() => router.push("/settings/api")}>
+              <CardHeader>
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
+                  <Key className="h-5 w-5 text-primary" />
+                </div>
+                <CardTitle className="text-lg">API Pública</CardTitle>
+                <CardDescription>Gere chaves para integrar suas notas e tarefas com outras ferramentas.</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="cursor-pointer hover:border-primary/50 transition-all" onClick={() => router.push("/settings/webhooks")}>
+              <CardHeader>
+                <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center mb-2">
+                  <Globe className="h-5 w-5 text-emerald-600" />
+                </div>
+                <CardTitle className="text-lg">Webhooks</CardTitle>
+                <CardDescription>Receba notificações em tempo real no seu servidor quando algo acontecer.</CardDescription>
+              </CardHeader>
+            </Card>
           </div>
         </TabsContent>
 

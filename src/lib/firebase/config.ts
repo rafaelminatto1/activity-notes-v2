@@ -3,6 +3,7 @@ import { getAuth, connectAuthEmulator, type Auth } from "firebase/auth";
 import {
   initializeFirestore,
   connectFirestoreEmulator,
+  enableMultiTabIndexedDbPersistence,
   type Firestore,
   type FirestoreSettings,
 } from "firebase/firestore";
@@ -39,6 +40,18 @@ const app = getFirebaseApp();
 
 export const auth: Auth | null = app ? getAuth(app) : null;
 export const db: Firestore | null = app ? initializeFirestore(app, firestoreSettings) : null;
+
+// Enable Offline Persistence
+if (typeof window !== "undefined" && db) {
+  enableMultiTabIndexedDbPersistence(db).catch((err) => {
+    if (err.code === "failed-precondition") {
+      console.warn("Multiple tabs open, persistence can only be enabled in one tab at a time.");
+    } else if (err.code === "unimplemented") {
+      console.warn("The current browser doesn't support all of the features required to enable persistence");
+    }
+  });
+}
+
 export const storage: FirebaseStorage | null = app ? getStorage(app) : null;
 export const rtdb: Database | null = app ? getDatabase(app) : null;
 export const remoteConfig: RemoteConfig | null = app && typeof window !== 'undefined' ? getRemoteConfig(app) : null;

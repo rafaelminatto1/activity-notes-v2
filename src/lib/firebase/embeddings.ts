@@ -4,18 +4,24 @@ import {
   setDoc,
   getDoc,
   serverTimestamp,
-  getFirestore,
+  // getFirestore,
   query,
   where,
   getDocs,
 } from "firebase/firestore";
+import { db } from "./config";
 import { generateEmbedding } from "@/lib/gemini/client";
 import { getDocument } from "./firestore";
 import type { Embedding } from "@/types/smart-note";
 import type { Document } from "@/types/document";
 import { cosineSimilarity } from "@/lib/utils/math";
 
-const db = getFirestore();
+// const db = getFirestore();
+
+function getDb() {
+  if (!db) throw new Error("Firestore não inicializado.");
+  return db;
+}
 const EMBEDDINGS_COLLECTION = "embeddings";
 
 export async function saveEmbedding(userId: string, documentId: string, vector: number[]): Promise<void> {
@@ -27,12 +33,12 @@ export async function saveEmbedding(userId: string, documentId: string, vector: 
     updatedAt: serverTimestamp() as unknown as any, // Type assertion for compatibility
   };
 
-  const docRef = doc(db, EMBEDDINGS_COLLECTION, documentId);
+  const docRef = doc(getDb(), EMBEDDINGS_COLLECTION, documentId);
   await setDoc(docRef, embeddingData);
 }
 
 export async function getEmbedding(documentId: string): Promise<Embedding | null> {
-  const docRef = doc(db, EMBEDDINGS_COLLECTION, documentId);
+  const docRef = doc(getDb(), EMBEDDINGS_COLLECTION, documentId);
   const snap = await getDoc(docRef);
 
   if (!snap.exists()) return null;
@@ -43,7 +49,7 @@ export async function searchSimilarDocuments(userId: string, searchQuery: string
   try {
     const queryVector = await generateEmbedding(searchQuery);
 
-    const coll = collection(db, EMBEDDINGS_COLLECTION);
+    const coll = collection(getDb(), EMBEDDINGS_COLLECTION);
 
     // Fallback: fetch all embeddings for user and do cosine similarity in memory
     // Firestore vector search requires exact index setup and might not be available in all regions/versions

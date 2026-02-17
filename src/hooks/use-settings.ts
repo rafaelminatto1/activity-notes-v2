@@ -26,5 +26,23 @@ export function useSettings() {
       "--content-max-width",
       CONTENT_WIDTH_MAP[contentWidth] || "720px"
     );
-  }, [settings?.fontSize, settings?.contentWidth]);
+
+    // Palette
+    const palette = settings?.colorPalette || "default";
+    html.setAttribute("data-palette", palette);
+
+    // Density
+    const density = settings?.density || "normal";
+    html.setAttribute("data-density", density);
+
+    // Font
+    const font = settings?.editorFont || "sans";
+    html.setAttribute("data-font", font);
+  }, [
+    settings?.fontSize,
+    settings?.contentWidth,
+    settings?.colorPalette,
+    settings?.density,
+    settings?.editorFont,
+  ]);
 }

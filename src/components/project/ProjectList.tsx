@@ -2,7 +2,7 @@
 
 import { useProjectStore } from "@/stores/project-store";
 import { cn } from "@/lib/utils";
-import { Folder, MoreHorizontal, Pencil, Trash2, Plus } from "lucide-react";
+import { Folder, MoreHorizontal, Pencil, Trash2, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
     DropdownMenu,
@@ -79,6 +79,13 @@ export function ProjectList() {
                                             </div>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="start" className="w-48">
+                                            <DropdownMenuItem onClick={(e) => {
+                                                e.stopPropagation();
+                                                router.push(`/projects/${project.id}/sprints`);
+                                            }}>
+                                                <Calendar className="h-4 w-4 mr-2" />
+                                                Sprints
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem onClick={(e) => handleEdit(project.id, e)}>
                                                 <Pencil className="h-4 w-4 mr-2" />
                                                 Editar

@@ -1,179 +1,336 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, Search, Sparkles } from "lucide-react";
+import { 
+  FileText, 
+  Search, 
+  CheckCircle2, 
+  MessageSquare, 
+  Clock,
+  X
+} from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
 import { useSearchStore } from "@/stores/search-store";
-import { useSearch } from "@/hooks/use-search";
-import { Spinner } from "@/components/ui/spinner";
 import { useSidebarStore } from "@/stores/sidebar-store";
-import { searchSimilarDocuments } from "@/lib/firebase/embeddings";
 import { useAuth } from "@/hooks/use-auth";
-import type { Document } from "@/types/document";
 import { cn } from "@/lib/utils";
+import { searchClient, INDEX_NAME } from "@/lib/search/algolia-client";
+import { InstantSearch, useInstantSearch, useSearchBox, useHits, Configure } from "react-instantsearch";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+// Tipos do Algolia
+interface AlgoliaRecord {
+  objectID: string;
+  type: "document" | "task" | "comment";
+  title?: string;
+  content?: string;
+  icon?: string;
+  path?: string[]; 
+  url: string;
+  createdAt: number;
+  status?: string; 
+  userName?: string; 
+  _highlightResult?: any;
+}
+
+// Componente para sincronizar query
+function CustomSearchBox({ query, refine }: { query: string; refine: (value: string) => void }) {
+  useEffect(() => {
+    refine(query);
+  }, [query, refine]);
+  return null;
+}
+
+// Componente para exibir Highlighting seguro
+function Highlight({ attribute, hit, className }: { attribute: string, hit: any, className?: string }) {
+  const highlightResult = hit._highlightResult?.[attribute];
+  
+  if (!highlightResult) {
+    return <span className={className}>{hit[attribute]}</span>;
+  }
+
+  return (
+    <span 
+      className={className}
+      dangerouslySetInnerHTML={{ __html: highlightResult.value }} 
+    />
+  );
+}
+
+function SearchResults({ onSelect }: { onSelect: (url: string) => void }) {
+  const { hits } = useHits<AlgoliaRecord>();
+  const { status } = useInstantSearch();
+  const isLoading = status === 'loading' || status === 'stalled';
+
+  // Grouping
+  const groupedHits = useMemo(() => {
+    const groups: Record<string, AlgoliaRecord[]> = {
+      document: [],
+      task: [],
+      comment: []
+    };
+    hits.forEach(hit => {
+      if (groups[hit.type]) {
+        groups[hit.type].push(hit);
+      } else {
+        if (!groups['other']) groups['other'] = [];
+        groups['other'].push(hit);
+      }
+    });
+    return groups;
+  }, [hits]);
+
+  const hasResults = hits.length > 0;
+
+  if (!hasResults && !isLoading) {
+    return <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>;
+  }
+
+  return (
+    <>
+      {groupedHits.document?.length > 0 && (
+        <CommandGroup heading="Documentos">
+          {groupedHits.document.map((hit) => (
+            <CommandItem
+              key={hit.objectID}
+              value={`doc-${hit.objectID}`}
+              onSelect={() => onSelect(hit.url)}
+              className="cursor-pointer"
+            >
+              <div className="flex items-center gap-3 w-full overflow-hidden">
+                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-muted/50 shrink-0 text-lg">
+                  {hit.icon || <FileText className="h-4 w-4 text-muted-foreground" />}
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <Highlight attribute="title" hit={hit} className="truncate font-medium text-sm" />
+                  {hit.path && hit.path.length > 0 && (
+                    <span className="text-[10px] text-muted-foreground truncate">
+                      {hit.path.join(" > ")}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      )}
+
+      {groupedHits.task?.length > 0 && (
+        <>
+          <CommandSeparator />
+          <CommandGroup heading="Tarefas">
+            {groupedHits.task.map((hit) => (
+              <CommandItem
+                key={hit.objectID}
+                value={`task-${hit.objectID}`}
+                onSelect={() => onSelect(hit.url)}
+                className="cursor-pointer"
+              >
+                <div className="flex items-center gap-3 w-full overflow-hidden">
+                   <div className={cn(
+                     "flex h-8 w-8 items-center justify-center rounded-md shrink-0",
+                     hit.status === "done" ? "bg-green-100 dark:bg-green-900/30 text-green-600" : "bg-muted/50 text-muted-foreground"
+                   )}>
+                    <CheckCircle2 className="h-4 w-4" />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <Highlight attribute="title" hit={hit} className="truncate font-medium text-sm" />
+                    <span className="text-[10px] text-muted-foreground truncate">
+                       Tarefa
+                    </span>
+                  </div>
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </>
+      )}
+
+      {groupedHits.comment?.length > 0 && (
+        <>
+          <CommandSeparator />
+          <CommandGroup heading="Comentários">
+            {groupedHits.comment.map((hit) => (
+              <CommandItem
+                key={hit.objectID}
+                value={`chat-${hit.objectID}`}
+                onSelect={() => onSelect(hit.url)}
+                className="cursor-pointer"
+              >
+                <div className="flex items-center gap-3 w-full overflow-hidden">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-600 shrink-0">
+                    <MessageSquare className="h-4 w-4" />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <Highlight attribute="content" hit={hit} className="truncate font-medium text-sm" />
+                    <span className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
+                      {hit.userName} • {hit.createdAt ? formatDistanceToNow(hit.createdAt, { addSuffix: true, locale: ptBR }) : ""}
+                    </span>
+                  </div>
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </>
+      )}
+    </>
+  );
+}
+
+function SearchContent({ 
+  query, 
+  onSelect, 
+  recentSearches,
+  onRecentSelect
+}: { 
+  query: string; 
+  onSelect: (url: string) => void;
+  recentSearches: string[];
+  onRecentSelect: (term: string) => void;
+}) {
+  const { refine } = useSearchBox();
+  
+  return (
+    <>
+      <CustomSearchBox query={query} refine={refine} />
+      {query ? (
+         <SearchResults onSelect={onSelect} />
+      ) : (
+         recentSearches.length > 0 && (
+          <CommandGroup heading="Recentes">
+            {recentSearches.map((term, i) => (
+              <CommandItem 
+                key={`recent-${i}`} 
+                value={`recent-${term}`} 
+                onSelect={() => onRecentSelect(term)}
+                className="cursor-pointer"
+              >
+                <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                {term}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+         )
+      )}
+    </>
+  );
+}
+
+function FilterButton({ active, onClick, label, icon }: { active: boolean, onClick: () => void, label: string, icon?: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex items-center px-2.5 py-1 rounded-full text-xs font-medium transition-colors border",
+        active 
+          ? "bg-primary/10 text-primary border-primary/20" 
+          : "bg-background text-muted-foreground border-transparent hover:bg-muted"
+      )}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
 
 export function SearchCommand() {
   const router = useRouter();
-  const { user } = useAuth();
   const { isOpen, close } = useSearchStore();
-  const { results: textResults, loading: textLoading, search, clear } = useSearch();
   const closeMobile = useSidebarStore((s) => s.closeMobile);
   const [query, setQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   
-  // Semantic Search State
-  const [semanticResults, setSemanticResults] = useState<Document[]>([]);
-  const [semanticLoading, setSemanticLoading] = useState(false);
-  const [showSemantic, setShowSemantic] = useState(false);
-
-  const isQuestion = query.trim().endsWith("?") || 
-    /^(quem|onde|como|qual|por que|oq|o que|who|where|how|what|why)/i.test(query.trim());
-
-  const handleSearch = useCallback(
-    (value: string) => {
-      setQuery(value);
-      setShowSemantic(false);
-      if (value.trim().length >= 2) {
-        search(value);
-      } else {
-        clear();
-        setSemanticResults([]);
-      }
-    },
-    [search, clear]
-  );
-
-  const handleSemanticSearch = async () => {
-    if (!user || query.trim().length < 3) return;
-    
-    setShowSemantic(true);
-    setSemanticLoading(true);
-    try {
-      const docs = await searchSimilarDocuments(user.uid, query);
-      setSemanticResults(docs);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSemanticLoading(false);
+  useEffect(() => {
+    const saved = localStorage.getItem("recent_searches");
+    if (saved) {
+      setRecentSearches(JSON.parse(saved));
     }
+  }, []);
+
+  const saveToHistory = (term: string) => {
+    if (!term.trim()) return;
+    const newHistory = [term, ...recentSearches.filter(t => t !== term)].slice(0, 5);
+    setRecentSearches(newHistory);
+    localStorage.setItem("recent_searches", JSON.stringify(newHistory));
   };
 
-  function handleSelect(documentId: string) {
+  const handleSelect = (url: string) => {
+    if (query) saveToHistory(query);
     close();
     closeMobile();
-    setQuery("");
-    clear();
-    setSemanticResults([]);
-    setShowSemantic(false);
-    router.push(`/documents/${documentId}`);
-  }
-
-  // Limpar ao fechar
-  useEffect(() => {
-    if (!isOpen) {
-      setQuery("");
-      clear();
-      setSemanticResults([]);
-      setShowSemantic(false);
-    }
-  }, [isOpen, clear]);
-
-  const isLoading = textLoading || semanticLoading;
+    router.push(url);
+    setTimeout(() => setQuery(""), 300);
+  };
 
   return (
     <CommandDialog open={isOpen} onOpenChange={(open) => !open && close()}>
-      <CommandInput
-        placeholder="Buscar documentos..."
-        value={query}
-        onValueChange={handleSearch}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey && textResults.length === 0) {
-             handleSemanticSearch();
-          }
-        }}
-      />
-      <CommandList>
-        {isLoading && (
-          <div className="flex items-center justify-center py-6">
-            <Spinner className="h-5 w-5" />
-          </div>
-        )}
-
-        {!isLoading && query.trim().length >= 2 && (
-          <CommandGroup>
-            <CommandItem
-              value="ask-ai-trigger"
-              onSelect={handleSemanticSearch}
-              className={cn(
-                "cursor-pointer",
-                isQuestion 
-                  ? "text-purple-600 dark:text-purple-400 font-medium" 
-                  : "text-emerald-600 dark:text-emerald-400"
-              )}
-            >
-              <Sparkles className={cn("mr-2 h-4 w-4", isQuestion && "fill-current")} />
-              Perguntar à IA: "{query}"
-              {isQuestion && <span className="ml-2 text-xs opacity-70">(Recomendado)</span>}
-            </CommandItem>
-          </CommandGroup>
-        )}
-
-        <CommandSeparator />
-
-        {showSemantic && semanticResults.length > 0 && (
-          <CommandGroup heading="Resultados Semânticos (IA)">
-            {semanticResults.map((doc) => (
-              <CommandItem
-                key={`semantic-${doc.id}`}
-                value={`sem-${doc.title}-${doc.id}`}
-                onSelect={() => handleSelect(doc.id)}
-                className="cursor-pointer"
-              >
-                <Sparkles className="mr-2 h-3.5 w-3.5 text-purple-500" />
-                <span className="truncate">{doc.title || "Sem título"}</span>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-
-        {textResults.length > 0 && (
-          <CommandGroup heading="Correspondência Exata">
-            {textResults.map((doc) => (
-              <CommandItem
-                key={doc.id}
-                value={`${doc.title} ${doc.id}`}
-                onSelect={() => handleSelect(doc.id)}
-                className="cursor-pointer"
-              >
-                {doc.icon ? (
-                  <span className="mr-2 text-sm">{doc.icon}</span>
-                ) : (
-                  <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
-                )}
-                <span className="truncate">
-                  {doc.title || "Sem título"}
-                </span>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-
-        {!isLoading && query.trim().length >= 2 && textResults.length === 0 && !showSemantic && (
-          <CommandEmpty>
-            <div className="flex flex-col items-center gap-2 py-4">
-              <Search className="h-8 w-8 text-muted-foreground" />
-              <p>Sem resultados exatos. Tente perguntar à IA.</p>
-            </div>
-          </CommandEmpty>
-        )}
+      <div className="flex flex-col border-b">
+        <div className="flex items-center px-3">
+          <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+          <input
+            className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            placeholder="Buscar em todo o workspace..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            autoFocus
+          />
+          {query && (
+            <button onClick={() => setQuery("")} className="ml-2 text-muted-foreground hover:text-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        
+        <div className="flex items-center gap-1 px-3 pb-2 overflow-x-auto scrollbar-hide">
+          <FilterButton 
+            active={activeFilter === "all"} 
+            onClick={() => setActiveFilter("all")} 
+            label="Tudo" 
+          />
+          <FilterButton 
+            active={activeFilter === "document"} 
+            onClick={() => setActiveFilter("document")} 
+            label="Documentos" 
+            icon={<FileText className="h-3 w-3 mr-1" />}
+          />
+          <FilterButton 
+            active={activeFilter === "task"} 
+            onClick={() => setActiveFilter("task")} 
+            label="Tarefas" 
+            icon={<CheckCircle2 className="h-3 w-3 mr-1" />}
+          />
+          <FilterButton 
+            active={activeFilter === "comment"} 
+            onClick={() => setActiveFilter("comment")} 
+            label="Comentários" 
+            icon={<MessageSquare className="h-3 w-3 mr-1" />}
+          />
+        </div>
+      </div>
+      
+      <CommandList className="max-h-[60vh]">
+        <InstantSearch searchClient={searchClient} indexName={INDEX_NAME} future={{ preserveSharedStateOnUnmount: true }}>
+          <Configure 
+            hitsPerPage={20} 
+            filters={activeFilter !== "all" ? `type:${activeFilter}` : undefined}
+          />
+          <SearchContent 
+            query={query} 
+            onSelect={handleSelect}
+            recentSearches={recentSearches}
+            onRecentSelect={(term) => setQuery(term)}
+          />
+        </InstantSearch>
       </CommandList>
     </CommandDialog>
   );

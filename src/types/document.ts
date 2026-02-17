@@ -1,10 +1,22 @@
 import { Timestamp } from "firebase/firestore";
 import { JSONContent } from "@tiptap/react";
 
+export interface AnnotationLayer {
+  page: number;
+  objects: Record<string, unknown>[];
+  version: string;
+}
+
 export interface Document {
   id: string;
   title: string;
+  type: "document" | "canvas";
   content: JSONContent | null;
+  canvasData?: {
+    nodes: any[];
+    edges: any[];
+    viewport?: { x: number; y: number; zoom: number };
+  };
   plainText: string;
   summary?: string;
   location?: { latitude: number; longitude: number };
@@ -13,6 +25,9 @@ export interface Document {
   coverImage: string;
   workspaceId: string;
   projectId: string | null;
+  spaceId?: string | null;
+  folderId?: string | null;
+  listId?: string | null;
   parentDocumentId: string | null;
   userId: string;
   isArchived: boolean;

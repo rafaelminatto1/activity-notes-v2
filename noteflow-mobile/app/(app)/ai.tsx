@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -37,6 +38,10 @@ export default function AIScreen() {
       }, 100);
     }
   }, [messages.length]);
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
 
   const handleSend = useCallback(async () => {
     if (!input.trim() || isLoading) return;
@@ -144,96 +149,98 @@ export default function AIScreen() {
       </View>
 
       {/* Messages */}
-      {messages.length === 0 ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingHorizontal: 32,
-          }}
-        >
-          <Ionicons name="sparkles" size={48} color={colors.primary} />
-          <Text
+      <TouchableOpacity activeOpacity={1} onPress={dismissKeyboard} style={{ flex: 1 }}>
+        {messages.length === 0 ? (
+          <View
             style={{
-              fontSize: 18,
-              fontWeight: '600',
-              color: colors.text,
-              marginTop: 16,
-              textAlign: 'center',
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingHorizontal: 32,
             }}
           >
-            Assistente IA
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              color: colors.textMuted,
-              marginTop: 8,
-              textAlign: 'center',
-              lineHeight: 20,
-            }}
-          >
-            Pergunte algo sobre seus documentos ou use as ações rápidas abaixo.
-          </Text>
+            <Ionicons name="sparkles" size={48} color={colors.primary} />
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: '600',
+                color: colors.text,
+                marginTop: 16,
+                textAlign: 'center',
+              }}
+            >
+              Assistente IA
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: colors.textMuted,
+                marginTop: 8,
+                textAlign: 'center',
+                lineHeight: 20,
+              }}
+            >
+              Pergunte algo sobre seus documentos ou use as ações rápidas abaixo.
+            </Text>
 
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                marginTop: 24,
+                gap: 8,
+              }}
+            >
+              {QUICK_ACTIONS.map((action) => (
+                <TouchableOpacity
+                  key={action}
+                  onPress={() => handleQuickAction(action)}
+                  style={{
+                    paddingHorizontal: 16,
+                    paddingVertical: 10,
+                    borderRadius: 24,
+                    backgroundColor: colors.surface,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                  }}
+                >
+                  <Text style={{ fontSize: 14, color: colors.text }}>
+                    {AI_ACTION_LABELS[action]}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ) : (
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            renderItem={renderMessage}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingVertical: 16 }}
+            onContentSizeChange={() =>
+              flatListRef.current?.scrollToEnd({ animated: true })
+            }
+          />
+        )}
+
+        {isLoading && (
           <View
             style={{
               flexDirection: 'row',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              marginTop: 24,
-              gap: 8,
+              alignItems: 'center',
+              paddingHorizontal: 20,
+              paddingVertical: 8,
             }}
           >
-            {QUICK_ACTIONS.map((action) => (
-              <TouchableOpacity
-                key={action}
-                onPress={() => handleQuickAction(action)}
-                style={{
-                  paddingHorizontal: 16,
-                  paddingVertical: 10,
-                  borderRadius: 24,
-                  backgroundColor: colors.surface,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                }}
-              >
-                <Text style={{ fontSize: 14, color: colors.text }}>
-                  {AI_ACTION_LABELS[action]}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            <ActivityIndicator size="small" color={colors.primary} />
+            <Text style={{ marginLeft: 8, color: colors.textMuted, fontSize: 14 }}>
+              Pensando...
+            </Text>
           </View>
-        </View>
-      ) : (
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={renderMessage}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingVertical: 16 }}
-          onContentSizeChange={() =>
-            flatListRef.current?.scrollToEnd({ animated: true })
-          }
-        />
-      )}
-
-      {isLoading && (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: 20,
-            paddingVertical: 8,
-          }}
-        >
-          <ActivityIndicator size="small" color={colors.primary} />
-          <Text style={{ marginLeft: 8, color: colors.textMuted, fontSize: 14 }}>
-            Pensando...
-          </Text>
-        </View>
-      )}
+        )}
+      </TouchableOpacity>
 
       {/* Input */}
       <View

@@ -4,6 +4,8 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/components/providers/auth-provider";
+import { OfflineIndicator } from "@/components/layout/offline-indicator";
+import { SWRegistration } from "@/components/providers/sw-registration";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -39,6 +41,8 @@ export default function RootLayout({
         >
           <AuthProvider>
             <TooltipProvider delayDuration={0}>
+              <SWRegistration />
+              <OfflineIndicator />
               {children}
             </TooltipProvider>
           </AuthProvider>

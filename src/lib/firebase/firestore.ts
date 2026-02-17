@@ -21,6 +21,8 @@ import { db } from "./config";
 import { trackDocumentCreated } from "./analytics";
 import type { Document, DocumentCreate, DocumentUpdate } from "@/types/document";
 import type { UserProfile, UserProfileUpdate } from "@/types/user";
+import type { Template } from "@/types/smart-note";
+import { JSONContent } from "@tiptap/react";
 
 function getDb() {
   if (!db) throw new Error("Firestore não inicializado. Verifique suas chaves de API.");
@@ -35,7 +37,16 @@ export async function createUserProfile(
 ) {
   const ref = doc(getDb(), "users", userId);
   const now = serverTimestamp();
-  await setDoc(ref, { ...data, createdAt: now, updatedAt: now }, { merge: true });
+  await setDoc(
+    ref,
+    {
+      ...data,
+      favoriteTemplateIds: [],
+      createdAt: now,
+      updatedAt: now,
+    },
+    { merge: true }
+  );
 }
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
@@ -88,11 +99,16 @@ export async function createDocument(userId: string, data: Partial<DocumentCreat
   delete safeData.userId;
   const docData = {
     title: "",
+    type: data.type || "document",
     content: null,
     plainText: "",
     icon: "",
     coverImage: "",
     workspaceId: "",
+    projectId: null,
+    spaceId: null,
+    folderId: null,
+    listId: null,
     parentDocumentId: null,
     isArchived: false,
     isPublished: false,
@@ -112,6 +128,34 @@ export async function createDocument(userId: string, data: Partial<DocumentCreat
     await updateDoc(parentRef, { childCount: increment(1) });
   }
 
+  return docRef.id;
+}
+
+export async function createWebClipDocument(userId: string, data: {
+  title: string;
+  content: JSONContent | null;
+  plainText: string;
+  sourceUrl: string;
+  coverImage?: string;
+  projectId?: string;
+  tags?: string[];
+}): Promise<string> {
+  const colRef = collection(getDb(), "documents");
+  const docData = {
+    ...data,
+    userId,
+    type: "document",
+    icon: "🌐",
+    isArchived: false,
+    isPublished: false,
+    position: 0,
+    childCount: 0,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+
+  const docRef = await addDoc(colRef, docData);
+  trackDocumentCreated();
   return docRef.id;
 }
 
@@ -245,6 +289,8 @@ export function subscribeToDocuments(
       )
       .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
     callback(docs);
+  }, (error) => {
+    console.error("Error subscribing to documents:", error);
   });
 }
 
@@ -261,6 +307,8 @@ export function subscribeToProjectDocuments(
       .filter((d) => !d.isArchived && d.projectId === projectId)
       .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
     callback(docs);
+  }, (error) => {
+    console.error("Error subscribing to project documents:", error);
   });
 }
 
@@ -275,6 +323,8 @@ export function subscribeToDocument(
       return;
     }
     callback({ id: snap.id, ...snap.data() } as Document);
+  }, (error) => {
+    console.error("Error subscribing to document:", error);
   });
 }
 
@@ -298,3 +348,125 @@ export async function batchArchiveChildren(parentDocumentId: string) {
     await batchArchiveChildren(d.id);
   }
 }
+
+// ---- Templates CRUD ----
+
+export async function createTemplate(
+  userId: string,
+  data: Partial<Template>
+): Promise<string> {
+  const colRef = collection(getDb(), "templates", "user", userId, "items");
+  const templateData = {
+    name: "",
+    description: "",
+    content: null,
+    icon: "📄",
+    color: "#6366f1",
+    category: "Geral",
+    usageCount: 0,
+    isPublic: false,
+    ...data,
+    userId,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+  const docRef = await addDoc(colRef, templateData);
+  return docRef.id;
+}
+
+export async function getUserTemplates(userId: string): Promise<Template[]> {
+  const colRef = collection(getDb(), "templates", "user", userId, "items");
+  const q = query(colRef, orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Template));
+}
+
+export async function getSystemTemplates(): Promise<Template[]> {
+  const colRef = collection(getDb(), "templates", "system", "items");
+  // Some system templates might not have usageCount yet, so just order by name if count is missing
+  const q = query(colRef);
+  const snap = await getDocs(q);
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() } as Template))
+    .sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0));
+}
+
+export async function getTemplate(
+  templateId: string,
+  userId?: string,
+  isSystem: boolean = false
+): Promise<Template | null> {
+  let ref;
+  if (isSystem) {
+    ref = doc(getDb(), "templates", "system", "items", templateId);
+  } else if (userId) {
+    ref = doc(getDb(), "templates", "user", userId, "items", templateId);
+  } else {
+    return null;
+  }
+
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() } as Template;
+}
+
+export async function updateTemplate(
+  userId: string,
+  templateId: string,
+  data: Partial<Template>
+) {
+  const ref = doc(getDb(), "templates", "user", userId, "items", templateId);
+  await updateDoc(ref, { ...data, updatedAt: serverTimestamp() });
+}
+
+export async function deleteTemplate(userId: string, templateId: string) {
+  const ref = doc(getDb(), "templates", "user", userId, "items", templateId);
+  await deleteDoc(ref);
+}
+
+export async function toggleFavoriteTemplate(
+  userId: string,
+  templateId: string
+): Promise<boolean> {
+  const ref = doc(getDb(), "users", userId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) throw new Error("Perfil de usuário não encontrado.");
+
+  const profile = snap.data() as UserProfile;
+  const favoriteTemplateIds = profile.favoriteTemplateIds || [];
+  const isFavorite = favoriteTemplateIds.includes(templateId);
+
+  if (isFavorite) {
+    await updateDoc(ref, {
+      favoriteTemplateIds: arrayRemove(templateId),
+      updatedAt: serverTimestamp(),
+    });
+  } else {
+    await updateDoc(ref, {
+      favoriteTemplateIds: arrayUnion(templateId),
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  return !isFavorite;
+}
+
+export async function incrementTemplateUsage(
+  templateId: string,
+  isSystem: boolean,
+  userId?: string
+) {
+  let ref;
+  if (isSystem) {
+    ref = doc(getDb(), "templates", "system", "items", templateId);
+  } else if (userId) {
+    ref = doc(getDb(), "templates", "user", userId, "items", templateId);
+  } else {
+    return;
+  }
+  await updateDoc(ref, {
+    usageCount: increment(1),
+    updatedAt: serverTimestamp(),
+  });
+}
+

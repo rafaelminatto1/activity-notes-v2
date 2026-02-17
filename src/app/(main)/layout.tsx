@@ -9,7 +9,6 @@ import { useSidebarStore } from "@/stores/sidebar-store";
 import { useSearchStore } from "@/stores/search-store";
 import { useAIStore } from "@/stores/ai-store";
 import { useTasksStore } from "@/stores/tasks-store";
-import { createDocument } from "@/lib/firebase/firestore";
 import { trackPageView } from "@/lib/firebase/analytics";
 import { Sidebar, MobileSidebar } from "@/components/layout/sidebar";
 import { SearchCommand } from "@/components/layout/search-command";
@@ -19,6 +18,10 @@ import { useGlobalQA } from "@/hooks/use-global-qa";
 import { Sidekick } from "@/components/ai/sidekick";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
+import { TemplateSelectorModal } from "@/components/smart/template-selector";
+import { useTemplateStore } from "@/stores/template-store";
+
+import { useAIQAStore } from "@/stores/ai-qa-store";
 
 export default function MainLayout({
   children,
@@ -41,25 +44,22 @@ export default function MainLayout({
   const toggleTasksPanel = useTasksStore((s) => s.togglePanel);
   const closeTasksPanel = useTasksStore((s) => s.closePanel);
 
-  // Global Q&A State
+  // Global Q&A Global Store
+  const isQAOpen = useAIQAStore((s) => s.isOpen);
+  const toggleQA = useAIQAStore((s) => s.toggle);
+  const closeQA = useAIQAStore((s) => s.close);
+
   const {
-    isOpen: isQAOpen,
-    openQA,
-    closeQA,
     isLoading: isQALoading,
     messages: qaMessages,
     askQuestion: askQA,
   } = useGlobalQA();
 
+  const onOpenTemplateSelector = useTemplateStore((s) => s.onOpen);
+
   const handleCreateDocument = useCallback(async () => {
-    if (!user) return;
-    try {
-      const docId = await createDocument(user.uid);
-      router.push(`/documents/${docId}`);
-    } catch {
-      toast.error("Falha ao criar documento.");
-    }
-  }, [user, router]);
+    onOpenTemplateSelector();
+  }, [onOpenTemplateSelector]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function MainLayout({
       // Ctrl+Q — Q&A Global (Ask AI)
       if (e.key === "q" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        isQAOpen ? closeQA() : openQA();
+        toggleQA();
         return;
       }
 
@@ -109,7 +109,7 @@ export default function MainLayout({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [openSearch, toggleSidebar, handleCreateDocument, toggleAIPanel, toggleTasksPanel, isQAOpen, openQA, closeQA]);
+  }, [openSearch, toggleQA, toggleSidebar, handleCreateDocument, toggleAIPanel, toggleTasksPanel]);
 
   // Track page views
   useEffect(() => {
@@ -163,6 +163,7 @@ export default function MainLayout({
 
       <SearchCommand />
       <Sidekick />
+      <TemplateSelectorModal />
       <GlobalQAModal
         isOpen={isQAOpen}
         onClose={closeQA}

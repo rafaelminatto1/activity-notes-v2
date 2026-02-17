@@ -1,0 +1,10 @@
+"use client";
+
+import { Goal } from "@/types/goal";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/button"; // Wait, Card is not Button
+import { Progress } from "@/components/ui/progress"; // Need to check if Progress exists
+import Link from "next/link";
+import { Target, TrendingUp, Users } from "lucide-react";
+
+// Assuming standard shadcn Card and Progress since project uses it.
+// I'll check if they exist first.

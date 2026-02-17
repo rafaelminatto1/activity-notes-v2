@@ -9,3 +9,23 @@ export interface Workspace {
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
+
+export type WorkspaceInvitationStatus =
+  | "pending"
+  | "accepted"
+  | "declined"
+  | "canceled";
+
+export interface WorkspaceInvitation {
+  id: string;
+  workspaceId: string;
+  workspaceName: string;
+  workspaceIcon: string;
+  invitedEmail: string;
+  invitedBy: string;
+  invitedByName: string;
+  status: WorkspaceInvitationStatus;
+  acceptedBy: string | null;
+  createdAt: Timestamp | null;
+  updatedAt: Timestamp | null;
+}

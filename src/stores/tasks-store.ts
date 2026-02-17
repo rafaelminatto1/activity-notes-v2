@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { Task, TaskStatus, TaskPriority } from "@/types/smart-note";
+import type { FilterGroup, SavedView } from "@/types/view";
 import {
   createTask,
   updateTask,
@@ -9,12 +10,13 @@ import {
 } from "@/lib/firebase/tasks";
 import { toast } from "sonner";
 
-interface TaskFilter {
+export interface TaskFilter {
   status?: TaskStatus | "all";
   priority?: TaskPriority | "all";
   assignee?: string | "all";
   dueDate?: "overdue" | "today" | "this-week" | "next-week" | "all";
   searchQuery?: string;
+  advanced?: FilterGroup;
 }
 
 export interface TasksStore {
@@ -23,6 +25,10 @@ export interface TasksStore {
   initialized: boolean;
   unsubscribe: (() => void) | null;
   filter: TaskFilter;
+  
+  // Views
+  savedViews: SavedView[];
+  activeViewId: string | null;
 
   // UI State
   isPanelOpen: boolean;
@@ -39,6 +45,11 @@ export interface TasksStore {
   toggleTaskComplete: (task: Task) => Promise<void>;
   setFilter: (updates: Partial<TaskFilter>) => void;
   clearFilter: (key?: keyof TaskFilter) => void;
+  
+  // View Actions
+  setSavedViews: (views: SavedView[]) => void;
+  setActiveView: (viewId: string | null) => void;
+  applyView: (view: SavedView) => void;
 }
 
 export const useTasksStore = create<TasksStore>((set, get) => ({
@@ -47,6 +58,9 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
   initialized: false,
   unsubscribe: null,
   filter: {},
+  
+  savedViews: [],
+  activeViewId: "all",
 
   isPanelOpen: false,
   togglePanel: () => set((state) => ({ isPanelOpen: !state.isPanelOpen })),
@@ -73,17 +87,15 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 
     const unsub = subscribeToTasks(userId, documentId, (tasks) => {
       set({ tasks, isLoading: false, initialized: true });
-    });
+    }, get().filter.advanced);
 
     set({ unsubscribe: unsub });
   },
 
   createTask: async (userId, task) => {
-    // Optimistic update (opcional, mas recomendado)
+    // Optimistic update
     const tempId = Math.random().toString(36).substring(7);
-    const optimisticTask = { ...task, id: tempId, userId } as Task;
-
-    // set((state) => ({ tasks: [optimisticTask, ...state.tasks] }));
+    // const optimisticTask = { ...task, id: tempId, userId } as Task;
 
     try {
       const id = await createTask(userId, task);
@@ -92,7 +104,6 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
     } catch (error) {
       console.error("Failed to create task:", error);
       toast.error("Erro ao criar tarefa");
-      // Revert optimistic update se implementado
       throw error;
     }
   },
@@ -107,7 +118,6 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
     } catch (error) {
       console.error("Failed to update task:", error);
       toast.error("Erro ao atualizar tarefa");
-      // Revert logic would go here
     }
   },
 
@@ -141,4 +151,17 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
         ? { ...state.filter, [key]: undefined }
         : {},
     })),
+
+  setSavedViews: (savedViews) => set({ savedViews }),
+  
+  setActiveView: (activeViewId) => set({ activeViewId }),
+  
+  applyView: (view) => {
+    set({
+      activeViewId: view.id,
+      filter: {
+        advanced: view.filters
+      }
+    });
+  }
 }));

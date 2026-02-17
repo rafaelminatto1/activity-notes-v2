@@ -8,7 +8,7 @@ import { createSlashCommandExtension, SlashCommandMenu } from "./slash-command";
 import { Toolbar } from "./toolbar";
 import { EditorBubbleMenu } from "./bubble-menu";
 import { useEditorAI } from "@/hooks/use-editor-ai";
-import { uploadImage } from "@/lib/firebase/storage";
+import { uploadImage, uploadFile } from "@/lib/firebase/storage";
 import { toast } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAutoEmbedding } from "@/hooks/use-auto-embedding";
@@ -38,10 +38,20 @@ export function Editor({
   const { collaborators, updateCursor } = useCollaboration(documentId);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
+  const annotatableImageInputRef = useRef<HTMLInputElement>(null);
   const initialContentSet = useRef(false);
 
   const handleImageUpload = useCallback(() => {
     fileInputRef.current?.click();
+  }, []);
+
+  const handlePdfUpload = useCallback(() => {
+    pdfInputRef.current?.click();
+  }, []);
+
+  const handleAnnotatableImageUpload = useCallback(() => {
+    annotatableImageInputRef.current?.click();
   }, []);
 
   const slashCommandExtension = useMemo(
@@ -143,12 +153,34 @@ export function Editor({
         case "translate":
           ai.translateSelection("English");
           break;
+        case "freePrompt": {
+          const prompt = window.prompt("O que você gostaria que a IA escrevesse?");
+          if (prompt) ai.freePrompt(prompt);
+          break;
+        }
+        case "generateDiagram": {
+          const desc = window.prompt("Descreva o diagrama que deseja criar:");
+          if (desc) ai.generateDiagram(desc);
+          break;
+        }
+        case "slash-pdf":
+          handlePdfUpload();
+          break;
+        case "slash-image-annotate":
+          handleAnnotatableImageUpload();
+          break;
       }
     }
 
     window.addEventListener("slash-ai", handleSlashAI);
-    return () => window.removeEventListener("slash-ai", handleSlashAI);
-  }, [ai]);
+    window.addEventListener("slash-pdf", handleSlashAI);
+    window.addEventListener("slash-image-annotate", handleSlashAI);
+    return () => {
+      window.removeEventListener("slash-ai", handleSlashAI);
+      window.removeEventListener("slash-pdf", handleSlashAI);
+      window.removeEventListener("slash-image-annotate", handleSlashAI);
+    };
+  }, [ai, handlePdfUpload, handleAnnotatableImageUpload]);
 
   // Listen for mention/backlink insertion and update Firestore
   useEffect(() => {
@@ -212,6 +244,38 @@ export function Editor({
     [editor, userId]
   );
 
+  const handleAnnotatableFile = useCallback(
+    async (file: File, type: "pdf" | "image") => {
+      if (!editor) return;
+
+      const toastId = toast.loading(`Enviando ${type === "pdf" ? "PDF" : "imagem"}...`);
+      try {
+        // Use uploadFile for PDF/Annotatable to preserve quality/format
+        const url = await uploadFile(file, userId, "annotatable-files", (progress) => {
+          toast.loading(`Enviando... ${progress}%`, { id: toastId });
+        });
+
+        editor.chain().focus().insertContent({
+          type: "pdfAnnotator",
+          attrs: {
+            src: url,
+            type: type,
+            title: file.name,
+            width: "100%",
+          },
+        }).run();
+
+        toast.success("Arquivo pronto para anotação!", { id: toastId });
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Erro ao enviar arquivo.",
+          { id: toastId }
+        );
+      }
+    },
+    [editor, userId]
+  );
+
   const handleFileInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -219,6 +283,24 @@ export function Editor({
       e.target.value = "";
     },
     [handleImageFile]
+  );
+
+  const handlePdfInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) handleAnnotatableFile(file, "pdf");
+      e.target.value = "";
+    },
+    [handleAnnotatableFile]
+  );
+
+  const handleAnnotatableImageInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) handleAnnotatableFile(file, "image");
+      e.target.value = "";
+    },
+    [handleAnnotatableFile]
   );
 
   if (!editor) return null;
@@ -245,7 +327,7 @@ export function Editor({
             loading: ai.loading,
           }}
         />
-        <EditorBubbleMenu editor={editor} onImproveWithAI={ai.improveSelection} />
+        <EditorBubbleMenu editor={editor} />
         <SlashCommandMenu editor={editor} onImageUpload={handleImageUpload} />
         <EditorContent editor={editor} className="mt-4" />
         <input
@@ -254,6 +336,20 @@ export function Editor({
           accept="image/*"
           className="hidden"
           onChange={handleFileInputChange}
+        />
+        <input
+          ref={pdfInputRef}
+          type="file"
+          accept="application/pdf"
+          className="hidden"
+          onChange={handlePdfInputChange}
+        />
+        <input
+          ref={annotatableImageInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleAnnotatableImageInputChange}
         />
       </div>
     </TooltipProvider>

@@ -8,14 +8,12 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
   limit,
   onSnapshot,
   serverTimestamp,
   arrayUnion,
   arrayRemove,
   Timestamp,
-  QueryConstraint,
   Unsubscribe,
 } from 'firebase/firestore';
 import { db } from './config';
@@ -31,16 +29,42 @@ function parseTimestamp(ts: unknown): Date {
   return new Date();
 }
 
+function parseStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string' && !!item.trim());
+}
+
+function mergeAndSortDocuments(first: Document[], second: Document[]): Document[] {
+  const map = new Map<string, Document>();
+  [...first, ...second].forEach((item) => {
+    map.set(item.id, item);
+  });
+
+  return Array.from(map.values()).sort(
+    (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
+  );
+}
+
 function docToDocument(id: string, data: Record<string, unknown>): Document {
+  const userId = (data.userId as string) || '';
+  const allowedUserIds = parseStringArray(data.allowedUserIds);
+  if (allowedUserIds.length === 0 && userId) {
+    allowedUserIds.push(userId);
+  }
+
   return {
     id,
     title: (data.title as string) || '',
     content: (data.content as Record<string, unknown>) || null,
     plainText: (data.plainText as string) || '',
     icon: (data.icon as string) || '',
+    color: (data.color as string) || '#10b981',
     coverImage: (data.coverImage as string) || '',
+    workspaceId: (data.workspaceId as string) || null,
+    projectId: (data.projectId as string) || null,
     parentDocumentId: (data.parentDocumentId as string) || null,
-    userId: (data.userId as string) || '',
+    userId,
+    allowedUserIds,
     isArchived: (data.isArchived as boolean) || false,
     isPublished: (data.isPublished as boolean) || false,
     isFavorite: (data.isFavorite as boolean) || false,
@@ -52,14 +76,22 @@ function docToDocument(id: string, data: Record<string, unknown>): Document {
 }
 
 export async function createDocument(userId: string, data: DocumentCreate): Promise<string> {
+  const allowedUserIds = Array.from(
+    new Set([userId, ...((data.allowedUserIds || []).filter((item) => !!item.trim()))])
+  );
+
   const docRef = await addDoc(collection(db, DOCUMENTS_COLLECTION), {
     title: data.title || '',
     content: null,
     plainText: '',
     icon: data.icon || '📝',
+    color: data.color || '#10b981',
     coverImage: '',
+    workspaceId: data.workspaceId || null,
+    projectId: data.projectId || null,
     parentDocumentId: data.parentDocumentId || null,
     userId,
+    allowedUserIds,
     isArchived: false,
     isPublished: false,
     isFavorite: false,
@@ -90,44 +122,88 @@ export async function getDocument(docId: string): Promise<Document | null> {
 }
 
 export async function getUserDocuments(userId: string): Promise<Document[]> {
-  const constraints: QueryConstraint[] = [
+  const q = query(
+    collection(db, DOCUMENTS_COLLECTION),
     where('userId', '==', userId),
-    where('isArchived', '==', false),
-    orderBy('updatedAt', 'desc'),
-    limit(50),
-  ];
-  const q = query(collection(db, DOCUMENTS_COLLECTION), ...constraints);
+    limit(200)
+  );
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => docToDocument(d.id, d.data()));
+  return snapshot.docs
+    .map((d) => docToDocument(d.id, d.data()))
+    .filter((docItem) => !docItem.isArchived)
+    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
 }
 
 export async function getArchivedDocuments(userId: string): Promise<Document[]> {
   const q = query(
     collection(db, DOCUMENTS_COLLECTION),
     where('userId', '==', userId),
-    where('isArchived', '==', true),
-    orderBy('updatedAt', 'desc'),
-    limit(50)
+    limit(200)
   );
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => docToDocument(d.id, d.data()));
+  return snapshot.docs
+    .map((d) => docToDocument(d.id, d.data()))
+    .filter((docItem) => docItem.isArchived)
+    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
 }
 
 export function subscribeToDocuments(
   userId: string,
   callback: (docs: Document[]) => void
 ): Unsubscribe {
-  const q = query(
+  let ownedDocuments: Document[] = [];
+  let sharedDocuments: Document[] = [];
+
+  const emit = () => {
+    callback(mergeAndSortDocuments(ownedDocuments, sharedDocuments));
+  };
+
+  const ownedQuery = query(
     collection(db, DOCUMENTS_COLLECTION),
     where('userId', '==', userId),
-    where('isArchived', '==', false),
-    orderBy('updatedAt', 'desc'),
-    limit(50)
+    limit(200)
   );
-  return onSnapshot(q, (snapshot) => {
-    const docs = snapshot.docs.map((d) => docToDocument(d.id, d.data()));
-    callback(docs);
-  });
+
+  const sharedQuery = query(
+    collection(db, DOCUMENTS_COLLECTION),
+    where('allowedUserIds', 'array-contains', userId),
+    limit(200)
+  );
+
+  const unsubOwned = onSnapshot(
+    ownedQuery,
+    (snapshot) => {
+      ownedDocuments = snapshot.docs
+        .map((d) => docToDocument(d.id, d.data()))
+        .filter((docItem) => !docItem.isArchived);
+      emit();
+    },
+    (error) => {
+      console.error('Error subscribing owned documents:', error);
+      ownedDocuments = [];
+      emit();
+    }
+  );
+
+  const unsubShared = onSnapshot(
+    sharedQuery,
+    (snapshot) => {
+      sharedDocuments = snapshot.docs
+        .map((d) => docToDocument(d.id, d.data()))
+        .filter((docItem) => !docItem.isArchived);
+      emit();
+    },
+    (error) => {
+      console.error('Error subscribing shared documents:', error);
+      sharedDocuments = [];
+      emit();
+    }
+  );
+
+  return () => {
+    unsubOwned();
+    unsubShared();
+  };
 }
 
 export async function toggleFavorite(userId: string, docId: string, isFavorite: boolean): Promise<void> {

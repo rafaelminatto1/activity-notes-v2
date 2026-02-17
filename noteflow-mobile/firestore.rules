@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Perfil do Usuário
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // PROJETOS
+    match /projects/{projectId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid || 
+        (resource.data.memberIds != null && request.auth.uid in resource.data.memberIds)
+      );
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // DOCUMENTOS
+    match /documents/{documentId} {
+      allow read: if (request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        (resource.data.allowedUserIds != null && request.auth.uid in resource.data.allowedUserIds)
+      )) || resource.data.isPublished == true;
+      
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // WORKSPACES
+    match /workspaces/{workspaceId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null && (
+        resource.data.ownerId == request.auth.uid || 
+        (resource.data.members != null && request.auth.uid in resource.data.members)
+      );
+      allow update, delete: if request.auth != null && resource.data.ownerId == request.auth.uid;
+    }
+
+    // Regra para a subcoleção de membros (usada em collectionGroup queries)
+    match /{path=**}/members/{memberId} {
+      allow read: if request.auth != null && (
+        resource.data.uid == request.auth.uid ||
+        request.auth.uid == get(/databases/$(database)/documents/$(path)).data.ownerId ||
+        request.auth.uid == get(/databases/$(database)/documents/$(path)).data.userId
+      );
+    }
+
+    // AI Usage
+    match /users/{userId}/aiUsage/{usageId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

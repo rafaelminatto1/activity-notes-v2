@@ -12,6 +12,7 @@ import {
   Copy,
   Sparkles,
   FolderOpen,
+  LayoutDashboard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -41,11 +42,12 @@ interface DocumentItemProps {
   id: string;
   title: string;
   icon: string;
+  type: "document" | "canvas";
   childCount: number;
   level: number;
 }
 
-function DocumentItem({ id, title, icon, childCount, level }: DocumentItemProps) {
+function DocumentItem({ id, title, icon, type, childCount, level }: DocumentItemProps) {
   const router = useRouter();
   const params = useParams();
   const { user, userProfile } = useAuth();
@@ -159,6 +161,8 @@ function DocumentItem({ id, title, icon, childCount, level }: DocumentItemProps)
         {/* Icon */}
         {icon ? (
           <span className="shrink-0 text-sm">{icon}</span>
+        ) : type === "canvas" ? (
+          <LayoutDashboard className="h-4 w-4 shrink-0 text-primary/70" />
         ) : (
           <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
         )}
@@ -277,6 +281,7 @@ function DocumentList({ parentDocumentId, level }: DocumentListProps) {
           id={doc.id}
           title={doc.title}
           icon={doc.icon}
+          type={doc.type}
           childCount={doc.childCount}
           level={level}
         />

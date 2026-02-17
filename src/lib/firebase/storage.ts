@@ -150,6 +150,37 @@ export async function uploadCoverImage(
   });
 }
 
+export async function uploadFile(
+  file: File,
+  userId: string,
+  path: string = "attachments",
+  onProgress?: ProgressCallback
+): Promise<string> {
+  const fileName = `${Date.now()}-${file.name}`;
+  const storageRef = ref(getStorageInstance(), `${path}/${userId}/${fileName}`);
+
+  return new Promise((resolve, reject) => {
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot: UploadTaskSnapshot) => {
+        if (onProgress) {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          onProgress(Math.round(progress));
+        }
+      },
+      (error) => {
+        reject(new Error(`Falha no upload do arquivo: ${error.message}`));
+      },
+      async () => {
+        const url = await getDownloadURL(uploadTask.snapshot.ref);
+        resolve(url);
+      }
+    );
+  });
+}
+
 export async function deleteImage(imageUrl: string): Promise<void> {
   try {
     const storageRef = ref(getStorageInstance(), imageUrl);

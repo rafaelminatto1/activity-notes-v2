@@ -2,6 +2,79 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ============================================================
+    // Global Helper Functions
+    // ============================================================
+    function isAdmin() {
+      return request.auth != null && request.auth.token.role == "admin";
+    }
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isMember(memberList) {
+      return isAuthenticated()
+             && memberList is list
+             && request.auth.uid in memberList;
+    }
+
+    function workspaceDoc(workspaceId) {
+      return get(/databases/$(database)/documents/workspaces/$(workspaceId));
+    }
+
+    function isWorkspaceOwner(workspaceId) {
+      return isAuthenticated()
+             && workspaceId is string
+             && workspaceDoc(workspaceId).data.ownerId == request.auth.uid;
+    }
+
+    function canManageWorkspace(workspaceId) {
+      return isWorkspaceOwner(workspaceId);
+    }
+
+    function invitationDocById(invitationId) {
+      return get(/databases/$(database)/documents/workspace_invitations/$(invitationId));
+    }
+
+    function canAccessWorkspace(workspaceId) {
+      return isAuthenticated()
+             && workspaceId is string
+             && (
+               isWorkspaceOwner(workspaceId)
+               || isMember(workspaceDoc(workspaceId).data.members)
+               || exists(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid))
+             );
+    }
+
+    function getMemberData(workspaceId, userId) {
+      return get(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(userId)).data;
+    }
+
+    function checkPermission(workspaceId, resource, action) {
+      let member = getMemberData(workspaceId, request.auth.uid);
+      let roleId = member.roleId;
+      // Admin check
+      if (roleId == "admin") { return true; }
+      // Editor check (simple implementation for rules)
+      if (roleId == "editor") {
+        return (resource == "documents" && (action in ["read", "create", "update"]))
+               || (resource == "tasks" && (action in ["read", "create", "update", "delete"]))
+               || (resource == "projects" && (action in ["read", "update"]));
+      }
+      // Viewer check
+      if (roleId == "viewer") {
+        return action == "read";
+      }
+      // Fallback or custom roles would require more complex get() calls
+      return false;
+    }
+
+    // Allow admins full access
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // ============================================================
     // Users can only read/write their own profile
     // ============================================================
     match /users/{userId} {
@@ -12,22 +85,100 @@ service cloud.firestore {
     // Projects Collection (for organizing documents)
     // ============================================================
     match /projects/{projectId} {
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated()
+                    && request.resource.data.userId == request.auth.uid
+                    && (
+                      (
+                        request.resource.data.workspaceId is string
+                        && canAccessWorkspace(request.resource.data.workspaceId)
+                      )
+                      || (
+                        request.resource.data.workspaceId == null
+                        && isMember(request.resource.data.memberIds)
+                      )
+                    );
+      allow read: if isAuthenticated()
+                  && (
+                    resource.data.userId == request.auth.uid
+                    || (
+                      resource.data.workspaceId is string
+                      && canAccessWorkspace(resource.data.workspaceId)
+                    )
+                    || (
+                      resource.data.workspaceId == null
+                      && isMember(resource.data.memberIds)
+                    )
+                  );
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
 
     // ============================================================
     // Documents - owner access + published docs are public
     // ============================================================
     match /documents/{documentId} {
-      // Query access: allow users to query their own documents
-      allow read: if request.auth != null && request.query.where[0].field == 'userId' && request.query.where[0].value == request.auth.uid
-                  || resource.data.isPublished == true
-                  || (request.auth != null && request.auth.uid == resource.data.userId);
-      allow create: if request.auth != null
-                    && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if request.auth != null
-                            && resource.data.userId == request.auth.uid;
+      // Allow read if user is owner or doc is published or has RBAC read permission
+      allow read: if (isAuthenticated()
+                      && (
+                        resource.data.userId == request.auth.uid
+                        || (
+                          resource.data.workspaceId is string
+                          && (canAccessWorkspace(resource.data.workspaceId) && checkPermission(resource.data.workspaceId, "documents", "read"))
+                        )
+                        || (
+                          resource.data.workspaceId == null
+                          && isMember(resource.data.allowedUserIds)
+                        )
+                      ))
+                  || resource.data.isPublished == true;
+      allow create: if isAuthenticated()
+                    && request.resource.data.userId == request.auth.uid
+                    && (
+                      (
+                        request.resource.data.workspaceId is string
+                        && canAccessWorkspace(request.resource.data.workspaceId)
+                        && checkPermission(request.resource.data.workspaceId, "documents", "create")
+                      )
+                      || (
+                        request.resource.data.workspaceId == null
+                        && isMember(request.resource.data.allowedUserIds)
+                      )
+                    );
+      allow update: if isAuthenticated()
+                    && (
+                      resource.data.userId == request.auth.uid
+                      || (
+                        resource.data.workspaceId is string
+                        && canAccessWorkspace(resource.data.workspaceId)
+                        && checkPermission(resource.data.workspaceId, "documents", "update")
+                      )
+                      || (
+                        resource.data.workspaceId == null
+                        && isMember(resource.data.allowedUserIds)
+                      )
+                    );
+      allow delete: if isAuthenticated()
+                    && (
+                      resource.data.userId == request.auth.uid
+                      || (
+                        resource.data.workspaceId is string
+                        && canAccessWorkspace(resource.data.workspaceId)
+                        && checkPermission(resource.data.workspaceId, "documents", "delete")
+                      )
+                    );
+
+      // ============================================================
+      // Subcollections for Collaboration
+      // ============================================================
+      match /presence/{userId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      match /invitations/{invitationId} {
+        allow read: if request.auth != null && (request.auth.token.email == resource.data.email || request.auth.uid == resource.data.invitedBy);
+        allow create: if request.auth != null;
+        allow update, delete: if request.auth != null && request.auth.uid == resource.data.invitedBy;
+      }
     }
 
     // ============================================================
@@ -54,7 +205,22 @@ service cloud.firestore {
     // Tasks Collection (independent or embedded in notes)
     // ============================================================
     match /tasks/{taskId} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        (resource.data.workspaceId is string && checkPermission(resource.data.workspaceId, "tasks", "read"))
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.userId == request.auth.uid ||
+        (request.resource.data.workspaceId is string && checkPermission(request.resource.data.workspaceId, "tasks", "create"))
+      );
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        (resource.data.workspaceId is string && checkPermission(resource.data.workspaceId, "tasks", "update"))
+      );
+      allow delete: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        (resource.data.workspaceId is string && checkPermission(resource.data.workspaceId, "tasks", "delete"))
+      );
     }
 
     // ============================================================
@@ -131,10 +297,90 @@ service cloud.firestore {
     // Workspaces (for collaboration)
     // ============================================================
     match /workspaces/{workspaceId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null
+      allow read: if isAuthenticated()
+                  && (
+                    resource.data.ownerId == request.auth.uid
+                    || isMember(resource.data.members)
+                    || exists(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid))
+                  );
+      allow create: if isAuthenticated()
+                    && request.resource.data.ownerId == request.auth.uid
+                    && isMember(request.resource.data.members);
+      allow update, delete: if isAuthenticated()
                             && resource.data.ownerId == request.auth.uid;
+
+      match /members/{memberId} {
+        allow read: if canAccessWorkspace(workspaceId)
+                    || (isAuthenticated() && request.auth.uid == memberId);
+        allow create: if isAuthenticated()
+                      && (
+                        canManageWorkspace(workspaceId)
+                        || (
+                          request.auth.uid == memberId
+                          && request.resource.data.uid == request.auth.uid
+                          && request.resource.data.invitationId is string
+                          && request.auth.token.email is string
+                          && request.resource.data.email is string
+                          && request.resource.data.email.lower() == request.auth.token.email.lower()
+                          && invitationDocById(request.resource.data.invitationId).data.invitedEmail is string
+                          && invitationDocById(request.resource.data.invitationId).data.workspaceId == workspaceId
+                          && invitationDocById(request.resource.data.invitationId).data.invitedEmail.lower() == request.auth.token.email.lower()
+                          && invitationDocById(request.resource.data.invitationId).data.status == "pending"
+                        )
+                      );
+        allow update: if canManageWorkspace(workspaceId)
+                      || request.auth.uid == memberId;
+        allow delete: if canManageWorkspace(workspaceId)
+                      || request.auth.uid == memberId;
+      }
+    }
+
+    // ============================================================
+    // Workspace invitations (email-based)
+    // ============================================================
+    match /workspace_invitations/{invitationId} {
+      allow create: if isAuthenticated()
+                    && request.resource.data.invitedBy == request.auth.uid
+                    && request.resource.data.workspaceId is string
+                    && canManageWorkspace(request.resource.data.workspaceId)
+                    && request.resource.data.invitedEmail is string
+                    && request.resource.data.status == "pending";
+
+      allow read: if isAuthenticated()
+                  && (
+                    canManageWorkspace(resource.data.workspaceId)
+                    || resource.data.invitedBy == request.auth.uid
+                    || (
+                      request.auth.token.email is string
+                      && resource.data.invitedEmail is string
+                      && request.auth.token.email.lower() == resource.data.invitedEmail.lower()
+                    )
+                  );
+
+      allow update: if isAuthenticated()
+                    && (
+                      canManageWorkspace(resource.data.workspaceId)
+                      || resource.data.invitedBy == request.auth.uid
+                      || (
+                        request.auth.token.email is string
+                        && resource.data.invitedEmail is string
+                        && request.auth.token.email.lower() == resource.data.invitedEmail.lower()
+                        && request.resource.data.workspaceId == resource.data.workspaceId
+                        && request.resource.data.invitedEmail == resource.data.invitedEmail
+                        && request.resource.data.invitedBy == resource.data.invitedBy
+                        && (
+                          request.resource.data.status == "accepted"
+                          || request.resource.data.status == "declined"
+                        )
+                        && (
+                          request.resource.data.status != "accepted"
+                          || request.resource.data.acceptedBy == request.auth.uid
+                        )
+                      )
+                    );
+
+      allow delete: if isAuthenticated()
+                    && canManageWorkspace(resource.data.workspaceId);
     }
 
     // ============================================================
