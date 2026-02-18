@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { UploadCloud, FileText, Loader2, Paperclip } from "lucide-react";
+import { Loader2, Paperclip } from "lucide-react";
 import { uploadImage } from "@/lib/firebase/storage";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase/config";
@@ -29,7 +29,7 @@ export function FileUploader({ documentId, editor }: FileUploaderProps) {
     try {
       // 1. Upload para Firebase Storage (reusing image upload for generic files for MVP)
       // Idealmente, criar bucket separado para documentos
-      const downloadURL = await uploadImage(file, user.uid, "documents", (progress) => {
+      const downloadURL = await uploadImage(file, user.uid, "documents", () => {
         // toast.loading(`Enviando... ${progress}%`, { id: toastId });
       });
 
@@ -41,8 +41,16 @@ export function FileUploader({ documentId, editor }: FileUploaderProps) {
       // Se a função backend espera 'gs://', precisamos converter ou baixar.
       // O código atual do backend tenta ler a string. Vamos confiar que vamos melhorar o backend logo.
       
-      const result = await analyzePDF({ documentRef: downloadURL });
-      const data = (result.data as any).data;
+      const result = await analyzePDF({ documentRef: downloadURL, documentId });
+      const data = (
+        result.data as {
+          data: {
+            summary: string;
+            topics?: string[];
+            actionItems?: Array<{ text: string; due?: string }>;
+          };
+        }
+      ).data;
 
       // 3. Inserir Insights no Editor
       if (editor) {
@@ -56,7 +64,7 @@ export function FileUploader({ documentId, editor }: FileUploaderProps) {
             ${data.actionItems?.length ? `
               <p><strong>Ações:</strong></p>
               <ul>
-                ${data.actionItems.map((item: any) => `<li>${item.text} (Prazo: ${item.due || 'N/A'})</li>`).join('')}
+                ${data.actionItems.map((item) => `<li>${item.text} (Prazo: ${item.due || 'N/A'})</li>`).join('')}
               </ul>
             ` : ''}
           </div>

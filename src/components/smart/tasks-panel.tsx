@@ -7,8 +7,6 @@ import {
   X, 
   Sparkles, 
   Filter as FilterIcon, 
-  ChevronDown, 
-  ChevronUp,
   Lock
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -19,8 +17,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { getDocument } from "@/lib/firebase/firestore";
@@ -61,8 +58,7 @@ export function TasksPanel({
     toggleTaskComplete, 
     deleteTask,
     filter,
-    setFilter,
-    activeViewId
+    setFilter
   } = useTasksStore();
   
   const tasks = forcedTasks || storeTasks;
@@ -98,7 +94,7 @@ export function TasksPanel({
         listId: listId || undefined,
       });
       setNewTaskTitle("");
-    } catch (error) {
+    } catch {
       // Error handled in store
     }
   };
@@ -117,7 +113,7 @@ export function TasksPanel({
         sortDir: "desc"
       });
       toast.success("Visualização salva!");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao salvar visualização");
     }
   };
@@ -171,8 +167,9 @@ export function TasksPanel({
 
     try {
       await toggleTaskComplete(task);
-    } catch (error: any) {
-      toast.error(error.message || "Erro ao atualizar tarefa");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Erro ao atualizar tarefa";
+      toast.error(message);
     }
   };
 
@@ -227,7 +224,11 @@ export function TasksPanel({
       <div className="px-4 py-2 bg-muted/10">
         {user && <SavedViewsTabs userId={user.uid} />}
         
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as "all" | "document" | "list")}
+          className="w-full"
+        >
           <TabsList className="w-full h-8">
             <TabsTrigger value="all" className="flex-1 text-xs">Coleção</TabsTrigger>
             {(documentId || listId) && (

@@ -18,7 +18,7 @@ export interface FilterRule {
   id: string;
   field: string;
   operator: FilterOperator;
-  value: any;
+  value: unknown;
 }
 
 export interface FilterGroup {

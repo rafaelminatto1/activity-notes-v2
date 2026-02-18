@@ -10,7 +10,7 @@ import { db } from "@/lib/firebase/config";
 import { Document } from "@/types/document";
 import { Task, List as ListType } from "@/types/smart-note";
 import { TasksPanel } from "@/components/smart/tasks-panel";
-import { FileText, Plus, List as ListIcon, Settings, ChevronRight, Home } from "lucide-react";
+import { Plus, List as ListIcon, Settings, ChevronRight, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Spinner } from "@/components/ui/spinner";
@@ -25,7 +25,7 @@ export default function ListViewPage() {
   const listId = params.listId as string;
   const spaceId = params.spaceId as string;
 
-  const [list, setList] = useState<any>(null);
+  const [list, setList] = useState<ListType | null>(null);
   const [spaceName, setSpaceName] = useState("");
   const [folderName, setFolderName] = useState("");
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -41,7 +41,7 @@ export default function ListViewPage() {
         const listSnap = await getDoc(doc(db!, "lists", listId));
         if (listSnap.exists()) {
           const listData = listSnap.data();
-          setList({ id: listSnap.id, ...listData });
+          setList({ id: listSnap.id, ...listData } as ListType);
           
           // Fetch Space
           if (listData.spaceId) {

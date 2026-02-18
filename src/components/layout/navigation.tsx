@@ -20,7 +20,6 @@ import { useDocuments } from "@/hooks/use-documents";
 import {
   createDocument,
   archiveDocument,
-  updateDocument,
   toggleFavorite,
 } from "@/lib/firebase/firestore";
 import {

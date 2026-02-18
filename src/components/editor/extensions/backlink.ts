@@ -1,5 +1,6 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import Suggestion from "@tiptap/suggestion";
+import type { SuggestionProps } from "@tiptap/suggestion";
 import { PluginKey } from "@tiptap/pm/state";
 
 const mentionPluginKey = new PluginKey("mention");
@@ -28,10 +29,13 @@ export const BacklinkExtension = Node.create({
     return [
       {
         tag: "span[data-mention]",
-        getAttrs: (node: any) => ({
-          id: node.getAttribute("data-id"),
-          label: node.getAttribute("data-label"),
-        }),
+        getAttrs: (node: string | HTMLElement) => {
+          if (typeof node === "string") return {};
+          return {
+            id: node.getAttribute("data-id"),
+            label: node.getAttribute("data-label"),
+          };
+        },
       },
     ];
   },
@@ -78,11 +82,11 @@ export const BacklinkExtension = Node.create({
             const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&type=basic`);
             if (!response.ok) return [];
             const json = await response.json();
-            return json.results.map((item: any) => ({
+            return (json.results as Array<{ documentId: string; title: string }>).map((item) => ({
               id: item.documentId,
               label: item.title,
             }));
-          } catch (e) {
+          } catch {
             return [];
           }
         },
@@ -90,21 +94,25 @@ export const BacklinkExtension = Node.create({
           let component: HTMLDivElement | null = null;
 
           return {
-            onStart: (props: any) => {
+            onStart: (props: SuggestionProps) => {
               component = document.createElement("div");
               component.className = "absolute z-50 bg-popover border rounded-md shadow-lg p-1 max-h-60 overflow-y-auto w-64";
               if (props.clientRect) {
                 const rect = props.clientRect();
-                component.style.setProperty("top", `${rect.bottom + 5}px`);
-                component.style.setProperty("left", `${rect.left}px`);
+                if (rect) {
+                  component.style.setProperty("top", `${rect.bottom + 5}px`);
+                  component.style.setProperty("left", `${rect.left}px`);
+                }
               }
               document.body.appendChild(component);
             },
-            onUpdate: (props: any) => {
+            onUpdate: (props: SuggestionProps) => {
               if (component && props.clientRect) {
                 const rect = props.clientRect();
-                component.style.setProperty("top", `${rect.bottom + 5}px`);
-                component.style.setProperty("left", `${rect.left}px`);
+                if (rect) {
+                  component.style.setProperty("top", `${rect.bottom + 5}px`);
+                  component.style.setProperty("left", `${rect.left}px`);
+                }
               }
             },
             onExit: () => {

@@ -29,7 +29,7 @@ export function CommentList({ documentId }: CommentListProps) {
     try {
       await deleteComment(id);
       toast.success("Comentário removido");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao remover comentário");
     }
   };

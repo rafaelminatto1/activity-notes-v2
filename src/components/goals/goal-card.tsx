@@ -4,6 +4,7 @@ import { Goal } from "@/types/goal";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import { Target, TrendingUp, Users } from "lucide-react";
+import type { CSSProperties } from "react";
 
 interface GoalCardProps {
   goal: Goal;
@@ -49,7 +50,7 @@ export function GoalCard({ goal }: GoalCardProps) {
           <Progress 
             value={goal.progress} 
             className="h-2 bg-muted shadow-inner" 
-            style={{ "--primary": goal.color } as any}
+            style={{ "--primary": goal.color } as CSSProperties}
           />
         </div>
 

@@ -371,7 +371,7 @@ export function useEditorAI(editor: Editor | null) {
         editor.chain().focus().deleteRange({ from, to }).insertContentAt(from, result).run();
       }
       toast.success("Nota formatada!", { id: toastId });
-    } catch (error) {
+    } catch {
       toast.error("Erro ao formatar.", { id: toastId });
     }
   }, [editor, getSelectedText, executeAction]);

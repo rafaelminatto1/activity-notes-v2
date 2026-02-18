@@ -15,7 +15,7 @@ import {
   List,
   ListOrdered,
   ListChecks,
-  Image,
+  Image as ImageIcon,
   Table,
   Minus,
   Info,
@@ -268,7 +268,7 @@ export function Toolbar({ editor, documentId, onImageUpload, aiProps }: ToolbarP
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem onClick={onImageUpload}>
-            <Image className="mr-2 h-4 w-4" />
+            <ImageIcon className="mr-2 h-4 w-4" />
             Imagem
           </DropdownMenuItem>
           <DropdownMenuItem

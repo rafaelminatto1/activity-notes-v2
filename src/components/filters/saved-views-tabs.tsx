@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Plus, Settings, X, MoreVertical } from "lucide-react";
+import { useEffect } from "react";
+import { Plus, X } from "lucide-react";
 import { useTasksStore } from "@/stores/tasks-store";
 import { Button } from "@/components/ui/button";
 import { subscribeToViews, deleteView } from "@/lib/firebase/tasks";
-import type { SavedView, FilterGroup } from "@/types/view";
+import type { FilterGroup } from "@/types/view";
 import { toast } from "sonner";
 
 interface SavedViewsTabsProps {
@@ -22,8 +22,6 @@ export function SavedViewsTabs({ userId }: SavedViewsTabsProps) {
     clearFilter,
     setFilter
   } = useTasksStore();
-
-  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -86,7 +84,7 @@ export function SavedViewsTabs({ userId }: SavedViewsTabsProps) {
     try {
       await deleteView(id);
       toast.success("Visualização excluída");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao excluir visualização");
     }
   };

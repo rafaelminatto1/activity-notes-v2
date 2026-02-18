@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -11,6 +10,10 @@ interface IconPickerProps {
     onChange: (icon: string) => void;
     children?: React.ReactNode;
     asChild?: boolean;
+}
+
+interface EmojiSelectPayload {
+    native: string;
 }
 
 export function IconPicker({ icon, onChange, children, asChild }: IconPickerProps) {
@@ -33,7 +36,7 @@ export function IconPicker({ icon, onChange, children, asChild }: IconPickerProp
             <PopoverContent className="p-0 border-none w-full shadow-none bg-transparent">
                 <Picker
                     data={data}
-                    onEmojiSelect={(emoji: any) => onChange(emoji.native)}
+                    onEmojiSelect={(emoji: EmojiSelectPayload) => onChange(emoji.native)}
                     theme={currentTheme}
                     previewPosition="none"
                     skinTonePosition="none"

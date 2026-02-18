@@ -32,7 +32,7 @@ export async function PATCH(
     const body: MentionedByRequest = await req.json();
     const currentMentionedBy = docSnap.data().mentionedBy || [];
 
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
 
     if (body.addMentionedBy) {
       // Add "mentioned by" if not already present

@@ -5,10 +5,6 @@ import {
   Zap, 
   Plus, 
   Trash2, 
-  Play, 
-  Settings2, 
-  ChevronRight,
-  ArrowRight,
   Bell,
   UserPlus,
   CheckCircle2,
@@ -25,17 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import type { Automation, AutomationAction, TriggerType, ActionType } from "@/types/automation";
-import { cn } from "@/lib/utils";
 
 interface AutomationBuilderProps {
   onSave: (automation: Partial<Automation>) => void;
   onCancel: () => void;
 }
 
-const TRIGGER_OPTIONS: { value: TriggerType; label: string; icon: any }[] = [
+const TRIGGER_OPTIONS: { value: TriggerType; label: string; icon: React.ElementType }[] = [
   { value: "task_created", label: "Tarefa criada", icon: PlusCircle },
   { value: "status_changed", label: "Status alterado", icon: CheckCircle2 },
   { value: "priority_changed", label: "Prioridade alterada", icon: Zap },
@@ -43,7 +36,7 @@ const TRIGGER_OPTIONS: { value: TriggerType; label: string; icon: any }[] = [
   { value: "comment_added", label: "Comentário adicionado", icon: MessageSquare },
 ];
 
-const ACTION_OPTIONS: { value: ActionType; label: string; icon: any }[] = [
+const ACTION_OPTIONS: { value: ActionType; label: string; icon: React.ElementType }[] = [
   { value: "update_status", label: "Mudar status", icon: CheckCircle2 },
   { value: "assign_to", label: "Atribuir a alguém", icon: UserPlus },
   { value: "add_comment", label: "Adicionar comentário", icon: MessageSquare },
@@ -176,7 +169,7 @@ export function AutomationBuilder({ onSave, onCancel }: AutomationBuilderProps) 
 
                   {action.type === "update_status" && (
                     <Select 
-                      value={action.config.value} 
+                      value={typeof action.config.value === "string" ? action.config.value : ""} 
                       onValueChange={(v) => action.id && updateAction(action.id, { config: { value: v } })}
                     >
                       <SelectTrigger className="flex-1 bg-background">
@@ -192,7 +185,7 @@ export function AutomationBuilder({ onSave, onCancel }: AutomationBuilderProps) 
 
                   {action.type === "update_priority" && (
                     <Select 
-                      value={action.config.value} 
+                      value={typeof action.config.value === "string" ? action.config.value : ""} 
                       onValueChange={(v) => action.id && updateAction(action.id, { config: { value: v } })}
                     >
                       <SelectTrigger className="flex-1 bg-background">
@@ -211,7 +204,7 @@ export function AutomationBuilder({ onSave, onCancel }: AutomationBuilderProps) 
                     <Input 
                       placeholder="Texto do comentário..." 
                       className="flex-1 bg-background"
-                      value={action.config.value || ""}
+                      value={typeof action.config.value === "string" ? action.config.value : ""}
                       onChange={(e) => action.id && updateAction(action.id, { config: { value: e.target.value } })}
                     />
                   )}
@@ -220,7 +213,7 @@ export function AutomationBuilder({ onSave, onCancel }: AutomationBuilderProps) 
                     <Input 
                       placeholder="Mensagem da notificação..." 
                       className="flex-1 bg-background"
-                      value={action.config.value || ""}
+                      value={typeof action.config.value === "string" ? action.config.value : ""}
                       onChange={(e) => action.id && updateAction(action.id, { config: { value: e.target.value } })}
                     />
                   )}
@@ -229,7 +222,7 @@ export function AutomationBuilder({ onSave, onCancel }: AutomationBuilderProps) 
                     <Input 
                       placeholder="Valor..." 
                       className="flex-1 bg-background"
-                      value={action.config.value || ""}
+                      value={typeof action.config.value === "string" ? action.config.value : ""}
                       onChange={(e) => action.id && updateAction(action.id, { config: { value: e.target.value } })}
                     />
                   )}

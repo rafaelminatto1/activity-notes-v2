@@ -7,7 +7,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
 
 const EmojiPicker = dynamic(() => import("@emoji-mart/react"), { ssr: false });

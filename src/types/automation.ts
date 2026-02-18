@@ -24,7 +24,7 @@ export interface AutomationTrigger {
     status?: string;
     priority?: string;
     field?: string;
-    matchValue?: any;
+    matchValue?: unknown;
   };
 }
 
@@ -32,7 +32,7 @@ export interface AutomationAction {
   id?: string; // Optional for UI tracking
   type: ActionType;
   config: {
-    value?: any;
+    value?: unknown;
     url?: string; // For webhooks
     template?: string; // For messages/comments
   };

@@ -321,7 +321,7 @@ function getSlashCommandItems(onImageUpload: () => void): SlashCommandItem[] {
 
 const slashPluginKey = new PluginKey("slashCommand");
 
-export function createSlashCommandExtension(onImageUpload: () => void) {
+export function createSlashCommandExtension() {
   return Extension.create({
     name: "slashCommand",
 
@@ -498,25 +498,6 @@ export function SlashCommandMenu({ editor, onImageUpload }: SlashCommandMenuProp
     }
   }, [active, slashFrom, editor]);
 
-  // Handle keyboard events
-  useEffect(() => {
-    if (!active) return;
-
-    function handleKey(e: Event) {
-      const key = (e as CustomEvent).detail;
-      if (key === "ArrowDown") {
-        setSelectedIndex((prev) => (prev + 1) % filteredItems.length);
-      } else if (key === "ArrowUp") {
-        setSelectedIndex((prev) => (prev - 1 + filteredItems.length) % filteredItems.length);
-      } else if (key === "Enter") {
-        executeCommand(selectedIndex);
-      }
-    }
-
-    window.addEventListener("slash-key", handleKey);
-    return () => window.removeEventListener("slash-key", handleKey);
-  }, [active, selectedIndex, filteredItems.length]);
-
   const executeCommand = useCallback(
     (index: number) => {
       const item = filteredItems[index];
@@ -544,6 +525,25 @@ export function SlashCommandMenu({ editor, onImageUpload }: SlashCommandMenuProp
     },
     [editor, filteredItems, slashFrom]
   );
+
+  // Handle keyboard events
+  useEffect(() => {
+    if (!active) return;
+
+    function handleKey(e: Event) {
+      const key = (e as CustomEvent).detail;
+      if (key === "ArrowDown") {
+        setSelectedIndex((prev) => (prev + 1) % filteredItems.length);
+      } else if (key === "ArrowUp") {
+        setSelectedIndex((prev) => (prev - 1 + filteredItems.length) % filteredItems.length);
+      } else if (key === "Enter") {
+        executeCommand(selectedIndex);
+      }
+    }
+
+    window.addEventListener("slash-key", handleKey);
+    return () => window.removeEventListener("slash-key", handleKey);
+  }, [active, selectedIndex, filteredItems.length, executeCommand]);
 
   // Scroll selected item into view
   useEffect(() => {

@@ -31,7 +31,7 @@ export interface Invitation {
   role: "editor" | "viewer";
   invitedBy: string;
   status: "pending" | "accepted";
-  createdAt: any;
+  createdAt: unknown;
 }
 
 // Function to invite user by email

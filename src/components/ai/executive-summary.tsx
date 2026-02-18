@@ -6,7 +6,6 @@ import { Sparkles, FileText, ChevronDown, ChevronUp, Loader2 } from "lucide-reac
 import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase/config";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editor-store";
 import { updateDocument } from "@/lib/firebase/firestore";
 
@@ -39,7 +38,7 @@ export function ExecutiveSummary({ documentId, summary: initialSummary, content 
         documentId, // This will automatically update Firestore too if flow is configured
       });
 
-      const data = (result.data as any).data;
+      const data = (result.data as { data: { summary: string; saved?: boolean } }).data;
       setSummary(data.summary);
       
       // If the cloud function didn't update (safety check), we update manually

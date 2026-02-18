@@ -167,7 +167,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const { profile, user } = useAuthStore();
-  const { documents, isLoading, create } = useDocuments();
+  const { documents, isLoading, create, getFavorites, getRecent } = useDocuments();
   const {
     workspaces,
     personalProjects,

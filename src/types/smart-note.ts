@@ -1,4 +1,5 @@
 import { Timestamp } from "firebase/firestore";
+import type { JSONContent } from "@tiptap/core";
 import { List } from "./list";
 
 export type { List };
@@ -10,7 +11,7 @@ export type { List };
 export interface SmartNote {
   id: string;
   title: string;
-  content: any; // JSONContent from Tiptap
+  content: JSONContent | null;
   plainText: string;
   icon: string;
   coverImage: string;
@@ -86,7 +87,7 @@ export interface Template {
   id: string;
   name: string;
   description: string;
-  content: any; // Tiptap JSON content
+  content: JSONContent | null;
   icon: string;
   color: string;
   category: string;
@@ -137,7 +138,7 @@ export interface Task {
 export interface DocumentVersion {
   id: string;
   documentId: string;
-  content: any; // Tiptap JSON content
+  content: JSONContent | null;
   plainText: string;
   version: number;
   createdBy: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { 
   Key, 
   Plus, 
@@ -30,23 +30,21 @@ export default function ApiSettingsPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      loadKeys();
-    }
-  }, [user]);
-
-  const loadKeys = async () => {
+  const loadKeys = useCallback(async () => {
     if (!user) return;
     try {
       const data = await getApiKeys(user.uid);
       setKeys(data);
-    } catch (error) {
+    } catch {
       toast.error("Erro ao carregar chaves");
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    void loadKeys();
+  }, [loadKeys]);
 
   const handleCreate = async () => {
     if (!user || !newName.trim()) return;
@@ -55,9 +53,9 @@ export default function ApiSettingsPage() {
       const key = await createApiKey(user.uid, newName);
       setNewlyCreatedKey(key);
       setNewName("");
-      loadKeys();
+      await loadKeys();
       toast.success("Chave gerada!");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao gerar chave");
     } finally {
       setIsCreating(false);
@@ -70,7 +68,7 @@ export default function ApiSettingsPage() {
       await deleteApiKey(id);
       setKeys(keys.filter(k => k.id !== id));
       toast.success("Chave revogada");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao revogar chave");
     }
   };

@@ -1,5 +1,5 @@
 import { Task } from "@/types/smart-note";
-import { Task as GanttTask, ViewMode } from "gantt-task-react";
+import { Task as GanttTask } from "gantt-task-react";
 import { addDays } from "date-fns";
 
 // Extende a interface da lib para incluir nossos dados extras se necessário

@@ -2,10 +2,7 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
   setDoc,
-  query,
-  where,
   serverTimestamp,
   onSnapshot,
 } from "firebase/firestore";
@@ -14,7 +11,6 @@ import type { WorkspaceRole, WorkspaceMember, ResourceType, PermissionAction } f
 import { DEFAULT_ROLES } from "@/types/permission";
 
 const ROLES_COLLECTION = "workspace_roles";
-const MEMBERS_COLLECTION = "workspace_members";
 
 function getDb() {
   if (!db) throw new Error("Firestore não inicializado.");
@@ -82,6 +78,6 @@ export function hasPermission(role: WorkspaceRole | null, resource: ResourceType
   // Admin bypass
   if (role.id === "admin") return true;
   
-  const permissions = role.permissions[resource] as PermissionAction[];
-  return permissions?.includes(action) || permissions?.includes("manage" as any);
+  const permissions = role.permissions[resource];
+  return permissions?.includes(action) || permissions?.includes("manage");
 }

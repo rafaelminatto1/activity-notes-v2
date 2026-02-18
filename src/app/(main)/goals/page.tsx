@@ -6,7 +6,7 @@ import { subscribeToGoals, createGoal } from "@/lib/firebase/goals";
 import { Goal } from "@/types/goal";
 import { GoalCard } from "@/components/goals/goal-card";
 import { Button } from "@/components/ui/button";
-import { Plus, Target, LayoutGrid, List } from "lucide-react";
+import { Plus, Target } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
@@ -39,7 +39,7 @@ export default function GoalsPage() {
         keyResults: [],
       });
       toast.success("Meta criada com sucesso!");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao criar meta");
     }
   };

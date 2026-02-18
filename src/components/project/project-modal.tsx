@@ -10,7 +10,6 @@ import { ColorPicker } from "@/components/color/ColorPicker";
 import { useProjectStore } from "@/stores/project-store";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { Project } from "@/types/project";
 import { motion } from "framer-motion";
 
 interface ProjectModalProps {
@@ -64,7 +63,7 @@ export function ProjectModal({ open, onClose, projectId }: ProjectModalProps) {
         });
       }
       onClose();
-    } catch (error) {
+    } catch {
       toast.error("Erro ao salvar projeto");
     } finally {
       setIsLoading(false);

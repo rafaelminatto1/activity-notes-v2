@@ -9,7 +9,7 @@ import {
 } from "firebase/firestore";
 import { getStorage, connectStorageEmulator, type FirebaseStorage } from "firebase/storage";
 import { getAnalytics, type Analytics } from "firebase/analytics";
-import { getDatabase, connectDatabaseEmulator, type Database } from "firebase/database";
+import { getDatabase, type Database } from "firebase/database";
 import { getRemoteConfig, type RemoteConfig } from "firebase/remote-config";
 import { getMessaging, type Messaging } from "firebase/messaging";
 import { getFunctions, connectFunctionsEmulator, type Functions } from "firebase/functions";

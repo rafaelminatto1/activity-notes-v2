@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, ChevronDown, Filter, Save } from "lucide-react";
+import { Plus, Trash2, Filter, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -65,7 +65,7 @@ export function FilterBuilder({ initialFilter, onChange, onSave }: FilterBuilder
   const removeRule = (id: string) => {
     updateFilter({
       ...filter,
-      rules: filter.rules.filter((r) => (r as any).id !== id),
+      rules: filter.rules.filter((r) => !isFilterRule(r) || r.id !== id),
     });
   };
 
@@ -73,7 +73,7 @@ export function FilterBuilder({ initialFilter, onChange, onSave }: FilterBuilder
     updateFilter({
       ...filter,
       rules: filter.rules.map((r) =>
-        (r as any).id === id ? { ...r, ...updates } : r
+        isFilterRule(r) && r.id === id ? { ...r, ...updates } : r
       ),
     });
   };
@@ -104,7 +104,7 @@ export function FilterBuilder({ initialFilter, onChange, onSave }: FilterBuilder
       </div>
 
       <div className="space-y-2">
-        {filter.rules.map((rule: any) => (
+        {filter.rules.filter(isFilterRule).map((rule) => (
           <div key={rule.id} className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
             <Select
               value={rule.field}
@@ -141,7 +141,11 @@ export function FilterBuilder({ initialFilter, onChange, onSave }: FilterBuilder
             {!["is_empty", "is_not_empty"].includes(rule.operator) && (
               <Input
                 className="h-9 flex-[1.5]"
-                value={rule.value}
+                value={
+                  typeof rule.value === "string" || typeof rule.value === "number"
+                    ? String(rule.value)
+                    : ""
+                }
                 onChange={(e) => updateRule(rule.id, { value: e.target.value })}
                 placeholder="Valor..."
               />
@@ -184,4 +188,8 @@ export function FilterBuilder({ initialFilter, onChange, onSave }: FilterBuilder
       </div>
     </div>
   );
+}
+
+function isFilterRule(rule: FilterRule | FilterGroup): rule is FilterRule {
+  return "field" in rule && "operator" in rule && "value" in rule;
 }

@@ -1,8 +1,12 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { initializeAuth, getAuth, browserLocalPersistence, getReactNativePersistence, Auth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeAuth, browserLocalPersistence, getReactNativePersistence, getAuth, Auth } from 'firebase/auth';
+import { 
+  initializeFirestore, 
+  persistentLocalCache, 
+  persistentMultipleTabManager 
+} from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 const firebaseConfig = {
@@ -14,6 +18,11 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Debug: Verificar se as variáveis de ambiente estão carregadas
+if (!firebaseConfig.apiKey) {
+  console.error('Firebase Config: EXPO_PUBLIC_FIREBASE_API_KEY is missing!');
+}
+
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 function getFirebaseAuth(): Auth {
@@ -24,16 +33,23 @@ function getFirebaseAuth(): Auth {
       });
     } else {
       return initializeAuth(app, {
-        persistence: getReactNativePersistence(AsyncStorage),
+        persistence: getReactNativePersistence(ReactNativeAsyncStorage),
       });
     }
-  } catch {
+  } catch (err) {
+    console.warn('Firebase Auth: Falha ao inicializar com persistência, tentando fallback...', err);
     return getAuth(app);
   }
 }
 
 const auth = getFirebaseAuth();
-const db = getFirestore(app);
+
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager(),
+  }),
+});
+
 const storage = getStorage(app);
 
 export { app, auth, db, storage };

@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useGlobalQA, Source } from "@/hooks/use-global-qa";
+import { Source } from "@/hooks/use-global-qa";
 import { Search, Sparkles, FileText, CornerDownLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 

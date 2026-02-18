@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import { X, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIconStore, COLOR_PALETTE } from "@/stores/icon-store";
-import type { Document } from "@/types/document";
 
 interface ColorPickerProps {
   open: boolean;
@@ -13,14 +12,7 @@ interface ColorPickerProps {
   currentColor?: string;
 }
 
-// Função para determinar cor do texto baseada no fundo (simplificado)
-function getTextColor(hexColor: string): string {
-  // Valores de luminosidade aproximados
-  const darkColors = ['#000000', '#1a1a1a', '#2d373b', '#4338ca', '#4a5568', '#1d4ed8', '#0f172a', '#7f1d1d'];
-  return darkColors.includes(hexColor) ? '#ffffff' : '#000000';
-}
-
-export function ColorPicker({ open, onClose, onSelect, currentColor }: ColorPickerProps) {
+export function ColorPicker({ open, onClose, onSelect }: ColorPickerProps) {
   const { selectedColor, recentColors, setSelectedColor, addRecentColor } = useIconStore();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -115,7 +107,7 @@ export function ColorPicker({ open, onClose, onSelect, currentColor }: ColorPick
         <div className="p-4 space-y-4 max-h-[400px] overflow-y-auto">
           {filteredColors.length === 0 ? (
             <p className="text-center text-muted-foreground text-sm">
-              Nenhuma cor encontrada para "{searchQuery}"
+              Nenhuma cor encontrada para &quot;{searchQuery}&quot;
             </p>
           ) : (
             <div className="grid grid-cols-6 gap-2">

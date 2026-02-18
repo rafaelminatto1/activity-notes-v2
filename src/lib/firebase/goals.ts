@@ -3,8 +3,6 @@ import {
   doc,
   addDoc,
   updateDoc,
-  deleteDoc,
-  getDocs,
   getDoc,
   query,
   where,
@@ -13,8 +11,8 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "./config";
-import type { Goal, KeyResult } from "@/types/goal";
-import { Task } from "@/types/smart-note";
+import type { Goal } from "@/types/goal";
+import type { Task } from "@/types/smart-note";
 
 function getDb() {
   if (!db) throw new Error("Firestore não inicializado.");

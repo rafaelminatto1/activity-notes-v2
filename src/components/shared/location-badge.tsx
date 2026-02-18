@@ -3,7 +3,7 @@
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { updateDocument } from "@/lib/firebase/firestore";
 import { MapPin, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 

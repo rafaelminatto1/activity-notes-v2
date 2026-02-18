@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { DocumentIcon, IconCategory, IconCategoryData, IconHistory } from '@/types/icon';
+import type { IconCategoryData, IconHistory } from '@/types/icon';
 
 /**
  * Catálogo de ícones organizados por categorias

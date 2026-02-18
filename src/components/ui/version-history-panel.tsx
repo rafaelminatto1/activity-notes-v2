@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useVersionHistoryStore } from "@/stores/version-history-store";
-import { Clock, RotateCcw, Check, X, ChevronDown, Eye, EyeOff } from "lucide-react";
+import { Clock, RotateCcw, X, Eye } from "lucide-react";
 
 export function VersionHistoryPanel() {
   const { isOpen, versions, restoreVersion, closePanel } = useVersionHistoryStore();
@@ -30,7 +30,7 @@ export function VersionHistoryPanel() {
               {versions.length} versões disponíveis
             </div>
 
-            {versions.slice().reverse().map((versionItem, index) => (
+            {versions.slice().reverse().map((versionItem) => (
               <div
                 key={versionItem.version}
                 onClick={() => restoreVersion(versionItem.version)}

@@ -9,7 +9,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { getAIClient, AILogicClient, type AIOptions, type AIModel } from "@/lib/firebase/ai-logic";
+import { getAIClient, AILogicClient, type AIOptions } from "@/lib/firebase/ai-logic";
 
 export type AIAction =
   | "summarize"
@@ -44,7 +44,7 @@ export interface UseAIClientReturn {
   generateTags: (text: string, options?: AIOptions) => Promise<string>;
   analyzeSentiment: (text: string, options?: AIOptions) => Promise<string>;
   generateEmbedding: (text: string) => Promise<number[]>;
-  chat: (messages: Array<{ role: string; content: string }>, options?: AIOptions) => Promise<string>;
+  chat: (messages: Array<{ role: "user" | "assistant"; content: string }>, options?: AIOptions) => Promise<string>;
   checkAvailability: () => Promise<boolean>;
 }
 
@@ -361,14 +361,14 @@ export function useAIClient(): UseAIClientReturn {
 
   const chat = useCallback(
     async (
-      messages: Array<{ role: string; content: string }>,
+      messages: Array<{ role: "user" | "assistant"; content: string }>,
       options?: AIOptions
     ): Promise<string> => {
       setLoading(true);
       setError(null);
 
       try {
-        const result = await client.chat(messages as any, options);
+        const result = await client.chat(messages, options);
         return result.text;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Erro no chat";

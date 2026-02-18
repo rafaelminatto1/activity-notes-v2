@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateText, generateChat } from "@/lib/gemini/client";
+import { generateText } from "@/lib/gemini/client";
 import { AI_PROMPTS } from "@/lib/ai/prompts";
 import { getUserIdFromRequest } from "@/lib/auth/server-utils";
 import type { AIActionType, AIRequest, AIResponse, AIErrorResponse } from "@/types/ai";

@@ -12,7 +12,6 @@ import {
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { 
-  Sparkles, 
   Wand2, 
   Languages, 
   AlignLeft, 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getGoal, updateGoal } from "@/lib/firebase/goals";
 import { Goal, KeyResult } from "@/types/goal";
@@ -9,11 +9,9 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { 
   ArrowLeft, 
-  Plus, 
   Target, 
   Calendar, 
   User, 
-  MoreHorizontal,
   PlusCircle,
   Trophy,
   PieChart
@@ -21,6 +19,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import type { CSSProperties } from "react";
 
 export default function GoalDetailPage() {
   const { goalId } = useParams();
@@ -29,22 +28,21 @@ export default function GoalDetailPage() {
   const [goal, setGoal] = useState<Goal | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (goalId) {
-      loadGoal();
-    }
-  }, [goalId]);
-
-  async function loadGoal() {
+  const loadGoal = useCallback(async () => {
+    if (!goalId) return;
     try {
       const data = await getGoal(goalId as string);
       setGoal(data);
-    } catch (error) {
+    } catch {
       toast.error("Erro ao carregar meta");
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [goalId]);
+
+  useEffect(() => {
+    void loadGoal();
+  }, [loadGoal]);
 
   const handleAddKeyResult = async () => {
     if (!goal) return;
@@ -66,7 +64,7 @@ export default function GoalDetailPage() {
       });
       loadGoal();
       toast.success("Resultado-Chave adicionado");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao adicionar resultado-chave");
     }
   };
@@ -150,7 +148,7 @@ export default function GoalDetailPage() {
               </div>
             </div>
 
-            <Progress value={goal.progress} className="h-3 shadow-inner" style={{ "--primary": goal.color } as any} />
+            <Progress value={goal.progress} className="h-3 shadow-inner" style={{ "--primary": goal.color } as CSSProperties} />
 
             <div className="space-y-4 pt-4 border-t border-border/50">
               <div className="flex items-center gap-3 text-sm font-medium">

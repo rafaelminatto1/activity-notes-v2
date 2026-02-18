@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useProjectStore } from './project-store';
+import { Timestamp } from 'firebase/firestore';
 
 // Mock types
 import type { Project } from '@/types/project';
@@ -29,8 +30,8 @@ const mockProject: Project = {
   icon: '📁',
   color: '#000000',
   userId: 'user-1',
-  createdAt: { seconds: 100, nanoseconds: 0 } as any,
-  updatedAt: { seconds: 100, nanoseconds: 0 } as any,
+  createdAt: Timestamp.fromMillis(100000),
+  updatedAt: Timestamp.fromMillis(100000),
   documentCount: 0,
 };
 
@@ -55,7 +56,7 @@ describe('Project Store', () => {
 
   it('should subscribe to projects', () => {
     const mockUnsub = vi.fn();
-    (subscribeToUserProjects as any).mockReturnValue(mockUnsub);
+    vi.mocked(subscribeToUserProjects).mockReturnValue(mockUnsub);
 
     useProjectStore.getState().initSubscription('user-1');
 
@@ -77,11 +78,10 @@ describe('Project Store', () => {
 
   it('should create project', async () => {
     const newProjectData = { name: 'New Project', icon: '✨', color: '#ffffff', userId: 'user-1' };
-    (createProject as any).mockResolvedValue('new-id');
+    vi.mocked(createProject).mockResolvedValue('new-id');
 
     await useProjectStore.getState().createProject(newProjectData);
 
-    const state = useProjectStore.getState();
     expect(createProject).toHaveBeenCalledWith(newProjectData);
     // State update is handled by subscription, not optimistically in this version of store
   });

@@ -326,7 +326,7 @@ export interface UsageStatsResponse {
     limit: number;
     remaining: number;
     lastAction?: string;
-    lastUsedAt?: any;
+    lastUsedAt?: unknown;
   };
   month: {
     count: number;
@@ -339,7 +339,7 @@ export interface UsageStatsResponse {
 // GenKit API Response Wrapper
 // ============================================================
 
-export interface GenKitResponse<T = any> {
+export interface GenKitResponse<T = unknown> {
   success: boolean;
   data: T;
 }
@@ -353,9 +353,9 @@ export interface GenKitError {
 // Hook Types
 // ============================================================
 
-export interface UseGenKitReturn<T = any> {
+export interface UseGenKitReturn<T = unknown> {
   data: T | null;
   loading: boolean;
   error: string | null;
-  execute: (params: any) => Promise<T>;
+  execute: (params: Record<string, unknown>) => Promise<T>;
 }

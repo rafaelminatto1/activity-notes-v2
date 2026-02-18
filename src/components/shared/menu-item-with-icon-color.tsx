@@ -3,7 +3,7 @@
 import React from "react";
 import { Star, Palette, MoreHorizontal, FolderOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useIconStore, ICON_CATEGORIES, COLOR_PALETTE } from "@/stores/icon-store";
+import { useIconStore, COLOR_PALETTE } from "@/stores/icon-store";
 import { useProjectStore } from "@/stores/project-store";
 import { updateDocument } from "@/lib/firebase/firestore";
 import { toast } from "sonner";
@@ -28,7 +28,7 @@ export function MenuItemWithIconColor({
   currentIcon,
   currentColor,
 }: MenuItemWithIconColorProps) {
-  const { iconCategories, selectedIcon, selectedColor, setSelectedIcon, setSelectedColor, addRecentIcon, addRecentColor } = useIconStore();
+  const { iconCategories, setSelectedIcon, setSelectedColor, addRecentIcon, addRecentColor } = useIconStore();
   const { projects, moveDocumentToProject } = useProjectStore();
   const [open, setOpen] = React.useState(false);
 

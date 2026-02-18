@@ -2,7 +2,6 @@
 
 import { useOnlineStatus } from "@/hooks/use-online-status";
 import { WifiOff, CloudOff, RefreshCw, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
 export function OfflineIndicator() {

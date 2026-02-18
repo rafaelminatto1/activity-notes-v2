@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useEditorAI } from "@/hooks/use-editor-ai";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sparkles, X, Send, Bot, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -42,7 +41,7 @@ export function Sidekick() {
             // For now, we'll pass a generic context or ask the AI to be general
             const result = await chatWithAI(userMsg, "User is asking a general question about their notes.");
             setMessages((prev) => [...prev, { role: "assistant", content: result }]);
-        } catch (error) {
+        } catch {
             setMessages((prev) => [
                 ...prev,
                 { role: "assistant", content: "Sorry, I encountered an error processing your request." },

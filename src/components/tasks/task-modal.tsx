@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useTasksStore } from "@/stores/tasks-store";
-import { useAuth } from "@/hooks/use-auth";
 import type { Task, TaskStatus, TaskPriority } from "@/types/smart-note";
 import { DependencySelector } from "./dependency-selector";
 import { 
@@ -44,7 +43,6 @@ interface TaskModalProps {
 }
 
 export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
-  const { user: _user } = useAuth();
   const { tasks: allTasks, updateTask } = useTasksStore();
   const { autoFillTask, loading: aiLoading } = useTaskAI();
   
@@ -60,14 +58,16 @@ export function TaskModal({ task, isOpen, onClose }: TaskModalProps) {
 
   useEffect(() => {
     if (task && isOpen) {
-      setTitle(task.title || "");
-      setDescription(task.description || "");
-      setStatus(task.status || "todo");
-      setPriority(task.priority || "medium");
-      setStoryPoints(task.storyPoints || 0);
-      setBlockedBy(task.blockedBy || []);
-      setBlocking(task.blocking || []);
-      setRelatedTo(task.relatedTo || []);
+      queueMicrotask(() => {
+        setTitle(task.title || "");
+        setDescription(task.description || "");
+        setStatus(task.status || "todo");
+        setPriority(task.priority || "medium");
+        setStoryPoints(task.storyPoints || 0);
+        setBlockedBy(task.blockedBy || []);
+        setBlocking(task.blocking || []);
+        setRelatedTo(task.relatedTo || []);
+      });
     }
   }, [task, isOpen]);
 

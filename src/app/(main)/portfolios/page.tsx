@@ -6,8 +6,7 @@ import {
   Plus, 
   ArrowRight, 
   Trash2, 
-  LayoutGrid,
-  Search
+  LayoutGrid
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
@@ -67,7 +66,7 @@ export default function PortfoliosPage() {
       setSelectedProjectIds([]);
       router.push(`/portfolios/${id}`);
       toast.success("Portfólio criado!");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao criar portfólio.");
     }
   };
@@ -78,7 +77,7 @@ export default function PortfoliosPage() {
     try {
       await deletePortfolio(id);
       toast.success("Portfólio excluído.");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao excluir.");
     }
   };

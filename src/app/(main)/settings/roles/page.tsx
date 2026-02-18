@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { 
   Shield, 
-  Users, 
-  Lock, 
   ChevronRight, 
   Plus, 
   Check, 
@@ -13,7 +11,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   ResourceType, 
   PermissionAction, 

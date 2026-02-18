@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { remoteConfig } from "@/lib/firebase/config";
 import { fetchAndActivate, getValue } from "firebase/remote-config";
 
-export function useRemoteConfig(key: string, defaultValue: any) {
-  const [value, setValue] = useState(defaultValue);
+type RemoteConfigScalar = string | number | boolean;
+
+export function useRemoteConfig<T extends RemoteConfigScalar>(key: string, defaultValue: T): T {
+  const [value, setValue] = useState<T>(defaultValue);
 
   useEffect(() => {
     if (!remoteConfig) return;
@@ -16,11 +18,11 @@ export function useRemoteConfig(key: string, defaultValue: any) {
         await fetchAndActivate(remoteConfig);
         const val = getValue(remoteConfig, key);
         if (typeof defaultValue === 'boolean') {
-            setValue(val.asBoolean());
+            setValue(val.asBoolean() as T);
         } else if (typeof defaultValue === 'number') {
-            setValue(val.asNumber());
+            setValue(val.asNumber() as T);
         } else {
-            setValue(val.asString());
+            setValue(val.asString() as T);
         }
       } catch (error) {
         console.error("Remote Config fetch failed", error);

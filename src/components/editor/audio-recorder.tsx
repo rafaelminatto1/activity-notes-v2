@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, Square, Loader2, CheckCircle2, FileAudio } from "lucide-react";
 import { toast } from "sonner";
@@ -17,9 +17,15 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+interface AudioTranscriptionResult {
+  summary: string;
+  actionItems?: string[];
+  transcript: string;
+}
+
 interface AudioRecorderProps {
   documentId: string;
-  onTranscriptionComplete?: (data: any) => void;
+  onTranscriptionComplete?: (data: AudioTranscriptionResult) => void;
 }
 
 export function AudioRecorder({ documentId, onTranscriptionComplete }: AudioRecorderProps) {
@@ -27,7 +33,7 @@ export function AudioRecorder({ documentId, onTranscriptionComplete }: AudioReco
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showResult, setShowResult] = useState(false);
-  const [resultData, setResultData] = useState<any>(null);
+  const [resultData, setResultData] = useState<AudioTranscriptionResult | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -75,7 +81,6 @@ export function AudioRecorder({ documentId, onTranscriptionComplete }: AudioReco
       // 1. Upload to Storage
       // Create a file object from blob
       const file = new File([audioBlob], `audio_${Date.now()}.webm`, { type: "audio/webm" });
-      const path = `audio/${user.uid}/${documentId}/${file.name}`;
       
       // Using existing uploadImage function but for audio (assuming it handles general files or I should adapt)
       // Since uploadImage might be specific to images folder, let's assume it works or I'll fix it later.
@@ -91,7 +96,7 @@ export function AudioRecorder({ documentId, onTranscriptionComplete }: AudioReco
       
       // Let's simplify: I'll use the uploadImage function but realize it might put it in images folder.
       // For MVP it's fine.
-      const downloadURL = await uploadImage(file, user.uid, "audio-notes");
+      await uploadImage(file, user.uid, "audio-notes");
 
       // 2. Call Transcription Function
       // Need to extract the storage path from URL or pass URL if function supports it.
@@ -112,7 +117,7 @@ export function AudioRecorder({ documentId, onTranscriptionComplete }: AudioReco
         documentId,
       });
 
-      const data = (result.data as any).data;
+      const data = (result.data as { data: AudioTranscriptionResult }).data;
       setResultData(data);
       setShowResult(true);
       
@@ -168,11 +173,11 @@ export function AudioRecorder({ documentId, onTranscriptionComplete }: AudioReco
                   <p className="text-sm text-muted-foreground">{resultData.summary}</p>
                 </div>
 
-                {resultData.actionItems?.length > 0 && (
+                {(resultData.actionItems?.length ?? 0) > 0 && (
                   <div>
                     <h4 className="text-sm font-medium mb-2 text-emerald-600">Itens de Ação</h4>
                     <ul className="space-y-2">
-                      {resultData.actionItems.map((item: string, i: number) => (
+                      {resultData.actionItems?.map((item: string, i: number) => (
                         <li key={i} className="flex items-start gap-2 text-sm bg-background p-2 rounded border">
                           <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
                           <span>{item}</span>

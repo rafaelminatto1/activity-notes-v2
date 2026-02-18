@@ -6,8 +6,7 @@ import {
   AtSign, 
   MessageSquareReply, 
   Heart,
-  Check,
-  ExternalLink
+  Check
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { subscribeToInbox, markAsRead } from "@/lib/firebase/chat";
@@ -19,17 +18,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 
 export function Inbox() {
   const { user } = useAuth();
   const [items, setItems] = useState<ChatInboxItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     if (!user) return;

@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 export interface VersionHistoryItem {
   version: number;
-  content: any;
+  content: unknown;
   plainText: string;
   createdAt: Date;
 }

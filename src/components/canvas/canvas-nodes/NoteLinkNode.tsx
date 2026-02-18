@@ -3,7 +3,7 @@
 import { memo } from "react";
 import { Handle, Position, NodeProps, Node } from "@xyflow/react";
 import { cn } from "@/lib/utils";
-import { FileText, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 type NoteLinkNodeData = Node<{

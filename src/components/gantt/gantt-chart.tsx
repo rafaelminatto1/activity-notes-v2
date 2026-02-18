@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Gantt, Task as GanttTask, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 import { Task } from "@/types/smart-note";
 import { transformTasksToGantt, calculateCriticalPath } from "@/lib/gantt-utils";
-import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -22,15 +21,14 @@ interface GanttChartProps {
 export function GanttChart({ tasks, onTaskChange, isLoading }: GanttChartProps) {
   const [view, setView] = useState<ViewMode>(ViewMode.Day);
   const [showCriticalPath, setShowCriticalPath] = useState(false);
-  const [ganttTasks, setGanttTasks] = useState<GanttTask[]>([]);
   const { updateTask } = useTasksStore();
 
-  useEffect(() => {
+  const ganttTasks = useMemo(() => {
     let transformed = transformTasksToGantt(tasks);
     if (showCriticalPath) {
       transformed = calculateCriticalPath(transformed);
     }
-    setGanttTasks(transformed);
+    return transformed;
   }, [tasks, showCriticalPath]);
 
   const handleTaskChange = (task: GanttTask) => {
@@ -72,13 +70,10 @@ export function GanttChart({ tasks, onTaskChange, isLoading }: GanttChartProps) 
       console.error(err);
     });
 
-    // Atualizar estado local otimista
-    setGanttTasks(prev => prev.map(t => t.id === task.id ? task : t));
   };
 
   const handleProgressChange = async (task: GanttTask) => {
     const newStatus = task.progress >= 100 ? "done" : task.progress > 0 ? "in_progress" : "todo";
-    setGanttTasks(prev => prev.map(t => t.id === task.id ? { ...t, progress: task.progress } : t));
     
     await updateTask(task.id, {
       status: newStatus
@@ -86,16 +81,15 @@ export function GanttChart({ tasks, onTaskChange, isLoading }: GanttChartProps) 
   };
 
   const handleDblClick = (task: GanttTask) => {
-    // Abrir modal de edição (pode ser implementado via callback)
-    // onTaskChange?.(task.originalTask);
-  };
-
-  const handleSelect = (task: GanttTask, isSelected: boolean) => {
-    // console.log(task.name + " has " + (isSelected ? "selected" : "unselected"));
+    if (!onTaskChange) return;
+    const originalTask = tasks.find((t) => t.id === task.id);
+    if (originalTask) {
+      onTaskChange(originalTask);
+    }
   };
 
   const handleExpanderClick = (task: GanttTask) => {
-    setGanttTasks(ganttTasks.map((t) => (t.id === task.id ? task : t)));
+    void task;
   };
 
   if (isLoading) {
@@ -145,7 +139,6 @@ export function GanttChart({ tasks, onTaskChange, isLoading }: GanttChartProps) 
           onDateChange={handleTaskChange}
           onProgressChange={handleProgressChange}
           onDoubleClick={handleDblClick}
-          onSelect={handleSelect}
           onExpanderClick={handleExpanderClick}
           listCellWidth="155px"
           columnWidth={view === ViewMode.Month ? 300 : 65}

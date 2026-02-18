@@ -4,11 +4,11 @@ import { NodeViewWrapper } from "@tiptap/react";
 import type { NodeViewProps } from "@tiptap/react";
 import { useState, useEffect, useRef } from "react";
 import katex from "katex";
-import { Sigma } from "lucide-react";
 
 export function MathInlineView({ node, updateAttributes, selected }: NodeViewProps) {
+  const sourceLatex = node.attrs.latex || "";
   const [isEditing, setIsEditing] = useState(false);
-  const [latex, setLatex] = useState(node.attrs.latex || "");
+  const [latex, setLatex] = useState(sourceLatex);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -17,11 +17,8 @@ export function MathInlineView({ node, updateAttributes, selected }: NodeViewPro
     }
   }, [isEditing]);
 
-  useEffect(() => {
-    setLatex(node.attrs.latex || "");
-  }, [node.attrs.latex]);
-
   const handleToggleEdit = () => {
+    setLatex(sourceLatex);
     setIsEditing(!isEditing);
   };
 
@@ -35,21 +32,23 @@ export function MathInlineView({ node, updateAttributes, selected }: NodeViewPro
       handleBlur();
     }
     if (e.key === "Escape") {
-      setLatex(node.attrs.latex);
+      setLatex(sourceLatex);
       setIsEditing(false);
     }
   };
 
+  const previewLatex = isEditing ? latex : sourceLatex;
+
   const renderedHtml = () => {
     try {
       return {
-        __html: katex.renderToString(latex || "latex", {
+        __html: katex.renderToString(previewLatex || "latex", {
           throwOnError: false,
           displayMode: false,
         }),
       };
-    } catch (e) {
-      return { __html: latex || "latex" };
+    } catch {
+      return { __html: previewLatex || "latex" };
     }
   };
 

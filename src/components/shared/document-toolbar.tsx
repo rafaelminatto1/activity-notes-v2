@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Star,
   Globe,
   MoreHorizontal,
   Copy,
@@ -21,7 +20,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { useAIStore } from "@/stores/ai-store";
 import {
   publishDocument,
-  toggleFavorite,
   createDocument,
   archiveDocument,
   createTemplate,
@@ -55,6 +53,7 @@ import { ShareDialog } from "@/components/collaboration/share-dialog";
 import { TemplateEditor } from "@/components/smart/template-editor";
 import { exportToMarkdown, exportToJson } from "@/lib/export/utils";
 import type { Document } from "@/types/document";
+import type { Template } from "@/types/smart-note";
 import { AutoTagButton } from "@/components/ai/auto-tag-button";
 import { LocationBadge } from "./location-badge";
 import { Collaborators } from "@/components/collaboration/collaborators";
@@ -68,7 +67,7 @@ interface DocumentToolbarProps {
 
 export function DocumentToolbar({ document }: DocumentToolbarProps) {
   const router = useRouter();
-  const { user, userProfile, refreshProfile } = useAuth();
+  const { user } = useAuth();
   const { can } = usePermission(document.workspaceId);
   const { collaborators } = useCollaboration(document.id);
   const saveStatus = useEditorStore((s) => s.saveStatus);
@@ -77,12 +76,11 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
   const [copied, setCopied] = useState(false);
   const [templateEditorOpen, setTemplateEditorOpen] = useState(false);
 
-  const isFavorite = userProfile?.favoriteIds?.includes(document.id) ?? false;
   const publicUrl = typeof window !== "undefined"
     ? `${window.location.origin}/preview/${document.id}`
     : `/preview/${document.id}`;
 
-  async function handleSaveAsTemplate(data: any) {
+  async function handleSaveAsTemplate(data: Partial<Template>) {
     if (!user) return;
     try {
       await createTemplate(user.uid, {
@@ -120,20 +118,6 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error("Falha ao copiar link.");
-    }
-  }
-
-  async function handleToggleFavorite() {
-    if (!user) return;
-    try {
-      const nowFavorite = await toggleFavorite(user.uid, document.id);
-      toast.success(
-        nowFavorite ? "Adicionado aos favoritos." : "Removido dos favoritos."
-      );
-      // Atualizar perfil para sincronizar favoritos na sidebar
-      await refreshProfile();
-    } catch {
-      toast.error("Falha ao atualizar favoritos.");
     }
   }
 
@@ -209,7 +193,7 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
         <Separator orientation="vertical" className="mx-2 h-4" />
 
         {/* Location */}
-        <LocationBadge documentId={document.id} initialLocation={(document as any).location} />
+        <LocationBadge documentId={document.id} initialLocation={document.location} />
 
         <Separator orientation="vertical" className="mx-2 h-4" />
 

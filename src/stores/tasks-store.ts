@@ -94,7 +94,6 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 
   createTask: async (userId, task) => {
     // Optimistic update
-    const tempId = Math.random().toString(36).substring(7);
     // const optimisticTask = { ...task, id: tempId, userId } as Task;
 
     try {

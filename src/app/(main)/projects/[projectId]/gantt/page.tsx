@@ -1,21 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useTasksStore } from "@/stores/tasks-store";
 import { useAuth } from "@/hooks/use-auth";
 import { GanttChart } from "@/components/gantt/gantt-chart";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getTasks } from "@/lib/firebase/tasks";
-import { Task } from "@/types/smart-note";
 
 export default function ProjectGanttPage() {
   const params = useParams();
   const projectId = params.projectId as string;
   const { user } = useAuth();
-  const { tasks, loadTasks, isLoading, subscribe } = useTasksStore();
-  const [localTasks, setLocalTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { tasks, isLoading, subscribe } = useTasksStore();
 
   useEffect(() => {
     if (user && projectId) {
@@ -24,15 +20,7 @@ export default function ProjectGanttPage() {
     }
   }, [user, projectId, subscribe]);
 
-  // Sincronizar localTasks com o store
-  useEffect(() => {
-    setLocalTasks(tasks);
-    if (!isLoading) {
-      setLoading(false);
-    }
-  }, [tasks, isLoading]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-4 p-6">
         <Skeleton className="h-10 w-40" />
@@ -53,7 +41,7 @@ export default function ProjectGanttPage() {
       </div>
 
       <div className="flex-1 bg-card rounded-xl border shadow-sm p-1 overflow-hidden">
-        <GanttChart tasks={localTasks} isLoading={isLoading} />
+        <GanttChart tasks={tasks} isLoading={isLoading} />
       </div>
     </div>
   );

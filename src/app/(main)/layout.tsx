@@ -17,7 +17,6 @@ import { GlobalQAModal } from "@/components/ai/global-qa-modal";
 import { useGlobalQA } from "@/hooks/use-global-qa";
 import { Sidekick } from "@/components/ai/sidekick";
 import { Spinner } from "@/components/ui/spinner";
-import { toast } from "sonner";
 import { TemplateSelectorModal } from "@/components/smart/template-selector";
 import { useTemplateStore } from "@/stores/template-store";
 

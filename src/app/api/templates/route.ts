@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getFirestore, collection, query, where, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, orderBy, limit } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, getDoc, addDoc, orderBy, limit } from "firebase/firestore";
 
 /**
  * Templates API route handler

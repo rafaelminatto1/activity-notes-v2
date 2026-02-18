@@ -15,7 +15,7 @@ interface IconPickerProps {
 }
 
 export function IconPicker({ open, onClose, onSelect }: IconPickerProps) {
-  const { iconCategories, selectedIcon, recentIcons, setSelectedIcon, addRecentIcon } = useIconStore();
+  const { selectedIcon, recentIcons, setSelectedIcon, addRecentIcon } = useIconStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 

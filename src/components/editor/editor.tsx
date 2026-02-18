@@ -3,6 +3,7 @@
 import { useCallback, useRef, useEffect, useMemo } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import type { JSONContent, Editor as TiptapEditor } from "@tiptap/core";
+import type { Node as PMNode } from "@tiptap/pm/model";
 import { getEditorExtensions } from "./extensions";
 import { createSlashCommandExtension, SlashCommandMenu } from "./slash-command";
 import { Toolbar } from "./toolbar";
@@ -13,7 +14,6 @@ import { toast } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAutoEmbedding } from "@/hooks/use-auto-embedding";
 import { useCollaboration } from "@/hooks/use-collaboration";
-import { Collaborators } from "@/components/collaboration/collaborators";
 
 interface EditorProps {
   documentId: string;
@@ -35,7 +35,7 @@ export function Editor({
   onEditorReady,
 }: EditorProps) {
   useAutoEmbedding(documentId);
-  const { collaborators, updateCursor } = useCollaboration(documentId);
+  const { updateCursor } = useCollaboration(documentId);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);
@@ -55,8 +55,8 @@ export function Editor({
   }, []);
 
   const slashCommandExtension = useMemo(
-    () => createSlashCommandExtension(handleImageUpload),
-    [handleImageUpload]
+    () => createSlashCommandExtension(),
+    []
   );
 
   const extensions = useMemo(() => {
@@ -182,17 +182,25 @@ export function Editor({
     };
   }, [ai, handlePdfUpload, handleAnnotatableImageUpload]);
 
+  useEffect(() => {
+    const openImagePicker = () => {
+      handleImageUpload();
+    };
+
+    window.addEventListener("editor-request-image-upload", openImagePicker);
+    return () => {
+      window.removeEventListener("editor-request-image-upload", openImagePicker);
+    };
+  }, [handleImageUpload]);
+
   // Listen for mention/backlink insertion and update Firestore
   useEffect(() => {
     if (!editor) return void 0;
 
     const handleTransaction = () => {
-      const docId = (editor as any).options.documentId;
-      if (!docId) return;
-
       // Find all mentions in the document
       const mentions: string[] = [];
-      editor.state.doc.descendants((node: any, pos: number) => {
+      editor.state.doc.descendants((node: PMNode) => {
         if (node.type.name === "mention" && node.attrs.id) {
           mentions.push(node.attrs.id);
         }
@@ -200,7 +208,7 @@ export function Editor({
 
       // Update backlinks asynchronously
       if (mentions.length > 0) {
-        fetch(`/api/documents/${docId}/backlinks`, {
+        fetch(`/api/documents/${documentId}/backlinks`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ addBacklink: mentions[0] }),
@@ -212,7 +220,7 @@ export function Editor({
     return () => {
       editor.off("transaction", handleTransaction);
     };
-  }, [editor]);
+  }, [editor, documentId]);
 
   const handleImageFile = useCallback(
     async (file: File, pos?: number) => {

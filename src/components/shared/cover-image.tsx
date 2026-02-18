@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { ImagePlus, X, Upload } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { uploadCoverImage, deleteImage } from "@/lib/firebase/storage";
 import { updateDocument } from "@/lib/firebase/firestore";
@@ -46,7 +45,7 @@ export function CoverImage({ documentId, coverImage }: CoverImageProps) {
     [user, documentId]
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: { "image/*": [".jpeg", ".jpg", ".png", ".webp", ".gif"] },
     maxSize: 5 * 1024 * 1024,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getFirestore, collection, query, where, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, orderBy, arrayUnion, arrayRemove, runTransaction } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 
 /**
  * Tags API route handler
@@ -142,7 +142,7 @@ export async function PATCH(req: Request) {
   const docRef = doc(db, "documents", documentId);
 
   try {
-    const updateData: any = { updatedAt: new Date() };
+    const updateData: Record<string, unknown> = { updatedAt: new Date() };
 
     if (tags !== undefined) {
       updateData.tags = tags;

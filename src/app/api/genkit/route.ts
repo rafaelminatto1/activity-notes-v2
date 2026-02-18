@@ -28,9 +28,9 @@ if (process.env.FUNCTIONS_EMULATOR_HOST) {
 }
 
 // Helper to call Firebase GenKit functions
-async function callGenKitFunction<T = any>(
+async function callGenKitFunction<T = unknown>(
   functionName: string,
-  data: any
+  data: Record<string, unknown>
 ): Promise<{ success: boolean; data: T }> {
   const genkitFunction = httpsCallable(functions, functionName);
   const result = await genkitFunction(data);

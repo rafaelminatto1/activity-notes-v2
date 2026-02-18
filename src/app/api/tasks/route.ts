@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { getFirestore, collection, query, where, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, orderBy, limit } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, getDoc, addDoc, orderBy, limit } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 /**
  * Tasks API route handler
  */
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
+  void req;
   const auth = getAuth();
   const user = auth.currentUser;
 

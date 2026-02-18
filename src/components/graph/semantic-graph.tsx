@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase/config";
 import { Loader2, ZoomIn, ZoomOut, RefreshCw, Search as SearchIcon } from "lucide-react";
@@ -49,7 +49,7 @@ export function SemanticGraph() {
       if (!functions) return;
       const getGraph = httpsCallable(functions, "genkitGenerateGraphData");
       const result = await getGraph();
-      const graphData = (result.data as any).data;
+      const graphData = (result.data as { data: { nodes: Node[]; edges: Edge[] } }).data;
       
       if (graphData && graphData.nodes) {
         graphData.nodes.forEach((node: Node) => {
@@ -73,12 +73,6 @@ export function SemanticGraph() {
   useEffect(() => {
     fetchData();
   }, []);
-
-  const filteredNodes = useMemo(() => {
-    if (!data) return [];
-    if (!searchTerm) return data.nodes;
-    return data.nodes.filter(n => n.label.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [data, searchTerm]);
 
   useEffect(() => {
     if (!data || !canvasRef.current) return;
@@ -236,7 +230,7 @@ export function SemanticGraph() {
     setTransform(t => ({ ...t, scale: Math.max(0.1, Math.min(5, t.scale * scaleFactor)) }));
   };
 
-  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleCanvasClick = () => {
     if (hoveredNodeId) {
       router.push(`/documents/${hoveredNodeId}`);
     }
@@ -315,4 +309,3 @@ export function SemanticGraph() {
     </div>
   );
 }
-

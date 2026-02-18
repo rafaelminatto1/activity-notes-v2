@@ -16,10 +16,8 @@ import { Button } from "@/components/ui/button";
 import { 
   Zap, 
   Plus, 
-  Settings2, 
   Trash2, 
   Power, 
-  Activity,
   Boxes,
   Workflow
 } from "lucide-react";
@@ -50,7 +48,7 @@ export default function ProjectAutomationsPage() {
       await createAutomation(user.uid, projectId as string, data);
       setIsCreating(false);
       toast.success("Automação criada!");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao criar automação");
     }
   };
@@ -59,7 +57,7 @@ export default function ProjectAutomationsPage() {
     try {
       await updateAutomation(id, { active: !current });
       toast.success(current ? "Automação pausada" : "Automação ativada");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao atualizar status");
     }
   };
@@ -69,7 +67,7 @@ export default function ProjectAutomationsPage() {
     try {
       await deleteAutomation(id);
       toast.success("Automação excluída");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao excluir");
     }
   };
@@ -182,7 +180,7 @@ export default function ProjectAutomationsPage() {
   );
 }
 
-function ArrowRight(props: any) {
+function ArrowRight(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

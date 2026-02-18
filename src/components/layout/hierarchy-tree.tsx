@@ -21,9 +21,7 @@ import {
   subscribeToLists, 
   createFolder, 
   createList,
-  deleteSpace,
-  deleteFolder,
-  deleteList 
+  deleteSpace
 } from "@/lib/firebase/spaces";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -60,6 +58,8 @@ import { CSS } from '@dnd-kit/utilities';
 interface HierarchyTreeProps {
   spaces: Space[];
 }
+
+type DragListeners = ReturnType<typeof useSortable>["listeners"];
 
 export function HierarchyTree({ spaces }: HierarchyTreeProps) {
   const { reorderSpaces } = useSpaceStore();
@@ -127,18 +127,16 @@ function SortableSpaceItem({ space }: { space: Space }) {
   );
 }
 
-function SpaceItem({ space, dragListeners }: { space: Space, dragListeners: any }) {
+function SpaceItem({ space, dragListeners }: { space: Space, dragListeners: DragListeners }) {
   const { user } = useAuth();
   const params = useParams();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [folders, setFolders] = useState<FolderType[]>([]);
   const [lists, setLists] = useState<ListType[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
-      setLoading(true);
       const unsubFolders = subscribeToFolders(space.id, setFolders);
       const unsubLists = subscribeToLists(space.id, (data) => {
         setLists(data.filter(l => !l.folderId));
@@ -205,7 +203,12 @@ function SpaceItem({ space, dragListeners }: { space: Space, dragListeners: any 
           isOpen && "bg-accent/30",
           params.spaceId === space.id && "text-primary bg-primary/5"
         )}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (!isOpen) {
+            setLoading(true);
+          }
+          setIsOpen(!isOpen);
+        }}
       >
         <div 
           className="p-1 -ml-1 rounded-sm hover:bg-accent cursor-grab active:cursor-grabbing text-muted-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -284,7 +287,6 @@ function FolderItem({ folder, spaceColor }: { folder: FolderType, spaceColor: st
 
   useEffect(() => {
     if (isOpen) {
-      const unsub = subscribeToFolders(folder.spaceId, () => {}); // Just to trigger subscription if needed
       const unsubLists = subscribeToLists(folder.spaceId, (data) => {
         setLists(data.filter(l => l.folderId === folder.id));
       });

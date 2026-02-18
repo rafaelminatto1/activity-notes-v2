@@ -8,34 +8,33 @@ import type { WorkspaceRole, ResourceType, PermissionAction } from "@/types/perm
 export function usePermission(workspaceId: string | null | undefined) {
   const { user } = useAuth();
   const [role, setRole] = useState<WorkspaceRole | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
+  const currentKey = user && workspaceId ? `${workspaceId}:${user.uid}` : null;
 
   useEffect(() => {
-    if (!user || !workspaceId) {
-      setRole(null);
-      setIsLoading(false);
-      return;
-    }
+    if (!currentKey || !workspaceId || !user) return;
 
-    setIsLoading(true);
     const unsubscribe = subscribeToMemberRole(workspaceId, user.uid, (memberRole) => {
       setRole(memberRole);
-      setIsLoading(false);
+      setLoadedKey(currentKey);
     });
 
     return () => unsubscribe();
-  }, [user, workspaceId]);
+  }, [currentKey, workspaceId, user]);
+
+  const roleForContext = loadedKey === currentKey ? role : null;
+  const isLoading = Boolean(currentKey && loadedKey !== currentKey);
 
   const can = (resource: ResourceType, action: PermissionAction) => {
-    return hasPermission(role, resource, action);
+    return hasPermission(roleForContext, resource, action);
   };
 
   return {
-    role,
+    role: roleForContext,
     isLoading,
     can,
     // Helpers for common checks
-    isAdmin: role?.id === "admin",
-    isEditor: role?.id === "editor" || role?.id === "admin",
+    isAdmin: roleForContext?.id === "admin",
+    isEditor: roleForContext?.id === "editor" || roleForContext?.id === "admin",
   };
 }

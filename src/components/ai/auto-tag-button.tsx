@@ -38,7 +38,7 @@ export function AutoTagButton({ documentId, content }: AutoTagButtonProps) {
         documentId,
       });
 
-      const data = (result.data as any).data;
+      const data = (result.data as { data: { tags: string[] } }).data;
       
       toast.success(`Tags geradas: ${data.tags.join(", ")}`, { id: toastId });
     } catch (error) {

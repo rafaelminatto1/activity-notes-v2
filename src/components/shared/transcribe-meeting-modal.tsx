@@ -18,9 +18,6 @@ import {
   CheckCircle, 
   FileText,
   Plus,
-  Play,
-  Pause,
-  Clock,
   Users,
   Target,
   Sparkles
@@ -109,7 +106,7 @@ export function TranscribeMeetingModal({ open, onClose, projectId }: TranscribeM
     }
   };
 
-  const handleCreateTask = async (actionItem: string, index: number) => {
+  const handleCreateTask = async (actionItem: string) => {
     if (!user) return;
     try {
       await createTask(user.uid, {
@@ -121,7 +118,7 @@ export function TranscribeMeetingModal({ open, onClose, projectId }: TranscribeM
       });
       setCreatedTasks(prev => new Set(prev).add(actionItem));
       toast.success("Tarefa criada!");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao criar tarefa.");
     }
   };
@@ -281,7 +278,7 @@ export function TranscribeMeetingModal({ open, onClose, projectId }: TranscribeM
                             variant="ghost" 
                             size="sm" 
                             className="h-8 gap-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => handleCreateTask(item, i)}
+                            onClick={() => handleCreateTask(item)}
                           >
                             <Plus className="h-3.5 w-3.5" /> Tarefa
                           </Button>

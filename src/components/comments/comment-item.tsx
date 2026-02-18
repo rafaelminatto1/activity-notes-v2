@@ -4,7 +4,6 @@ import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { 
-  MessageSquare, 
   MoreHorizontal, 
   Trash2, 
   ClipboardList, 
@@ -95,7 +94,7 @@ export function CommentItem({ comment, onDelete }: CommentItemProps) {
 
         {comment.selection?.text && (
           <div className="text-[10px] font-bold text-primary/60 uppercase tracking-widest bg-primary/5 px-2 py-0.5 rounded-full w-fit">
-            Em destaque: "{comment.selection.text}"
+            Em destaque: &quot;{comment.selection.text}&quot;
           </div>
         )}
 

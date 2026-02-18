@@ -7,17 +7,12 @@ import { useAuth } from "./use-auth";
 
 export function useDocuments(parentDocumentId: string | null = null) {
   const { user } = useAuth();
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [documentsState, setDocuments] = useState<Document[]>([]);
+  const [loadingState, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      setDocuments([]);
-      setLoading(false);
-      return;
-    }
+    if (!user) return;
 
-    setLoading(true);
     const unsubscribe = subscribeToDocuments(
       user.uid,
       parentDocumentId,
@@ -29,6 +24,9 @@ export function useDocuments(parentDocumentId: string | null = null) {
 
     return unsubscribe;
   }, [user, parentDocumentId]);
+
+  const documents = user ? documentsState : [];
+  const loading = user ? loadingState : false;
 
   return { documents, loading };
 }

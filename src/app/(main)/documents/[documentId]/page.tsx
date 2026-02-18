@@ -56,6 +56,12 @@ export default function DocumentPage() {
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentText, setCurrentText] = useState("");
+  const [initialContent, setInitialContent] = useState<JSONContent | null>(null);
+  const [editorInstance, setEditorInstance] = useState<TiptapEditor | null>(null);
+  const [aiPanelReady, setAiPanelReady] = useState(false);
+  const [aiPanelLoading, setAiPanelLoading] = useState(false);
+  const [aiPanelUsage, setAiPanelUsage] = useState({ count: 0, remaining: 0, limit: 50 });
+  const [documentContext, setDocumentContext] = useState("");
 
   // Local editable state
   const [title, setTitle] = useState("");
@@ -63,7 +69,6 @@ export default function DocumentPage() {
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const contentSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedTitleRef = useRef("");
-  const initialContentRef = useRef<JSONContent | null>(null);
   const contentLoaded = useRef(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -73,10 +78,15 @@ export default function DocumentPage() {
 
   const handleAIReady = useCallback((ai: ReturnType<typeof useEditorAI>) => {
     aiRef.current = ai;
+    setAiPanelReady(true);
+    setAiPanelLoading(ai.loading);
+    setAiPanelUsage(ai.usage);
   }, []);
 
   const handleEditorReady = useCallback((editor: TiptapEditor) => {
     tiptapEditorRef.current = editor;
+    setEditorInstance(editor);
+    setDocumentContext(editor.getText().slice(0, 5000));
   }, []);
 
   const handleChatWithAI = useCallback(async (message: string, context: string) => {
@@ -100,7 +110,6 @@ export default function DocumentPage() {
   useEffect(() => {
     if (!params.documentId) return;
 
-    setLoading(true);
     setIdle();
     contentLoaded.current = false;
 
@@ -114,9 +123,10 @@ export default function DocumentPage() {
         }
         // Pass initial content only once
         if (!contentLoaded.current) {
-          initialContentRef.current = doc.content;
+          setInitialContent(doc.content ?? null);
           contentLoaded.current = true;
         }
+        setDocumentContext((doc.plainText || "").slice(0, 5000));
       }
       setLoading(false);
     });
@@ -180,6 +190,7 @@ export default function DocumentPage() {
       if (contentSaveTimerRef.current) clearTimeout(contentSaveTimerRef.current);
       contentSaveTimerRef.current = setTimeout(() => saveContent(json, plainText), AUTO_SAVE_DELAY);
       setCurrentText(plainText);
+      setDocumentContext(plainText.slice(0, 5000));
     },
     [saveContent]
   );
@@ -328,7 +339,7 @@ export default function DocumentPage() {
             ) : user && (
               <Editor
                 documentId={document.id}
-                content={initialContentRef.current}
+                content={initialContent}
                 onUpdate={handleEditorUpdate}
                 editable={!document.isArchived}
                 userId={user.uid}
@@ -341,20 +352,20 @@ export default function DocumentPage() {
       </div>
 
       {/* Floating AI / Panels */}
-      {aiRef.current && (
+      {aiPanelReady && (
         <AIPanel
           onChat={handleChatWithAI}
           onInsertToDocument={handleInsertToDocument}
-          documentContext={tiptapEditorRef.current?.getText().slice(0, 5000) || ""}
-          loading={aiRef.current.loading}
-          usage={aiRef.current.usage}
+          documentContext={documentContext}
+          loading={aiPanelLoading}
+          usage={aiPanelUsage}
         />
       )}
 
       <ContextualSidebar 
         documentId={params.documentId} 
         currentText={currentText}
-        editor={tiptapEditorRef.current}
+        editor={editorInstance}
       />
     </div>
   );

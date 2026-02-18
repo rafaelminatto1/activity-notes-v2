@@ -5,6 +5,7 @@ import { Space } from "@/types/space";
 interface SpaceStore {
   spaces: Space[];
   loading: boolean;
+  unsubscribe: (() => void) | null;
   initSubscription: (userId: string) => void;
   cleanupSubscription: () => void;
   createSpace: (userId: string, name: string) => Promise<void>;
@@ -14,24 +15,24 @@ interface SpaceStore {
 export const useSpaceStore = create<SpaceStore>((set, get) => ({
   spaces: [],
   loading: true,
-  unsubscribe: null as any,
+  unsubscribe: null,
 
   initSubscription: (userId: string) => {
     // Prevent double subscription
-    if ((get() as any).unsubscribe) return;
+    if (get().unsubscribe) return;
 
     set({ loading: true });
     const unsub = subscribeToSpaces(userId, (spaces) => {
       set({ spaces, loading: false });
     });
-    set({ unsubscribe: unsub } as any);
+    set({ unsubscribe: unsub });
   },
 
   cleanupSubscription: () => {
-    const unsub = (get() as any).unsubscribe;
+    const unsub = get().unsubscribe;
     if (unsub) {
       unsub();
-      set({ unsubscribe: null } as any);
+      set({ unsubscribe: null });
     }
   },
 

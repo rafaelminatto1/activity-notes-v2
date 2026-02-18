@@ -6,36 +6,58 @@ import {
   Bar, 
   XAxis, 
   YAxis, 
-  CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell,
-  LineChart,
-  Line
+  Cell
 } from "recharts";
 import { 
-  LayoutDashboard, 
   CheckCircle2, 
   FileText, 
   Sparkles, 
-  TrendingUp,
   Clock,
   ArrowUpRight,
   ArrowDownRight
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { collection, query, where, getDocs, limit, orderBy } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { Spinner } from "@/components/ui/spinner";
 
 const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"];
 
+interface ActivityPoint {
+  name: string;
+  tasks: number;
+  docs: number;
+}
+
+interface TaskStatusPoint {
+  name: string;
+  value: number;
+}
+
+interface DashboardStats {
+  totalTasks: number;
+  completedTasks: number;
+  totalDocs: number;
+  activityData: ActivityPoint[];
+  taskStatusData: TaskStatusPoint[];
+}
+
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  description: string;
+  trend?: "up" | "down";
+}
+
 export default function WorkspaceDashboard() {
   const { user } = useAuth();
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -80,6 +102,7 @@ export default function WorkspaceDashboard() {
   }, [user]);
 
   if (loading) return <div className="flex h-full items-center justify-center"><Spinner /></div>;
+  if (!stats) return <div className="flex h-full items-center justify-center"><Spinner /></div>;
 
   return (
     <div className="flex-1 space-y-8 p-8 pt-6 overflow-y-auto">
@@ -160,7 +183,7 @@ export default function WorkspaceDashboard() {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {stats.taskStatusData.map((entry: any, index: number) => (
+                  {stats.taskStatusData.map((entry, index: number) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -184,7 +207,7 @@ export default function WorkspaceDashboard() {
   );
 }
 
-function StatCard({ title, value, icon, description, trend }: any) {
+function StatCard({ title, value, icon, description, trend }: StatCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

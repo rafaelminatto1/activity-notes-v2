@@ -23,7 +23,7 @@ import { createTaskFromComment } from "@/lib/firebase/tasks";
 import { useAuth } from "@/hooks/use-auth";
 import type { Comment, TaskStatus, TaskPriority } from "@/types/smart-note";
 import { toast } from "sonner";
-import { ClipboardList, User, Calendar, Flag } from "lucide-react";
+import { ClipboardList, User, Flag } from "lucide-react";
 
 interface ConvertToTaskModalProps {
   comment: Comment;
@@ -119,7 +119,7 @@ export function ConvertToTaskModal({
               <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
                 <Flag className="w-3 h-3" /> Prioridade
               </label>
-              <Select value={priority} onValueChange={(v: any) => setPriority(v)}>
+              <Select value={priority} onValueChange={(v) => setPriority(v as TaskPriority)}>
                 <SelectTrigger className="rounded-xl">
                   <SelectValue />
                 </SelectTrigger>
@@ -136,7 +136,7 @@ export function ConvertToTaskModal({
               <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
                 <User className="w-3 h-3" /> Status
               </label>
-              <Select value={status} onValueChange={(v: any) => setStatus(v)}>
+              <Select value={status} onValueChange={(v) => setStatus(v as TaskStatus)}>
                 <SelectTrigger className="rounded-xl">
                   <SelectValue />
                 </SelectTrigger>

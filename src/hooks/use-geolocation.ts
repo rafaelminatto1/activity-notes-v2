@@ -9,11 +9,15 @@ interface Coords {
 
 export function useGeolocation() {
   const [coords, setCoords] = useState<Coords | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => {
+    if (typeof navigator !== "undefined" && !navigator.geolocation) {
+      return "Geolocalização não suportada.";
+    }
+    return null;
+  });
 
   useEffect(() => {
     if (!navigator.geolocation) {
-      setError("Geolocalização não suportada.");
       return;
     }
 

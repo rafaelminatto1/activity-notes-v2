@@ -2,7 +2,7 @@
 
 import React, { useEffect, useCallback, useState, useRef } from "react";
 import { Portal } from "@radix-ui/react-portal";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText } from "lucide-react";
 
 interface MentionItem {
   id: string;
@@ -19,11 +19,7 @@ interface MentionMenuProps {
 export function MentionMenu({ items, command, isOpen, clientRect }: MentionMenuProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  // Reset selection when items change
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [items]);
+  const safeSelectedIndex = items.length > 0 ? Math.min(selectedIndex, items.length - 1) : 0;
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -37,12 +33,12 @@ export function MentionMenu({ items, command, isOpen, clientRect }: MentionMenuP
         setSelectedIndex((prev) => (prev - 1 + items.length) % items.length);
       } else if (e.key === "Enter" || e.key === "Tab") {
         e.preventDefault();
-        command(items[selectedIndex]);
+        command(items[safeSelectedIndex]);
       } else if (e.key === "Escape") {
         // Let editor handle escape
       }
     },
-    [isOpen, items, selectedIndex, command]
+    [isOpen, items, safeSelectedIndex, command]
   );
 
   useEffect(() => {
@@ -75,7 +71,7 @@ export function MentionMenu({ items, command, isOpen, clientRect }: MentionMenuP
                 key={item.id}
                 type="button"
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-left text-sm transition-colors ${
-                  index === selectedIndex
+                  index === safeSelectedIndex
                     ? "bg-accent text-accent-foreground"
                     : "hover:bg-muted"
                 }`}

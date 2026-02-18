@@ -9,7 +9,6 @@ import {
   getDocs,
   serverTimestamp,
   writeBatch,
-  getDoc,
   onSnapshot,
   Unsubscribe,
   orderBy

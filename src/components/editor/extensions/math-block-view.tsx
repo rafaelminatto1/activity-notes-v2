@@ -8,8 +8,9 @@ import { Sigma, Code2, Check, X } from "lucide-react";
 import TextareaAutosize from "react-textarea-autosize";
 
 export function MathBlockView({ node, updateAttributes, selected }: NodeViewProps) {
+  const sourceLatex = node.attrs.latex || "";
   const [isEditing, setIsEditing] = useState(node.attrs.latex === "");
-  const [latex, setLatex] = useState(node.attrs.latex || "");
+  const [latex, setLatex] = useState(sourceLatex);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -18,11 +19,10 @@ export function MathBlockView({ node, updateAttributes, selected }: NodeViewProp
     }
   }, [isEditing]);
 
-  useEffect(() => {
-    setLatex(node.attrs.latex || "");
-  }, [node.attrs.latex]);
-
   const handleToggleEdit = () => {
+    if (!isEditing) {
+      setLatex(sourceLatex);
+    }
     setIsEditing(!isEditing);
   };
 
@@ -32,7 +32,7 @@ export function MathBlockView({ node, updateAttributes, selected }: NodeViewProp
   };
 
   const handleCancel = () => {
-    setLatex(node.attrs.latex);
+    setLatex(sourceLatex);
     setIsEditing(false);
   };
 
@@ -45,16 +45,18 @@ export function MathBlockView({ node, updateAttributes, selected }: NodeViewProp
     }
   };
 
+  const previewLatex = isEditing ? latex : sourceLatex;
+
   const renderedHtml = () => {
     try {
       return {
-        __html: katex.renderToString(latex || "f(x) = \int_{-\infty}^{\infty} e^{-x^2} dx", {
+        __html: katex.renderToString(previewLatex || "f(x) = \int_{-\infty}^{\infty} e^{-x^2} dx", {
           throwOnError: false,
           displayMode: true,
         }),
       };
-    } catch (e) {
-      return { __html: latex || "latex error" };
+    } catch {
+      return { __html: previewLatex || "latex error" };
     }
   };
 

@@ -24,7 +24,7 @@ const initialNodes: Node[] = [
 const initialEdges: Edge[] = [{ id: "e1-2", source: "1", target: "2" }];
 
 export function CanvasBoard() {
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    const [nodes, , onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const { theme } = useTheme();
 

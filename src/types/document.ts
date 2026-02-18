@@ -13,8 +13,8 @@ export interface Document {
   type: "document" | "canvas";
   content: JSONContent | null;
   canvasData?: {
-    nodes: any[];
-    edges: any[];
+    nodes: Record<string, unknown>[];
+    edges: Record<string, unknown>[];
     viewport?: { x: number; y: number; zoom: number };
   };
   plainText: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo, useState, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   ReactFlow,
   MiniMap,
@@ -14,7 +14,6 @@ import {
   Node,
   Panel,
   BackgroundVariant,
-  PanelPosition,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -31,14 +30,11 @@ import {
   Circle, 
   StickyNote, 
   Link2, 
-  Save, 
-  Undo2, 
-  Grid3X3,
   MousePointer2,
   Image as ImageIcon,
   Trash2
 } from "lucide-react";
-import { updateDocument, searchDocuments, getDocument } from "@/lib/firebase/firestore";
+import { updateDocument, searchDocuments } from "@/lib/firebase/firestore";
 import { toast } from "sonner";
 
 const nodeTypes = {
@@ -51,16 +47,15 @@ const nodeTypes = {
 
 interface CanvasEditorProps {
   documentId: string;
-  initialNodes?: any[];
-  initialEdges?: any[];
+  initialNodes?: Record<string, unknown>[];
+  initialEdges?: Record<string, unknown>[];
   initialViewport?: { x: number; y: number; zoom: number };
 }
 
 export function CanvasEditor({ 
   documentId, 
   initialNodes = [], 
-  initialEdges = [],
-  initialViewport 
+  initialEdges = []
 }: CanvasEditorProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes as Node[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges as Edge[]);
@@ -84,7 +79,7 @@ export function CanvasEditor({
 
   useEffect(() => {
     setNodes((nds) => attachHandlers(nds));
-  }, []); // Only on mount
+  }, [attachHandlers, setNodes]);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -131,7 +126,7 @@ export function CanvasEditor({
     return () => clearTimeout(timer);
   }, [nodes, edges, saveCanvas]);
 
-  const addNode = (type: string, customData: any = {}) => {
+  const addNode = (type: string, customData: Record<string, unknown> = {}) => {
     const id = `node_${Date.now()}`;
     const newNode: Node = {
       id,

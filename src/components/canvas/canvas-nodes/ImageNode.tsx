@@ -3,7 +3,7 @@
 import { memo, useState } from "react";
 import { Handle, Position, NodeProps, NodeResizer, Node } from "@xyflow/react";
 import { cn } from "@/lib/utils";
-import { Image as ImageIcon, Upload } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 
 type ImageNodeData = Node<{
   url: string;

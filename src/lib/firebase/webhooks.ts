@@ -34,6 +34,7 @@ export interface WebhookLog {
   status: number;
   response: string;
   createdAt: Timestamp;
+  is_resend?: boolean;
 }
 
 const WEBHOOKS_COLLECTION = "webhooks";

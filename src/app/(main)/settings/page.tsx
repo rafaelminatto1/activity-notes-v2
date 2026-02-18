@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import {
@@ -99,18 +99,22 @@ export default function SettingsPage() {
     setAIUsage(getAIUsage());
   }, []);
 
-  const settings: UserSettings = userProfile?.settings || {
-    theme: "system",
-    colorPalette: "default",
-    density: "normal",
-    editorFont: "sans",
-    defaultView: "list",
-    fontSize: "medium",
-    contentWidth: "medium",
-    aiEnabled: true,
-    aiPreferredModel: "flash",
-    aiResponseLanguage: "pt-BR",
-  };
+  const settings: UserSettings = useMemo(
+    () =>
+      userProfile?.settings || {
+        theme: "system",
+        colorPalette: "default",
+        density: "normal",
+        editorFont: "sans",
+        defaultView: "list",
+        fontSize: "medium",
+        contentWidth: "medium",
+        aiEnabled: true,
+        aiPreferredModel: "flash",
+        aiResponseLanguage: "pt-BR",
+      },
+    [userProfile?.settings]
+  );
 
   const saveSetting = useCallback(
     async (key: keyof UserSettings, value: string | boolean) => {

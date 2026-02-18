@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { Tag, X, Calendar, User, Plus, Trash2, Star, Circle } from "lucide-react";
 
 interface DatabasePropertiesProps {
@@ -48,16 +48,9 @@ export function DatabaseProperties({
   const [localTags, setLocalTags] = useState<string[]>(initialTags);
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
 
-  // Load user's tags for autocomplete
-  useEffect(() => {
-    if (initialTags.length === 0) {
-      loadUserTags();
-    }
-  }, [documentId]);
-
-  const loadUserTags = async () => {
+  const loadUserTags = useCallback(async () => {
     try {
-      const response = await fetch("/api/tags");
+      const response = await fetch(`/api/tags?documentId=${encodeURIComponent(documentId)}`);
       if (response.ok) {
         const userTags = await response.json();
         setLocalTags(userTags);
@@ -65,7 +58,16 @@ export function DatabaseProperties({
     } catch (error) {
       console.error("Failed to load tags:", error);
     }
-  };
+  }, [documentId]);
+
+  const handleToggleTagDropdown = useCallback(async () => {
+    const nextOpen = !isTagDropdownOpen;
+    setIsTagDropdownOpen(nextOpen);
+
+    if (nextOpen && localTags.length === 0) {
+      await loadUserTags();
+    }
+  }, [isTagDropdownOpen, localTags.length, loadUserTags]);
 
   const handleToggleTag = useCallback((tag: string) => {
     if (localTags.includes(tag)) {
@@ -99,7 +101,9 @@ export function DatabaseProperties({
       <div className="flex items-center gap-2">
         <Tag size={18} className="text-muted-foreground" />
         <button
-          onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
+          onClick={() => {
+            void handleToggleTagDropdown();
+          }}
           className="flex items-center gap-1 text-muted-foreground hover:text-foreground px-2 py-1 rounded-md hover:bg-muted"
         >
           {localTags.length > 0 ? (

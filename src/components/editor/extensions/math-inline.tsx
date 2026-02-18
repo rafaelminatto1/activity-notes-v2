@@ -3,7 +3,7 @@ import { ReactNodeViewRenderer } from "@tiptap/react";
 import { MathInlineView } from "./math-inline-view";
 
 export interface MathInlineOptions {
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, unknown>;
 }
 
 declare module "@tiptap/core" {
@@ -48,7 +48,7 @@ export const MathInline = Node.create<MathInlineOptions>({
     ];
   },
 
-  renderHTML({ node, HTMLAttributes }) {
+  renderHTML({ HTMLAttributes }) {
     return [
       "span",
       mergeAttributes(HTMLAttributes, { "data-type": "math-inline", class: "math-inline" }),

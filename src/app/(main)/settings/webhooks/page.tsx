@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { 
   Globe, 
   Plus, 
@@ -66,23 +66,21 @@ export default function WebhooksSettingsPage() {
     events: [] as WebhookEvent[]
   });
 
-  useEffect(() => {
-    if (user) {
-      loadWebhooks();
-    }
-  }, [user]);
-
-  const loadWebhooks = async () => {
+  const loadWebhooks = useCallback(async () => {
     if (!user) return;
     try {
       const data = await getWebhooks(user.uid);
       setWebhooks(data);
-    } catch (error) {
+    } catch {
       toast.error("Erro ao carregar webhooks");
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    void loadWebhooks();
+  }, [loadWebhooks]);
 
   const handleCreate = async () => {
     if (!user || !newWebhook.url.trim() || newWebhook.events.length === 0) {
@@ -94,9 +92,9 @@ export default function WebhooksSettingsPage() {
       await createWebhook(user.uid, newWebhook);
       setNewWebhook({ url: "", events: [] });
       setIsModalOpen(false);
-      loadWebhooks();
+      await loadWebhooks();
       toast.success("Webhook adicionado!");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao salvar webhook");
     }
   };
@@ -107,7 +105,7 @@ export default function WebhooksSettingsPage() {
       await deleteWebhook(id);
       setWebhooks(webhooks.filter(w => w.id !== id));
       toast.success("Webhook removido");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao remover webhook");
     }
   };
@@ -118,7 +116,7 @@ export default function WebhooksSettingsPage() {
     try {
       const data = await getWebhookLogs(webhookId);
       setLogs(data);
-    } catch (error) {
+    } catch {
       toast.error("Erro ao carregar logs");
     } finally {
       setLogsLoading(false);
@@ -269,7 +267,7 @@ export default function WebhooksSettingsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase text-muted-foreground">
-                        {log.event} {(log as any).is_resend && "(Reenvio)"}
+                        {log.event} {log.is_resend && "(Reenvio)"}
                       </span>
                       <span className="text-[10px] text-muted-foreground font-mono">Status: {log.status}</span>
                     </div>

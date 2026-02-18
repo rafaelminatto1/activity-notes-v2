@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth } from "@/hooks/use-auth";
 import { UserPresence } from "@/hooks/use-collaboration";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";

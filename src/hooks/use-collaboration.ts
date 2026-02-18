@@ -21,10 +21,10 @@ export interface UserPresence {
 export function useCollaboration(documentId: string) {
   const { user, userProfile } = useAuth();
   const [collaborators, setCollaborators] = useState<UserPresence[]>([]);
-  const presenceRef = useRef<any>(null);
+  const presenceRef = useRef<ReturnType<typeof ref> | null>(null);
 
   // Cor única para o usuário nesta sessão
-  const userColor = useRef(generateColor(user?.uid || ""));
+  const [userColor] = useState(() => generateColor(user?.uid || ""));
 
   useEffect(() => {
     if (!user || !rtdb || !documentId) return;
@@ -38,7 +38,7 @@ export function useCollaboration(documentId: string) {
       uid: user.uid,
       name: userProfile?.displayName || user.displayName || user.email || "Anônimo",
       photoURL: userProfile?.avatarUrl || user.photoURL,
-      color: userColor.current,
+      color: userColor,
       lastActive: serverTimestamp(),
     };
 
@@ -67,7 +67,7 @@ export function useCollaboration(documentId: string) {
         remove(presenceRef.current);
       }
     };
-  }, [user, documentId, userProfile]);
+  }, [user, documentId, userProfile, userColor]);
 
   const updateCursor = (index: number, length: number) => {
     if (!presenceRef.current) return;
@@ -75,11 +75,11 @@ export function useCollaboration(documentId: string) {
       uid: user?.uid,
       name: userProfile?.displayName || user?.displayName || user?.email || "Anônimo",
       photoURL: userProfile?.avatarUrl || user?.photoURL,
-      color: userColor.current,
+      color: userColor,
       lastActive: serverTimestamp(),
       cursor: { index, length },
     });
   };
 
-  return { collaborators, updateCursor, userColor: userColor.current };
+  return { collaborators, updateCursor, userColor };
 }

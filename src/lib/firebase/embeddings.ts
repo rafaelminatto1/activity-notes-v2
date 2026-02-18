@@ -25,12 +25,12 @@ function getDb() {
 const EMBEDDINGS_COLLECTION = "embeddings";
 
 export async function saveEmbedding(userId: string, documentId: string, vector: number[]): Promise<void> {
-  const embeddingData: Omit<Embedding, "id"> & { userId: string } = {
+  const embeddingData = {
     documentId,
     userId,
     vector,
     model: "text-embedding-004",
-    updatedAt: serverTimestamp() as unknown as any, // Type assertion for compatibility
+    updatedAt: serverTimestamp(),
   };
 
   const docRef = doc(getDb(), EMBEDDINGS_COLLECTION, documentId);

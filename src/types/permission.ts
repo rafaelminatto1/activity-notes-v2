@@ -23,7 +23,7 @@ export interface WorkspaceMember {
   uid: string;
   email: string;
   roleId: string;
-  joinedAt: any;
+  joinedAt: unknown;
 }
 
 export const DEFAULT_ROLES: Record<string, WorkspaceRole> = {

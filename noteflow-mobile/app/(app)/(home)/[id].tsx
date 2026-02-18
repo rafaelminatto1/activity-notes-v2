@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
+  Image,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,6 +25,7 @@ import { useSpaces } from '@/hooks/useSpaces';
 import { useAI } from '@/hooks/useAI';
 import { getDocument } from '@/lib/firebase/firestore';
 import { pickImage, takePhoto, uploadImage } from '@/lib/firebase/storage';
+import { generateEmbedding } from '@/lib/gemini/client';
 import { Document } from '@/types/document';
 import { 
   GestureDetector, 
@@ -155,6 +157,7 @@ export default function DocumentEditorScreen() {
   const [document, setDocument] = useState<Document | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [blocks, setBlocks] = useState<Block[]>([]);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [isUploading, setIsUploading] = useState(false);
@@ -296,6 +299,7 @@ export default function DocumentEditorScreen() {
       setTitle(doc.title);
       const text = doc.plainText || '';
       setContent(text);
+      setBlocks(parseToBlocks(text));
       lastSavedContent.current = text;
       lastSavedTitle.current = doc.title;
     }
@@ -381,6 +385,7 @@ export default function DocumentEditorScreen() {
       const markdown = `\n![imagem](${url})\n`;
       const newText = content.substring(0, start) + markdown + content.substring(end);
       setContent(newText);
+      setBlocks(parseToBlocks(newText));
       scheduleAutoSave(title, newText);
     } catch (error) {
       console.error('Image upload failed:', error);
@@ -463,6 +468,7 @@ export default function DocumentEditorScreen() {
 
     if (newText) {
       setContent(newText);
+      setBlocks(parseToBlocks(newText));
       scheduleAutoSave(title, newText);
     }
   };
@@ -511,6 +517,7 @@ export default function DocumentEditorScreen() {
                   const newUrl = await uploadImage(user.uid, uri, 'covers');
                   const newContent = content.replace(imageUrl, newUrl);
                   setContent(newContent);
+                  setBlocks(parseToBlocks(newContent));
                   scheduleAutoSave(title, newContent);
                 } catch (error) {
                   Alert.alert('Erro', 'Não foi possível atualizar a imagem.');
@@ -528,6 +535,7 @@ export default function DocumentEditorScreen() {
               const pattern = new RegExp(`\\!\\[.*?\\]\\(${imageUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\)`, 'g');
               const newContent = content.replace(pattern, '');
               setContent(newContent);
+              setBlocks(parseToBlocks(newContent));
               scheduleAutoSave(title, newContent);
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             },
@@ -576,7 +584,6 @@ export default function DocumentEditorScreen() {
   const handleAIAction = async (promptType: string) => {
     if (focusedBlockIndex === null) return;
     
-    const blocks = parseToBlocks(content);
     const block = blocks[focusedBlockIndex];
     const textToProcess = block.type === 'text' || block.type === 'heading' || block.type === 'callout' 
       ? block.content 
@@ -585,25 +592,10 @@ export default function DocumentEditorScreen() {
     setIsAIModalVisible(false);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-    // Optimistic update or loading state could be here
     try {
-      // We use a direct call here instead of the store flow for immediate block update
-      // But since useAI exposes sendMessage which updates store, we might need a direct helper or just listen to store
-      // For simplicity in this refactor, let's assume we want to use the result directly.
-      // Since useAI hook is tied to chat interface, we'll adapt it or use the client directly if needed.
-      // For now, let's simulate the flow or reuse the chat store if the user wants a chat experience.
-      // BUT, the requirement is "AI for text processing" in place.
-      
-      // Let's use the store's message for now, but ideally we'd have a `processText` function.
-      // As a shortcut, we'll send a message and watch for the response, OR (better)
-      // just assume the user wants to see the result in the block.
-      
-      // REAL IMPLEMENTATION:
-      // We need a way to get the response text back. 
-      // For this MVP, let's just append the AI Loading text and then replace it.
-      
       const newBlocks = [...blocks];
       newBlocks[focusedBlockIndex].content = "✨ Gerando resposta...";
+      setBlocks(newBlocks);
       setContent(blocksToMarkdown(newBlocks));
 
       // This is a bit of a hack because useAI is designed for chat. 
@@ -676,20 +668,28 @@ export default function DocumentEditorScreen() {
 
   const addBlock = (type: BlockType) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    let newContent = '';
     
-    if (type === 'text') newContent = 'Novo parágrafo';
-    if (type === 'heading') newContent = '# Novo título';
-    if (type === 'checkbox') newContent = '- [ ] Nova tarefa';
-    if (type === 'callout') newContent = '> Destaque importante';
-    if (type === 'table') newContent = '| Coluna 1 | Coluna 2 |\n| --- | --- |\n| Item | Item |';
+    let newBlock: Block = { id: Math.random().toString(), type, content: '' };
+    
+    if (type === 'text') newBlock.content = '';
+    if (type === 'heading') newBlock.content = 'Novo título';
+    if (type === 'checkbox') {
+      newBlock.content = 'Nova tarefa';
+      newBlock.checked = false;
+    }
+    if (type === 'callout') newBlock.content = 'Destaque importante';
+    if (type === 'table') {
+      newBlock.content = [['Coluna 1', 'Coluna 2'], ['', '']];
+    }
     
     if (type === 'image') {
       handleImageAction();
       return;
     }
 
-    const updatedMd = (content.trim() ? content + '\n\n' : '') + newContent;
+    const newBlocks = [...blocks, newBlock];
+    setBlocks(newBlocks);
+    const updatedMd = blocksToMarkdown(newBlocks);
     setContent(updatedMd);
     scheduleAutoSave(title, updatedMd);
   };
@@ -914,7 +914,7 @@ export default function DocumentEditorScreen() {
           </View>
         ) : (
           <View>
-            {parseToBlocks(content).map((block, index, allBlocks) => (
+            {blocks.map((block, index) => (
               <View 
                 key={block.id} 
                 style={{ 
@@ -929,10 +929,12 @@ export default function DocumentEditorScreen() {
                   <TouchableOpacity 
                     onPress={() => {
                       if (index > 0) {
-                        const newBlocks = [...allBlocks];
+                        const newBlocks = [...blocks];
                         [newBlocks[index-1], newBlocks[index]] = [newBlocks[index], newBlocks[index-1]];
+                        setBlocks(newBlocks);
                         const md = blocksToMarkdown(newBlocks);
                         setContent(md);
+                        scheduleAutoSave(title, md);
                       }
                     }}
                     style={{ padding: 4 }}
@@ -941,9 +943,11 @@ export default function DocumentEditorScreen() {
                   </TouchableOpacity>
                   <TouchableOpacity 
                     onPress={() => {
-                      const newBlocks = allBlocks.filter((_, i) => i !== index);
+                      const newBlocks = blocks.filter((_, i) => i !== index);
+                      setBlocks(newBlocks);
                       const md = blocksToMarkdown(newBlocks);
                       setContent(md);
+                      scheduleAutoSave(title, md);
                     }}
                     style={{ padding: 4 }}
                   >
@@ -963,9 +967,12 @@ export default function DocumentEditorScreen() {
                       }}
                       value={block.content}
                       onChangeText={(newVal) => {
-                        const newBlocks = [...allBlocks];
+                        const newBlocks = [...blocks];
                         newBlocks[index].content = newVal;
-                        setContent(blocksToMarkdown(newBlocks));
+                        setBlocks(newBlocks);
+                        const md = blocksToMarkdown(newBlocks);
+                        setContent(md); // Update content string for sync but don't re-render from it
+                        scheduleAutoSave(title, md);
                       }}
                       placeholder="Título"
                       placeholderTextColor={colors.textMuted}
@@ -992,9 +999,14 @@ export default function DocumentEditorScreen() {
                       }}
                       value={block.content}
                       onChangeText={(newVal) => {
-                        const newBlocks = [...allBlocks];
+                        const newBlocks = [...blocks];
                         newBlocks[index].content = newVal;
-                        setContent(blocksToMarkdown(newBlocks));
+                        setBlocks(newBlocks);
+                        // Debounce the heavy markdown conversion/content update if needed, 
+                        // but for now just updating it is fine as long as we don't re-render from it.
+                        const md = blocksToMarkdown(newBlocks);
+                        setContent(md);
+                        scheduleAutoSave(title, md);
                       }}
                       multiline
                       placeholder="Escreva algo..."
@@ -1020,9 +1032,12 @@ export default function DocumentEditorScreen() {
                       style={{ flex: 1, fontSize: 16, color: colors.text }}
                       value={block.content}
                       onChangeText={(newVal) => {
-                        const newBlocks = [...allBlocks];
+                        const newBlocks = [...blocks];
                         newBlocks[index].content = newVal;
-                        setContent(blocksToMarkdown(newBlocks));
+                        setBlocks(newBlocks);
+                        const md = blocksToMarkdown(newBlocks);
+                        setContent(md);
+                        scheduleAutoSave(title, md);
                       }}
                       multiline
                       placeholder="Destaque..."
@@ -1034,9 +1049,12 @@ export default function DocumentEditorScreen() {
                   <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4 }}>
                     <TouchableOpacity 
                       onPress={() => {
-                        const newBlocks = [...allBlocks];
+                        const newBlocks = [...blocks];
                         newBlocks[index].checked = !newBlocks[index].checked;
-                        setContent(blocksToMarkdown(newBlocks));
+                        setBlocks(newBlocks);
+                        const md = blocksToMarkdown(newBlocks);
+                        setContent(md);
+                        scheduleAutoSave(title, md);
                       }}
                       style={{ marginRight: 10 }}
                     >
@@ -1055,9 +1073,12 @@ export default function DocumentEditorScreen() {
                       }}
                       value={block.content}
                       onChangeText={(newVal) => {
-                        const newBlocks = [...allBlocks];
+                        const newBlocks = [...blocks];
                         newBlocks[index].content = newVal;
-                        setContent(blocksToMarkdown(newBlocks));
+                        setBlocks(newBlocks);
+                        const md = blocksToMarkdown(newBlocks);
+                        setContent(md);
+                        scheduleAutoSave(title, md);
                       }}
                       placeholder="Tarefa"
                     />
@@ -1069,9 +1090,12 @@ export default function DocumentEditorScreen() {
                     colors={colors}
                     data={block.content}
                     onChange={(newData) => {
-                      const newBlocks = [...allBlocks];
+                      const newBlocks = [...blocks];
                       newBlocks[index].content = newData;
-                      setContent(blocksToMarkdown(newBlocks));
+                      setBlocks(newBlocks);
+                      const md = blocksToMarkdown(newBlocks);
+                      setContent(md);
+                      scheduleAutoSave(title, md);
                     }}
                   />
                 )}
@@ -1084,11 +1108,14 @@ export default function DocumentEditorScreen() {
                           style={{ fontSize: 14, color: colors.text }}
                           value={col}
                           onChangeText={(newVal) => {
-                            const newBlocks = [...allBlocks];
+                            const newBlocks = [...blocks];
                             const newCols = [...(newBlocks[index].content as string[])];
                             newCols[colIdx] = newVal;
                             newBlocks[index].content = newCols;
-                            setContent(blocksToMarkdown(newBlocks));
+                            setBlocks(newBlocks);
+                            const md = blocksToMarkdown(newBlocks);
+                            setContent(md);
+                            scheduleAutoSave(title, md);
                           }}
                           multiline
                           placeholder="Coluna"

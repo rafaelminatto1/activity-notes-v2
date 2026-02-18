@@ -34,7 +34,7 @@ export function ScanButton({ editor }: ScanButtonProps) {
       if (!functions) throw new Error("Firebase functions not initialized");
       const analyzeImage = httpsCallable(functions, "analyzeImageWithOCR");
       const result = await analyzeImage({ imageRef: downloadURL });
-      const data = (result.data as any).data;
+      const data = (result.data as { data: { text?: string } }).data;
 
       // 3. Insert Text
       if (data.text) {
