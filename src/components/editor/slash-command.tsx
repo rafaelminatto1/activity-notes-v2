@@ -7,7 +7,6 @@ import {
   useRef,
   useLayoutEffect,
 } from "react";
-import { createPortal } from "react-dom";
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import type { EditorView } from "@tiptap/pm/view";
@@ -557,7 +556,7 @@ export function SlashCommandMenu({ editor, onImageUpload }: SlashCommandMenuProp
 
   let flatIndex = 0;
 
-  return createPortal(
+  return (
     <div
       ref={menuRef}
       className="absolute z-50 max-h-80 w-72 overflow-y-auto rounded-md border bg-popover p-1 shadow-lg"
@@ -594,7 +593,6 @@ export function SlashCommandMenu({ editor, onImageUpload }: SlashCommandMenuProp
           })}
         </div>
       ))}
-    </div>,
-    document.body
+    </div>
   );
 }

@@ -16,6 +16,7 @@ import {
   Target,
   LayoutDashboard,
   Briefcase,
+  Home,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -114,6 +115,11 @@ function SidebarContent() {
 
       {/* Quick Actions */}
       <div className="space-y-0.5 px-2 py-1">
+        <SidebarButton
+          icon={<Home className="h-4 w-4" />}
+          label="Início"
+          onClick={() => navigateTo("/documents")}
+        />
         <SidebarButton
           icon={<LayoutDashboard className="h-4 w-4" />}
           label="Dashboard"
