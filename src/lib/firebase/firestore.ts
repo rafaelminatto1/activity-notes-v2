@@ -312,6 +312,24 @@ export function subscribeToProjectDocuments(
   });
 }
 
+export function subscribeToSpaceDocuments(
+  userId: string,
+  spaceId: string,
+  callback: (docs: Document[]) => void
+) {
+  const q = query(collection(getDb(), "documents"), where("userId", "==", userId));
+
+  return onSnapshot(q, (snapshot) => {
+    const docs = snapshot.docs
+      .map((d) => ({ id: d.id, ...d.data() }) as Document)
+      .filter((d) => !d.isArchived && (d.spaceId ?? null) === spaceId)
+      .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+    callback(docs);
+  }, (error) => {
+    console.error("Error subscribing to space documents:", error);
+  });
+}
+
 export function subscribeToDocument(
   documentId: string,
   callback: (doc: Document | null) => void
@@ -487,4 +505,3 @@ export async function incrementTemplateUsage(
     updatedAt: serverTimestamp(),
   });
 }
-

@@ -1,9 +1,10 @@
 import {
+  arrayRemove,
+  arrayUnion,
   collection,
   doc,
   addDoc,
   updateDoc,
-  deleteDoc,
   query,
   where,
   getDocs,
@@ -26,8 +27,14 @@ const DOCUMENTS_COLLECTION = "documents";
 export async function createProject(data: ProjectCreate): Promise<string> {
   if (!db) throw new Error("Firestore not initialized");
   try {
+    const ownerId = data.userId;
+    const memberIds = Array.from(new Set([ownerId, ...(data.memberIds || [])]));
     const docRef = await addDoc(collection(db, PROJECTS_COLLECTION), {
       ...data,
+      kind: data.kind || "folder",
+      visibility: data.visibility || "private",
+      workspaceId: data.workspaceId || null,
+      memberIds,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       documentCount: 0
@@ -46,8 +53,12 @@ export async function updateProject(id: string, data: ProjectUpdate): Promise<vo
   if (!db) throw new Error("Firestore not initialized");
   try {
     const docRef = doc(db, PROJECTS_COLLECTION, id);
+    const payload = { ...data } as ProjectUpdate;
+    if (data.memberIds) {
+      payload.memberIds = Array.from(new Set(data.memberIds));
+    }
     await updateDoc(docRef, {
-      ...data,
+      ...payload,
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
@@ -142,13 +153,99 @@ export function subscribeToUserProjects(userId: string, callback: (projects: Pro
   );
 
   return onSnapshot(q, (snapshot) => {
-    const projects = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Project));
+    const projects = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() } as Project))
+      .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
     callback(projects);
   }, (error) => {
     console.error("Error subscribing to projects:", error);
+  });
+}
+
+/**
+ * Inscreve-se para projetos compartilhados com o usuário
+ */
+export function subscribeToMemberProjects(
+  userId: string,
+  callback: (projects: Project[]) => void
+): Unsubscribe {
+  if (!db) return () => { };
+
+  const q = query(
+    collection(db, PROJECTS_COLLECTION),
+    where("memberIds", "array-contains", userId)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const projects = snapshot.docs
+      .map(doc => ({ id: doc.id, ...doc.data() } as Project))
+      .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+    callback(projects);
+  }, (error) => {
+    console.error("Error subscribing to shared projects:", error);
+  });
+}
+
+export function subscribeProjectsByKind(
+  userId: string,
+  kind: "folder" | "notebook",
+  callback: (projects: Project[]) => void
+): Unsubscribe {
+  if (!db) return () => { };
+
+  const q = query(
+    collection(db, PROJECTS_COLLECTION),
+    where("userId", "==", userId),
+    where("kind", "==", kind)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const projects = snapshot.docs
+      .map((project) => ({ id: project.id, ...project.data() } as Project))
+      .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+    callback(projects);
+  }, (error) => {
+    console.error("Error subscribing projects by kind:", error);
+  });
+}
+
+export function subscribeWorkspaceProjects(
+  workspaceId: string,
+  callback: (projects: Project[]) => void
+): Unsubscribe {
+  if (!db) return () => { };
+
+  const q = query(
+    collection(db, PROJECTS_COLLECTION),
+    where("workspaceId", "==", workspaceId)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const projects = snapshot.docs
+      .map((project) => ({ id: project.id, ...project.data() } as Project))
+      .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+    callback(projects);
+  }, (error) => {
+    console.error("Error subscribing workspace projects:", error);
+  });
+}
+
+export async function addProjectMember(projectId: string, userId: string): Promise<void> {
+  if (!db) throw new Error("Firestore not initialized");
+  const ref = doc(db, PROJECTS_COLLECTION, projectId);
+  await updateDoc(ref, {
+    memberIds: arrayUnion(userId),
+    visibility: "shared",
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function removeProjectMember(projectId: string, userId: string): Promise<void> {
+  if (!db) throw new Error("Firestore not initialized");
+  const ref = doc(db, PROJECTS_COLLECTION, projectId);
+  await updateDoc(ref, {
+    memberIds: arrayRemove(userId),
+    updatedAt: serverTimestamp(),
   });
 }
 

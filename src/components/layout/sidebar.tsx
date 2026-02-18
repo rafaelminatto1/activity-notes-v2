@@ -3,7 +3,9 @@
 import { useRouter, useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  BookOpenText,
   ChevronsLeft,
+  FolderOpen,
   Plus,
   Search,
   Settings,
@@ -17,6 +19,7 @@ import {
   LayoutDashboard,
   Briefcase,
   Home,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
@@ -24,16 +27,24 @@ import { useSidebarStore } from "@/stores/sidebar-store";
 import { useSearchStore } from "@/stores/search-store";
 import { useAIQAStore } from "@/stores/ai-qa-store";
 import { createDocument, getDocument } from "@/lib/firebase/firestore";
-import { useSpaceStore } from "@/stores/space-store";
+import {
+  subscribeToMemberProjects,
+  subscribeToUserProjects,
+} from "@/lib/firebase/projects";
+import {
+  createWorkspace,
+  subscribeToUserWorkspaces,
+} from "@/lib/firebase/workspaces";
 import { Navigation } from "./navigation";
 import { UserMenu } from "./user-menu";
-import { HierarchyTree } from "./hierarchy-tree";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Inbox } from "./inbox";
 import { TranscribeMeetingModal } from "@/components/shared/transcribe-meeting-modal";
 import { toast } from "sonner";
 import type { Document } from "@/types/document";
+import type { Project, ProjectKind } from "@/types/project";
+import type { Workspace } from "@/types/workspace";
 
 function SidebarContent() {
   const router = useRouter();
@@ -42,18 +53,41 @@ function SidebarContent() {
   const openSearch = useSearchStore((s) => s.open);
   const openQA = useAIQAStore((s) => s.open);
   const closeMobile = useSidebarStore((s) => s.closeMobile);
-  const { spaces, initSubscription, cleanupSubscription, createSpace } = useSpaceStore();
   const [transcribeModalOpen, setTranscribeModalOpen] = useState(false);
+  const [ownedProjects, setOwnedProjects] = useState<Project[]>([]);
+  const [sharedProjects, setSharedProjects] = useState<Project[]>([]);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
 
-  // Carregar espaços ao montar
   useEffect(() => {
-    if (user?.uid) {
-      initSubscription(user.uid);
+    if (!user?.uid) return;
+    const unsubscribe = subscribeToUserWorkspaces(user.uid, setWorkspaces);
+    return () => unsubscribe();
+  }, [user?.uid]);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      return;
     }
+
+    const unsubOwned = subscribeToUserProjects(user.uid, (projects) => {
+      setOwnedProjects(projects);
+    });
+    const unsubShared = subscribeToMemberProjects(user.uid, (projects) => {
+      setSharedProjects(projects.filter((project) => project.userId !== user.uid));
+    });
+
     return () => {
-      cleanupSubscription();
+      unsubOwned();
+      unsubShared();
     };
-  }, [user, initSubscription, cleanupSubscription]);
+  }, [user?.uid]);
+
+  const folderProjects = ownedProjects.filter(
+    (project) => resolveProjectKind(project) !== "notebook"
+  );
+  const notebookProjects = ownedProjects.filter(
+    (project) => resolveProjectKind(project) === "notebook"
+  );
 
   // Favorites — lidos do userProfile
   const [favoriteDocs, setFavoriteDocs] = useState<Document[]>([]);
@@ -88,7 +122,11 @@ function SidebarContent() {
     if (!user) return;
     const name = prompt("Nome do novo espaço:");
     if (name) {
-      await createSpace(user.uid, name);
+      await createWorkspace(
+        user.uid,
+        { name, icon: "🏢" },
+        { email: user.email || "", displayName: user.displayName || "Owner" }
+      );
     }
   };
 
@@ -121,6 +159,21 @@ function SidebarContent() {
           onClick={() => navigateTo("/documents")}
         />
         <SidebarButton
+          icon={<FolderOpen className="h-4 w-4" />}
+          label="Pastas"
+          onClick={() => navigateTo("/pastas")}
+        />
+        <SidebarButton
+          icon={<BookOpenText className="h-4 w-4" />}
+          label="Cadernos"
+          onClick={() => navigateTo("/cadernos")}
+        />
+        <SidebarButton
+          icon={<Users className="h-4 w-4" />}
+          label="Compartilhados comigo"
+          onClick={() => navigateTo("/compartilhados")}
+        />
+        <SidebarButton
           icon={<LayoutDashboard className="h-4 w-4" />}
           label="Dashboard"
           onClick={() => navigateTo("/dashboard")}
@@ -144,8 +197,8 @@ function SidebarContent() {
         />
         <SidebarButton
           icon={<Briefcase className="h-4 w-4" />}
-          label="Portfólios"
-          onClick={() => navigateTo("/portfolios")}
+          label="Espaços"
+          onClick={() => navigateTo("/espacos")}
         />
         <SidebarButton
           icon={<Network className="h-4 w-4" />}
@@ -213,7 +266,68 @@ function SidebarContent() {
           </div>
         )}
 
-        {/* Spaces Hierarchy */}
+        <div className="py-1">
+          <p className="mb-1 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Pastas
+          </p>
+          {folderProjects.length === 0 ? (
+            <p className="px-3 py-1 text-xs text-muted-foreground">Nenhuma pasta</p>
+          ) : (
+            <div className="space-y-0.5">
+              {folderProjects.map((project) => (
+                <SidebarMiniItem
+                  key={project.id}
+                  icon={project.icon || "📁"}
+                  label={project.name}
+                  onClick={() => navigateTo(`/documents?project=${project.id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="py-1">
+          <p className="mb-1 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Cadernos
+          </p>
+          {notebookProjects.length === 0 ? (
+            <p className="px-3 py-1 text-xs text-muted-foreground">Nenhum caderno</p>
+          ) : (
+            <div className="space-y-0.5">
+              {notebookProjects.map((project) => (
+                <SidebarMiniItem
+                  key={project.id}
+                  icon={project.icon || "📓"}
+                  label={project.name}
+                  onClick={() => navigateTo(`/documents?project=${project.id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="py-1">
+          <p className="mb-1 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Compartilhados comigo
+          </p>
+          {sharedProjects.length === 0 ? (
+            <p className="px-3 py-1 text-xs text-muted-foreground">Nenhum compartilhado</p>
+          ) : (
+            <div className="space-y-0.5">
+              {sharedProjects.map((project) => (
+                <SidebarMiniItem
+                  key={project.id}
+                  icon={project.icon || "🤝"}
+                  label={project.name}
+                  onClick={() => navigateTo(`/documents?project=${project.id}`)}
+                />
+              ))}
+            </div>
+          )}
+          <Separator className="my-1" />
+        </div>
+
+        {/* Workspaces */}
         <div className="py-1">
           <div className="flex items-center justify-between mb-1 px-3">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -226,10 +340,20 @@ function SidebarContent() {
               <Plus className="h-4 w-4" />
             </button>
           </div>
-          <HierarchyTree spaces={spaces} />
-          {spaces.length === 0 && (
+          {workspaces.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-4 text-center text-muted-foreground">
               <p className="text-xs">Nenhum espaço</p>
+            </div>
+          ) : (
+            <div className="space-y-0.5">
+              {workspaces.map((workspace) => (
+                <SidebarMiniItem
+                  key={workspace.id}
+                  icon={workspace.icon || "🏢"}
+                  label={workspace.name}
+                  onClick={() => navigateTo(`/espacos/${workspace.id}`)}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -253,6 +377,26 @@ function SidebarContent() {
       <div className="space-y-0.5 px-2 py-2">
       </div>
     </div>
+  );
+}
+
+function SidebarMiniItem({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: string;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex w-full items-center gap-2 rounded-sm px-3 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+    >
+      <span className="text-sm">{icon}</span>
+      <span className="truncate text-left">{label}</span>
+    </button>
   );
 }
 
@@ -281,6 +425,22 @@ function SidebarButton({
       )}
     </button>
   );
+}
+
+function resolveProjectKind(project: Project): ProjectKind {
+  if (
+    project.kind === "folder" ||
+    project.kind === "notebook" ||
+    project.kind === "shared-project"
+  ) {
+    return project.kind;
+  }
+
+  if ((project.icon || "").includes("📓")) {
+    return "notebook";
+  }
+
+  return "folder";
 }
 
 export function Sidebar() {

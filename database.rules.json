@@ -4,7 +4,11 @@
     ".write": "auth != null",
     "presence": {
       "$documentId": {
-        ".indexOn": ["updatedAt"]
+        ".indexOn": ["updatedAt"],
+        "$userId": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid == $userId"
+        }
       }
     }
   }

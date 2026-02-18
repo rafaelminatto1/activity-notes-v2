@@ -1,9 +1,13 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_KEY = process.env.GEMINI_API_KEY || '';
+const API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY || '';
 const DAILY_LIMIT = 50;
 const STORAGE_KEY = 'ai_usage';
+
+if (!API_KEY) {
+  console.warn('GEMINI_API_KEY não está configurada no ambiente.');
+}
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 

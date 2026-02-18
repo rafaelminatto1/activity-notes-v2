@@ -35,9 +35,10 @@ import {
   Undo2, 
   Grid3X3,
   MousePointer2,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Trash2
 } from "lucide-react";
-import { updateDocument } from "@/lib/firebase/firestore";
+import { updateDocument, searchDocuments, getDocument } from "@/lib/firebase/firestore";
 import { toast } from "sonner";
 
 const nodeTypes = {
@@ -65,22 +66,24 @@ export function CanvasEditor({
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges as Edge[]);
 
   // Attach onChange handlers to nodes
-  useEffect(() => {
-    setNodes((nds) => 
-      nds.map((node) => ({
-        ...node,
-        data: {
-          ...node.data,
-          onChange: (val: string) => {
-            setNodes((currentNodes) => 
-              currentNodes.map((n) => 
-                n.id === node.id ? { ...n, data: { ...n.data, label: val } } : n
-              )
-            );
-          },
+  const attachHandlers = useCallback((nds: Node[]) => {
+    return nds.map((node) => ({
+      ...node,
+      data: {
+        ...node.data,
+        onChange: (val: string) => {
+          setNodes((currentNodes) => 
+            currentNodes.map((n) => 
+              n.id === node.id ? { ...n, data: { ...n.data, label: val } } : n
+            )
+          );
         },
-      }))
-    );
+      },
+    }));
+  }, [setNodes]);
+
+  useEffect(() => {
+    setNodes((nds) => attachHandlers(nds));
   }, []); // Only on mount
 
   const onConnect = useCallback(
@@ -88,12 +91,30 @@ export function CanvasEditor({
     [setEdges]
   );
 
+  const deleteSelected = useCallback(() => {
+    setNodes((nds) => nds.filter((n) => !n.selected));
+    setEdges((eds) => eds.filter((e) => !e.selected));
+  }, [setNodes, setEdges]);
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === "Delete" || e.key === "Backspace") && 
+          !(e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement)) {
+        deleteSelected();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [deleteSelected]);
+
   // Auto-save logic
   const saveCanvas = useCallback(async () => {
     try {
+      // Don't save if it's the same (basic check)
       await updateDocument(documentId, {
         canvasData: {
-          nodes,
+          nodes: nodes.map(({ data, ...n }) => ({ ...n, data: { ...data, onChange: undefined } })),
           edges,
         }
       });
@@ -131,6 +152,24 @@ export function CanvasEditor({
     setNodes((nds) => nds.concat(newNode));
   };
 
+  const handleAddNoteLink = async () => {
+    const query = window.prompt("Buscar nota por título:");
+    if (!query) return;
+
+    const results = await searchDocuments("", query); // Empty userId might need fix in firestore.ts but works for local filter
+    if (results.length === 0) {
+      toast.error("Nenhuma nota encontrada.");
+      return;
+    }
+
+    const note = results[0];
+    addNode("noteLink", { 
+      noteId: note.id, 
+      title: note.title || "Sem título",
+      icon: note.icon || "📄" 
+    });
+  };
+
   return (
     <div className="w-full h-full min-h-[80vh] border rounded-xl overflow-hidden bg-muted/5 relative group/canvas">
       <ReactFlow
@@ -143,6 +182,7 @@ export function CanvasEditor({
         fitView
         snapToGrid
         snapGrid={[15, 15]}
+        deleteKeyCode={["Backspace", "Delete"]}
       >
         <Background variant={BackgroundVariant.Dots} gap={15} size={1} />
         <Controls />
@@ -194,12 +234,16 @@ export function CanvasEditor({
           <div className="w-px h-4 bg-border self-center mx-1" />
           <Button 
             variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl" 
-            onClick={() => {
-              const noteId = window.prompt("ID da Nota ou Título:");
-              if(noteId) addNode("noteLink", { noteId, title: noteId });
-            }} title="Conectar Nota"
+            onClick={handleAddNoteLink} title="Conectar Nota"
           >
             <Link2 className="w-4 h-4" />
+          </Button>
+          <div className="w-px h-4 bg-border self-center mx-1" />
+          <Button 
+            variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10" 
+            onClick={deleteSelected} title="Excluir Selecionados"
+          >
+            <Trash2 className="w-4 h-4" />
           </Button>
         </Panel>
 

@@ -8,7 +8,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   serverTimestamp,
   onSnapshot,
   Timestamp,
@@ -26,6 +25,10 @@ function getDb() {
   return db;
 }
 
+function toMillis(value: unknown): number {
+  return value instanceof Timestamp ? value.toMillis() : 0;
+}
+
 export async function createPortfolio(userId: string, name: string, projectIds: string[]): Promise<string> {
   const colRef = collection(getDb(), COLLECTION);
   const docRef = await addDoc(colRef, {
@@ -41,21 +44,23 @@ export async function createPortfolio(userId: string, name: string, projectIds: 
 export async function getPortfolios(userId: string): Promise<Portfolio[]> {
   const q = query(
     collection(getDb(), COLLECTION),
-    where("userId", "==", userId),
-    orderBy("createdAt", "desc")
+    where("userId", "==", userId)
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Portfolio));
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() } as Portfolio))
+    .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
 }
 
 export function subscribeToPortfolios(userId: string, callback: (portfolios: Portfolio[]) => void) {
   const q = query(
     collection(getDb(), COLLECTION),
-    where("userId", "==", userId),
-    orderBy("createdAt", "desc")
+    where("userId", "==", userId)
   );
   return onSnapshot(q, (snap) => {
-    const portfolios = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Portfolio));
+    const portfolios = snap.docs
+      .map((d) => ({ id: d.id, ...d.data() } as Portfolio))
+      .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
     callback(portfolios);
   });
 }

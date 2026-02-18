@@ -10,6 +10,15 @@ export interface Workspace {
   updatedAt: Timestamp;
 }
 
+export interface WorkspaceMember {
+  uid: string;
+  email: string;
+  displayName: string;
+  role: "owner" | "member";
+  invitationId?: string;
+  joinedAt: Timestamp | null;
+}
+
 export type WorkspaceInvitationStatus =
   | "pending"
   | "accepted"
@@ -28,4 +37,16 @@ export interface WorkspaceInvitation {
   acceptedBy: string | null;
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
+}
+
+export interface WorkspaceCreateInput {
+  name: string;
+  icon?: string;
+  members?: string[];
+}
+
+export interface WorkspaceUpdateInput {
+  name?: string;
+  icon?: string;
+  members?: string[];
 }

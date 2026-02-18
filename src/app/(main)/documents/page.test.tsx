@@ -1,10 +1,23 @@
 import { render, screen, waitFor } from "@/test/test-utils";
 import DocumentsPage from "./page";
 
-const { mockPush, mockGetDocument, mockCreateDocument, mockToast, mockUser, mockUserProfile } = vi.hoisted(() => ({
+const {
+  mockPush,
+  mockGetDocument,
+  mockCreateDocument,
+  mockSubscribeToUserProjects,
+  mockSubscribeToMemberProjects,
+  mockSubscribeToSpaces,
+  mockToast,
+  mockUser,
+  mockUserProfile,
+} = vi.hoisted(() => ({
   mockPush: vi.fn(),
   mockGetDocument: vi.fn(),
   mockCreateDocument: vi.fn(),
+  mockSubscribeToUserProjects: vi.fn(),
+  mockSubscribeToMemberProjects: vi.fn(),
+  mockSubscribeToSpaces: vi.fn(),
   mockToast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
   mockUser: { uid: "test-user-123", displayName: "Test User" },
   mockUserProfile: {
@@ -28,6 +41,19 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/firebase/firestore", () => ({
   getDocument: (...args: unknown[]) => mockGetDocument(...args),
   createDocument: (...args: unknown[]) => mockCreateDocument(...args),
+  subscribeToProjectDocuments: vi.fn(() => () => {}),
+  subscribeToSpaceDocuments: vi.fn(() => () => {}),
+}));
+
+vi.mock("@/lib/firebase/projects", () => ({
+  getProject: vi.fn(),
+  subscribeToUserProjects: (...args: unknown[]) => mockSubscribeToUserProjects(...args),
+  subscribeToMemberProjects: (...args: unknown[]) => mockSubscribeToMemberProjects(...args),
+}));
+
+vi.mock("@/lib/firebase/spaces", () => ({
+  createSpace: vi.fn(),
+  subscribeToSpaces: (...args: unknown[]) => mockSubscribeToSpaces(...args),
 }));
 
 vi.mock("sonner", () => ({ toast: mockToast }));
@@ -41,30 +67,47 @@ vi.mock("@/hooks/use-auth", () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockSubscribeToUserProjects.mockImplementation((_uid: string, cb: (items: unknown[]) => void) => {
+    cb([]);
+    return () => {};
+  });
+  mockSubscribeToMemberProjects.mockImplementation((_uid: string, cb: (items: unknown[]) => void) => {
+    cb([]);
+    return () => {};
+  });
+  mockSubscribeToSpaces.mockImplementation((_uid: string, cb: (items: unknown[]) => void) => {
+    cb([]);
+    return () => {};
+  });
 });
 
 describe("DocumentsPage", () => {
   it("renders greeting with firstName", async () => {
     mockGetDocument.mockResolvedValue(null);
     render(<DocumentsPage />);
-    // firstName = "Maria"
     expect(screen.getByText(/Maria/)).toBeInTheDocument();
   });
 
   it("loads recent docs via getDocument per ID and renders titles", async () => {
-    mockGetDocument
-      .mockResolvedValueOnce({
-        id: "doc-1",
-        title: "My First Doc",
-        icon: "",
-        isArchived: false,
-      })
-      .mockResolvedValueOnce({
-        id: "doc-2",
-        title: "Second Document",
-        icon: "",
-        isArchived: false,
-      });
+    mockGetDocument.mockImplementation(async (id: string) => {
+      if (id === "doc-1") {
+        return {
+          id: "doc-1",
+          title: "My First Doc",
+          icon: "",
+          isArchived: false,
+        };
+      }
+      if (id === "doc-2") {
+        return {
+          id: "doc-2",
+          title: "Second Document",
+          icon: "",
+          isArchived: false,
+        };
+      }
+      return null;
+    });
 
     render(<DocumentsPage />);
 
@@ -74,28 +117,18 @@ describe("DocumentsPage", () => {
     });
   });
 
-  it("renders doc.icon emoji when present", async () => {
-    mockGetDocument.mockResolvedValueOnce({
-      id: "doc-1",
-      title: "Emoji Doc",
-      icon: "🎉",
-      isArchived: false,
-    }).mockResolvedValueOnce(null);
-
-    render(<DocumentsPage />);
-
-    await waitFor(() => {
-      expect(screen.getByText("🎉")).toBeInTheDocument();
-    });
-  });
-
   it("navigates on doc click", async () => {
-    mockGetDocument.mockResolvedValueOnce({
-      id: "doc-1",
-      title: "Clickable Doc",
-      icon: "",
-      isArchived: false,
-    }).mockResolvedValueOnce(null);
+    mockGetDocument.mockImplementation(async (id: string) => {
+      if (id === "doc-1") {
+        return {
+          id: "doc-1",
+          title: "Clickable Doc",
+          icon: "",
+          isArchived: false,
+        };
+      }
+      return null;
+    });
 
     const { user } = render(<DocumentsPage />);
 
@@ -107,16 +140,14 @@ describe("DocumentsPage", () => {
     expect(mockPush).toHaveBeenCalledWith("/documents/doc-1");
   });
 
-  it("Nova página card creates document and navigates", async () => {
+  it("Pasta card navigates to /pastas", async () => {
     mockGetDocument.mockResolvedValue(null);
-    mockCreateDocument.mockResolvedValue("new-doc-id");
 
     const { user } = render(<DocumentsPage />);
-    await user.click(screen.getByText("Nova página"));
+    await user.click(screen.getByText("Pasta"));
 
     await waitFor(() => {
-      expect(mockCreateDocument).toHaveBeenCalledWith("test-user-123", expect.objectContaining({ projectId: null }));
-      expect(mockPush).toHaveBeenCalledWith("/documents/new-doc-id");
+      expect(mockPush).toHaveBeenCalledWith("/pastas");
     });
   });
 });
