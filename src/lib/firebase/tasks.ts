@@ -26,6 +26,32 @@ const TASKS_COLLECTION = "tasks";
 const VIEWS_COLLECTION = "views";
 const SPRINTS_COLLECTION = "sprints";
 
+function getTimestampMillis(value: unknown): number {
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "toMillis" in value &&
+    typeof (value as { toMillis?: unknown }).toMillis === "function"
+  ) {
+    return (value as { toMillis: () => number }).toMillis();
+  }
+  return 0;
+}
+
+function toComparable(value: unknown): number | string | null {
+  if (typeof value === "number" || typeof value === "string") return value;
+  if (value instanceof Date) return value.getTime();
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "toMillis" in value &&
+    typeof (value as { toMillis?: unknown }).toMillis === "function"
+  ) {
+    return (value as { toMillis: () => number }).toMillis();
+  }
+  return null;
+}
+
 // --- SPRINTS ---
 
 export async function createSprint(data: SprintCreate): Promise<string> {
@@ -224,8 +250,8 @@ export function subscribeToTasks(
 
     // Client-side Sorting
     tasks.sort((a, b) => {
-      const dateA = a.createdAt && typeof (a.createdAt as any).toMillis === 'function' ? (a.createdAt as any).toMillis() : 0;
-      const dateB = b.createdAt && typeof (b.createdAt as any).toMillis === 'function' ? (b.createdAt as any).toMillis() : 0;
+      const dateA = getTimestampMillis(a.createdAt);
+      const dateB = getTimestampMillis(b.createdAt);
       return dateB - dateA;
     });
 
@@ -253,8 +279,8 @@ export function subscribeToProjectTasks(
     
     // Sort by creation date
     tasks.sort((a, b) => {
-      const dateA = a.createdAt && typeof (a.createdAt as any).toMillis === 'function' ? (a.createdAt as any).toMillis() : 0;
-      const dateB = b.createdAt && typeof (b.createdAt as any).toMillis === 'function' ? (b.createdAt as any).toMillis() : 0;
+      const dateA = getTimestampMillis(a.createdAt);
+      const dateB = getTimestampMillis(b.createdAt);
       return dateB - dateA;
     });
 
@@ -278,8 +304,8 @@ export function subscribeToListTasks(
       .filter((t) => t.listId === listId);
     
     tasks.sort((a, b) => {
-      const dateA = a.createdAt && typeof (a.createdAt as any).toMillis === 'function' ? (a.createdAt as any).toMillis() : 0;
-      const dateB = b.createdAt && typeof (b.createdAt as any).toMillis === 'function' ? (b.createdAt as any).toMillis() : 0;
+      const dateA = getTimestampMillis(a.createdAt);
+      const dateB = getTimestampMillis(b.createdAt);
       return dateB - dateA;
     });
 
@@ -289,7 +315,7 @@ export function subscribeToListTasks(
 
 // --- FILTER EVALUATION ---
 
-function evaluateFilterGroup(item: any, group: FilterGroup): boolean {
+function evaluateFilterGroup(item: Task, group: FilterGroup): boolean {
   if (!group.rules || group.rules.length === 0) return true;
 
   if (group.logic === "AND") {
@@ -307,8 +333,8 @@ function evaluateFilterGroup(item: any, group: FilterGroup): boolean {
   }
 }
 
-function evaluateFilterRule(item: any, rule: FilterRule): boolean {
-  const value = item[rule.field];
+function evaluateFilterRule(item: Task, rule: FilterRule): boolean {
+  const value = item[rule.field as keyof Task];
   const target = rule.value;
 
   switch (rule.operator) {
@@ -326,10 +352,18 @@ function evaluateFilterRule(item: any, rule: FilterRule): boolean {
       return value !== null && value !== undefined && value !== "";
     case "greater_than":
     case "after":
-      return value > target;
+      {
+        const left = toComparable(value);
+        const right = toComparable(target);
+        return left !== null && right !== null && left > right;
+      }
     case "less_than":
     case "before":
-      return value < target;
+      {
+        const left = toComparable(value);
+        const right = toComparable(target);
+        return left !== null && right !== null && left < right;
+      }
     default:
       return true;
   }
@@ -341,7 +375,7 @@ export async function saveView(userId: string, viewData: Partial<SavedView>): Pr
   const colRef = collection(getDb(), VIEWS_COLLECTION);
   const docRef = viewData.id ? doc(getDb(), VIEWS_COLLECTION, viewData.id) : doc(colRef);
   
-  const finalData = {
+  const finalData: Record<string, unknown> = {
     ...viewData,
     id: docRef.id,
     userId,
@@ -349,7 +383,7 @@ export async function saveView(userId: string, viewData: Partial<SavedView>): Pr
   };
 
   if (!viewData.id) {
-    (finalData as any).createdAt = serverTimestamp();
+    finalData.createdAt = serverTimestamp();
   }
 
   await setDoc(docRef, finalData, { merge: true });
