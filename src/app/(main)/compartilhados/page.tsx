@@ -11,17 +11,17 @@ import type { Project } from "@/types/project";
 import { toast } from "sonner";
 
 export default function CompartilhadosPage() {
-  const { user } = useAuth();
+  const { user, ready } = useAuth();
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!ready || !user?.uid) return;
     const unsubscribe = subscribeToMemberProjects(user.uid, (items) => {
       setProjects(items.filter((project) => project.userId !== user.uid));
     });
     return () => unsubscribe();
-  }, [user?.uid]);
+  }, [ready, user?.uid]);
 
   async function handleLeave(project: Project) {
     if (!user?.uid) return;

@@ -272,13 +272,10 @@ export function Toolbar({ editor, documentId, onImageUpload, aiProps }: ToolbarP
             Imagem
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              editor
-                .chain()
-                .focus()
-                .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-                .run()
-            }
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent("editor-open-table-dialog"));
+              editor.chain().focus().run();
+            }}
           >
             <Table className="mr-2 h-4 w-4" />
             Tabela

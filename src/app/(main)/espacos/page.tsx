@@ -29,7 +29,7 @@ import type { Workspace, WorkspaceInvitation } from "@/types/workspace";
 import { toast } from "sonner";
 
 export default function EspacosPage() {
-  const { user } = useAuth();
+  const { user, ready } = useAuth();
   const router = useRouter();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [incomingInvitations, setIncomingInvitations] = useState<WorkspaceInvitation[]>([]);
@@ -40,20 +40,20 @@ export default function EspacosPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!ready || !user?.uid) return;
     const unsubscribe = subscribeToUserWorkspaces(user.uid, (items) => {
       setWorkspaces(items);
     });
     return () => unsubscribe();
-  }, [user?.uid]);
+  }, [ready, user?.uid]);
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!ready || !user?.email) return;
     const unsubscribe = subscribeToInvitationsByEmail(user.email, (items) => {
       setIncomingInvitations(items);
     });
     return () => unsubscribe();
-  }, [user?.email]);
+  }, [ready, user?.email]);
 
   async function handleSaveWorkspace() {
     if (!user?.uid || !name.trim()) return;

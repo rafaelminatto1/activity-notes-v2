@@ -54,7 +54,7 @@ export default function WorkspaceDetailPage() {
   const params = useParams<{ workspaceId: string }>();
   const workspaceId = params.workspaceId;
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, ready } = useAuth();
 
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
@@ -66,7 +66,7 @@ export default function WorkspaceDetailPage() {
   const [savingProject, setSavingProject] = useState(false);
 
   useEffect(() => {
-    if (!workspaceId) return;
+    if (!workspaceId || !ready) return;
     const unsubWorkspace = subscribeWorkspaceById(workspaceId, setWorkspace);
     const unsubMembers = subscribeToWorkspaceMembers(workspaceId, setMembers);
     const unsubInvitations = subscribeToWorkspaceInvitations(workspaceId, setInvitations);
@@ -78,7 +78,7 @@ export default function WorkspaceDetailPage() {
       unsubInvitations();
       unsubProjects();
     };
-  }, [workspaceId]);
+  }, [workspaceId, ready]);
 
   const isOwner = useMemo(
     () => !!user?.uid && !!workspace && workspace.ownerId === user.uid,

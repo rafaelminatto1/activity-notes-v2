@@ -40,7 +40,7 @@ import type { Project, ProjectKind } from "@/types/project";
 import type { Space } from "@/types/space";
 
 export default function DocumentsPage() {
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, ready } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const projectId = searchParams.get("project");
@@ -57,7 +57,7 @@ export default function DocumentsPage() {
   const [spaces, setSpaces] = useState<Space[]>([]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!ready || !user) return;
 
     const unsubOwned = subscribeToUserProjects(user.uid, (projects) => {
       setOwnedProjects(projects);
@@ -74,10 +74,10 @@ export default function DocumentsPage() {
       unsubShared();
       unsubSpaces();
     };
-  }, [user]);
+  }, [ready, user]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!ready || !user) return;
 
     if (projectId) {
       const unsubscribe = subscribeToProjectDocuments(user.uid, projectId, (docs) => {
@@ -111,7 +111,7 @@ export default function DocumentsPage() {
     }
 
     loadRecents();
-  }, [user, userProfile?.recentDocIds, projectId, spaceId]);
+  }, [ready, user, userProfile?.recentDocIds, projectId, spaceId]);
 
   const folderProjects = useMemo(
     () => ownedProjects.filter((project) => resolveProjectKind(project) !== "notebook"),

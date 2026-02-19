@@ -32,6 +32,13 @@ service cloud.firestore {
       return isWorkspaceOwner(workspaceId);
     }
 
+    function isWorkspaceMemberDoc(workspaceId, userId) {
+      return isAuthenticated()
+             && workspaceId is string
+             && userId is string
+             && exists(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(userId));
+    }
+
     function invitationDocById(invitationId) {
       return get(/databases/$(database)/documents/workspace_invitations/$(invitationId));
     }
@@ -40,10 +47,10 @@ service cloud.firestore {
       return isAuthenticated()
              && workspaceId is string
              && (
-               isWorkspaceOwner(workspaceId)
-               || isMember(workspaceDoc(workspaceId).data.members)
-               || exists(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid))
-             );
+                isWorkspaceOwner(workspaceId)
+                || isWorkspaceMemberDoc(workspaceId, request.auth.uid)
+                || isMember(workspaceDoc(workspaceId).data.members)
+              );
     }
 
     function getMemberData(workspaceId, userId) {
@@ -340,8 +347,12 @@ service cloud.firestore {
                             && resource.data.ownerId == request.auth.uid;
 
       match /members/{memberId} {
-        allow read: if canAccessWorkspace(workspaceId)
-                    || (isAuthenticated() && request.auth.uid == memberId);
+        allow read: if isAuthenticated()
+                    && (
+                      canAccessWorkspace(workspaceId)
+                      || request.auth.uid == memberId
+                      || isWorkspaceMemberDoc(workspaceId, request.auth.uid)
+                    );
         allow create: if isAuthenticated()
                       && (
                         canManageWorkspace(workspaceId)

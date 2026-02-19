@@ -62,6 +62,7 @@ vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({
     user: mockUser,
     userProfile: mockUserProfile,
+    ready: true,
   }),
 }));
 
@@ -144,7 +145,10 @@ describe("DocumentsPage", () => {
     mockGetDocument.mockResolvedValue(null);
 
     const { user } = render(<DocumentsPage />);
-    await user.click(screen.getByText("Pasta"));
+    const pastaElements = screen.getAllByText(/Pasta/i);
+    const pastaButton = pastaElements.map((el) => el.closest("button")).find((btn) => btn);
+    expect(pastaButton).toBeTruthy();
+    await user.click(pastaButton!);
 
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/pastas");

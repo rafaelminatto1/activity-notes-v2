@@ -3,7 +3,9 @@ import { getAuth, connectAuthEmulator, type Auth } from "firebase/auth";
 import {
   initializeFirestore,
   connectFirestoreEmulator,
-  enableMultiTabIndexedDbPersistence,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  persistentSingleTabManager,
   type Firestore,
   type FirestoreSettings,
 } from "firebase/firestore";
@@ -29,8 +31,26 @@ function getFirebaseApp(): FirebaseApp | null {
   return getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 }
 
-const firestoreSettings: FirestoreSettings = {
+function createPersistentCache() {
+  try {
+    return persistentLocalCache({
+      tabManager: persistentMultipleTabManager(),
+    });
+  } catch (error) {
+    console.warn(
+      "[Firestore] multi-tab persistence unavailable, falling back to single-tab storage",
+      error
+    );
+    return persistentLocalCache({
+      tabManager: persistentSingleTabManager({}),
+    });
+  }
+}
+
+const hasWindow = typeof window !== "undefined";
+const firestoreSettings: FirestoreSettings & { localCache?: ReturnType<typeof persistentLocalCache> } = {
   ignoreUndefinedProperties: true,
+  ...(hasWindow ? { localCache: createPersistentCache() } : {}),
 };
 if (process.env.NEXT_PUBLIC_FIRESTORE_FORCE_LONG_POLLING === "true") {
   firestoreSettings.experimentalForceLongPolling = true;
@@ -40,17 +60,6 @@ const app = getFirebaseApp();
 
 export const auth: Auth | null = app ? getAuth(app) : null;
 export const db: Firestore | null = app ? initializeFirestore(app, firestoreSettings) : null;
-
-// Enable Offline Persistence
-if (typeof window !== "undefined" && db) {
-  enableMultiTabIndexedDbPersistence(db).catch((err) => {
-    if (err.code === "failed-precondition") {
-      console.warn("Multiple tabs open, persistence can only be enabled in one tab at a time.");
-    } else if (err.code === "unimplemented") {
-      console.warn("The current browser doesn't support all of the features required to enable persistence");
-    }
-  });
-}
 
 export const storage: FirebaseStorage | null = app ? getStorage(app) : null;
 export const rtdb: Database | null = app ? getDatabase(app) : null;

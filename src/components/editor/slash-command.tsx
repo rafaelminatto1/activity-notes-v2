@@ -139,11 +139,13 @@ function getSlashCommandItems(onImageUpload: () => void): SlashCommandItem[] {
     },
     {
       title: "Tabela",
-      description: "Inserir tabela 3x3",
+      description: "Inserir tabela customizável",
       icon: Table,
       category: "AVANÇADO",
-      command: (editor) =>
-        editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
+      command: (editor) => {
+        window.dispatchEvent(new CustomEvent("editor-open-table-dialog"));
+        editor.chain().focus().run();
+      },
     },
     {
       title: "Callout",

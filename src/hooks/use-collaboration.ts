@@ -43,8 +43,10 @@ export function useCollaboration(documentId: string) {
     };
 
     // Ao conectar, definir dados e configurar desconexão
-    set(myPresenceRef, initialData);
-    onDisconnect(myPresenceRef).remove();
+    set(myPresenceRef, initialData).catch((err) => {
+      console.warn("[Collaboration] Failed to set presence:", err);
+    });
+    onDisconnect(myPresenceRef).remove().catch(() => {});
 
     // Escutar todos os usuários neste documento
     const allUsersRef = ref(rtdb, `presence/${documentId}`);

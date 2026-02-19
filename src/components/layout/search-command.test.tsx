@@ -44,6 +44,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({
     user: mockUser,
+    ready: true,
   }),
 }));
 

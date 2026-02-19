@@ -8,6 +8,7 @@ import { getEditorExtensions } from "./extensions";
 import { createSlashCommandExtension, SlashCommandMenu } from "./slash-command";
 import { Toolbar } from "./toolbar";
 import { EditorBubbleMenu } from "./bubble-menu";
+import { TableControls } from "./table-controls";
 import { useEditorAI } from "@/hooks/use-editor-ai";
 import { uploadImage, uploadFile } from "@/lib/firebase/storage";
 import { toast } from "sonner";
@@ -336,6 +337,7 @@ export function Editor({
           }}
         />
         <EditorBubbleMenu editor={editor} />
+        <TableControls editor={editor} />
         <SlashCommandMenu editor={editor} onImageUpload={handleImageUpload} />
         <EditorContent editor={editor} className="mt-4" />
         <input

@@ -22,15 +22,15 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export function Inbox() {
-  const { user } = useAuth();
+  const { user, ready } = useAuth();
   const [items, setItems] = useState<ChatInboxItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!ready || !user) return;
     const unsub = subscribeToInbox(user.uid, setItems);
     return () => unsub();
-  }, [user]);
+  }, [ready, user]);
 
   const handleItemClick = async (item: ChatInboxItem) => {
     await markAsRead(item.id);

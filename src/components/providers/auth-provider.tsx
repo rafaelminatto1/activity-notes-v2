@@ -21,6 +21,7 @@ interface AuthContextValue {
   error: string | null;
   isAuthenticated: boolean;
   refreshProfile: () => Promise<void>;
+  ready: boolean;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -30,6 +31,7 @@ const AuthContext = createContext<AuthContextValue>({
   error: null,
   isAuthenticated: false,
   refreshProfile: async () => {},
+  ready: false,
 });
 
 const DEFAULT_SETTINGS: UserProfile["settings"] = {
@@ -50,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [authReady, setAuthReady] = useState(false);
 
   const refreshProfile = useCallback(async () => {
     if (!user) return;
@@ -99,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setLoading(false);
+      setAuthReady(true);
     });
 
     return unsubscribe;
@@ -113,6 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error,
         isAuthenticated: !!user,
         refreshProfile,
+        ready: authReady,
       }}
     >
       {children}

@@ -29,7 +29,7 @@ export function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
 
   const shouldShow = useCallback(
     ({ editor: e }: { editor: Editor }) => {
-      if (e.isActive("image")) return false;
+      if (e.isActive("image") || e.isActive("table")) return false;
       const { from, to } = e.state.selection;
       return from !== to;
     },

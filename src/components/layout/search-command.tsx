@@ -209,7 +209,7 @@ function FilterButton({
 
 export function SearchCommand() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, ready } = useAuth();
   const { isOpen, close } = useSearchStore();
   const closeMobile = useSidebarStore((s) => s.closeMobile);
 
@@ -221,15 +221,18 @@ export function SearchCommand() {
   const [isIndexReady, setIsIndexReady] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!ready || !user) return;
     return subscribeToRealtimeSearchIndex(user.uid, (state) => {
       setRecords(state.records);
       setIsIndexReady(state.isReady);
     });
-  }, [user]);
+  }, [ready, user]);
 
-  const indexedRecords = useMemo(() => (user ? records : []), [user, records]);
-  const indexReady = user ? isIndexReady : true;
+  const indexedRecords = useMemo(
+    () => (ready && user ? records : []),
+    [ready, user, records]
+  );
+  const indexReady = ready && user ? isIndexReady : true;
 
   const fuse = useMemo(() => {
     return new Fuse(indexedRecords, {

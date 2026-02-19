@@ -6,12 +6,12 @@ import type { Document } from "@/types/document";
 import { useAuth } from "./use-auth";
 
 export function useDocuments(parentDocumentId: string | null = null) {
-  const { user } = useAuth();
+  const { user, ready } = useAuth();
   const [documentsState, setDocuments] = useState<Document[]>([]);
   const [loadingState, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!ready || !user) return;
 
     const unsubscribe = subscribeToDocuments(
       user.uid,
@@ -23,10 +23,10 @@ export function useDocuments(parentDocumentId: string | null = null) {
     );
 
     return unsubscribe;
-  }, [user, parentDocumentId]);
+  }, [ready, user, parentDocumentId]);
 
-  const documents = user ? documentsState : [];
-  const loading = user ? loadingState : false;
+  const documents = ready && user ? documentsState : [];
+  const loading = ready && user ? loadingState : false;
 
   return { documents, loading };
 }

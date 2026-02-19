@@ -50,7 +50,7 @@ import type { Workspace } from "@/types/workspace";
 function SidebarContent() {
   const router = useRouter();
   const params = useParams();
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, ready } = useAuth();
   const openSearch = useSearchStore((s) => s.open);
   const openQA = useAIQAStore((s) => s.open);
   const closeMobile = useSidebarStore((s) => s.closeMobile);
@@ -60,13 +60,13 @@ function SidebarContent() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!ready || !user?.uid) return;
     const unsubscribe = subscribeToUserWorkspaces(user.uid, setWorkspaces);
     return () => unsubscribe();
-  }, [user?.uid]);
+  }, [ready, user?.uid]);
 
   useEffect(() => {
-    if (!user?.uid) {
+    if (!ready || !user?.uid) {
       return;
     }
 
@@ -81,7 +81,7 @@ function SidebarContent() {
       unsubOwned();
       unsubShared();
     };
-  }, [user?.uid]);
+  }, [ready, user?.uid]);
 
   const folderProjects = ownedProjects.filter(
     (project) => resolveProjectKind(project) !== "notebook"
@@ -94,6 +94,7 @@ function SidebarContent() {
   const [favoriteDocs, setFavoriteDocs] = useState<Document[]>([]);
 
   useEffect(() => {
+    if (!ready || !user) return;
     async function loadFavorites() {
       const ids = userProfile?.favoriteIds ?? [];
       if (ids.length === 0) {
@@ -106,7 +107,7 @@ function SidebarContent() {
       );
     }
     loadFavorites();
-  }, [userProfile?.favoriteIds]);
+  }, [ready, user, userProfile?.favoriteIds]);
 
   async function handleCreate(type: "document" | "canvas" = "document") {
     if (!user) return;

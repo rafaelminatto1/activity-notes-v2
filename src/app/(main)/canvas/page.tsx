@@ -57,7 +57,7 @@ function CanvasCard({ canvas, subtitle, onClick }: CanvasCardProps) {
 }
 
 export default function CanvasPage() {
-  const { user } = useAuth();
+  const { user, ready } = useAuth();
   const router = useRouter();
   const [canvases, setCanvases] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +68,7 @@ export default function CanvasPage() {
   >({});
 
   useEffect(() => {
-    if (!user) return;
+    if (!ready || !user) return;
 
     const unsubscribe = subscribeToCanvasDocuments(user.uid, (docs) => {
       setCanvases(docs);
@@ -76,10 +76,10 @@ export default function CanvasPage() {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [ready, user]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!ready || !user) return;
     const unsubscribe = subscribeToMemberProjects(user.uid, (projects) => {
       const filtered = projects.filter((project) => project.userId !== user.uid);
       setSharedProjects(filtered);
@@ -92,7 +92,7 @@ export default function CanvasPage() {
       setSharedLoading(true);
       setSharedCanvasesByProject({});
     };
-  }, [user]);
+  }, [ready, user]);
 
   useEffect(() => {
     if (sharedProjects.length === 0) return;
