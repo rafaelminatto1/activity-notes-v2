@@ -119,8 +119,15 @@ export async function uploadImage(
         }
       },
       (error) => {
-        console.error("Storage upload error:", error);
-        reject(new Error(`Falha no upload: ${error.message}`));
+        console.error("Storage upload error details:", {
+          code: error.code,
+          message: error.message,
+          name: error.name,
+          serverResponse: error.serverResponse,
+          storageRef: storageRef.fullPath,
+          userId
+        });
+        reject(new Error(`Falha no upload (${error.code}): ${error.message}`));
       },
       async () => {
         const url = await getDownloadURL(uploadTask.snapshot.ref);
@@ -156,7 +163,13 @@ export async function uploadCoverImage(
         }
       },
       (error) => {
-        console.error("Storage cover upload error:", error);
+        console.error("Storage cover upload error details:", {
+          code: error.code,
+          message: error.message,
+          serverResponse: error.serverResponse,
+          storageRef: storageRef.fullPath,
+          userId
+        });
         reject(new Error(`Falha no upload da capa: ${error.message}`));
       },
       async () => {
@@ -188,6 +201,13 @@ export async function uploadFile(
         }
       },
       (error) => {
+        console.error("Storage upload file error details:", {
+          code: error.code,
+          message: error.message,
+          serverResponse: error.serverResponse,
+          storageRef: storageRef.fullPath,
+          userId
+        });
         reject(new Error(`Falha no upload do arquivo: ${error.message}`));
       },
       async () => {

@@ -313,17 +313,26 @@ export function subscribeToDocuments(
 }
 
 export function subscribeToProjectDocuments(
-  userId: string,
+  _userId: string,
   projectId: string,
   callback: (docs: Document[]) => void
 ) {
-  const q = query(collection(getDb(), "documents"), where("userId", "==", userId));
+  // Query all documents in the project. 
+  // Security rules will ensure the user can only see them if they are a member.
+  const q = query(
+    collection(getDb(), "documents"), 
+    where("projectId", "==", projectId),
+    where("isArchived", "==", false)
+  );
 
   return onSnapshot(q, (snapshot) => {
     const docs = snapshot.docs
       .map((d) => ({ id: d.id, ...d.data() }) as Document)
-      .filter((d) => !d.isArchived && d.projectId === projectId)
-      .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+      .sort((a, b) => {
+        const aTime = a.updatedAt?.toMillis?.() ?? 0;
+        const bTime = b.updatedAt?.toMillis?.() ?? 0;
+        return bTime - aTime;
+      });
     callback(docs);
   }, (error) => {
     console.error("Error subscribing to project documents:", error);
@@ -331,17 +340,20 @@ export function subscribeToProjectDocuments(
 }
 
 export function subscribeToSpaceDocuments(
-  userId: string,
+  _userId: string,
   spaceId: string,
   callback: (docs: Document[]) => void
 ) {
-  const q = query(collection(getDb(), "documents"), where("userId", "==", userId));
+  const q = query(
+    collection(getDb(), "documents"), 
+    where("spaceId", "==", spaceId),
+    where("isArchived", "==", false)
+  );
 
   return onSnapshot(q, (snapshot) => {
     const docs = snapshot.docs
       .map((d) => ({ id: d.id, ...d.data() }) as Document)
-      .filter((d) => !d.isArchived && (d.spaceId ?? null) === spaceId)
-      .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+      .sort((a, b) => (b.updatedAt?.toMillis?.() ?? 0) - (a.updatedAt?.toMillis?.() ?? 0));
     callback(docs);
   }, (error) => {
     console.error("Error subscribing to space documents:", error);
@@ -406,17 +418,20 @@ export function subscribeToDocument(
 }
 
 export function subscribeToListDocuments(
-  userId: string,
+  _userId: string,
   listId: string,
   callback: (docs: Document[]) => void
 ) {
-  const q = query(collection(getDb(), "documents"), where("userId", "==", userId));
+  const q = query(
+    collection(getDb(), "documents"), 
+    where("listId", "==", listId),
+    where("isArchived", "==", false)
+  );
 
   return onSnapshot(q, (snapshot) => {
     const docs = snapshot.docs
-      .map((d) => ({ id: d.id, ...d.data() } as Document))
-      .filter((d) => !d.isArchived && d.listId === listId)
-      .sort((a, b) => b.updatedAt.toMillis() - a.updatedAt.toMillis());
+      .map((d) => ({ id: d.id, ...d.data() }) as Document)
+      .sort((a, b) => (b.updatedAt?.toMillis?.() ?? 0) - (a.updatedAt?.toMillis?.() ?? 0));
     callback(docs);
   }, (error) => {
     console.error("Error subscribing to list documents:", error);

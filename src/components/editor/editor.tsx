@@ -227,11 +227,21 @@ export function Editor({
     async (file: File, pos?: number) => {
       if (!editor) return;
 
+      console.log("[Editor] Starting image upload:", {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        userId,
+        documentId
+      });
+
       const toastId = toast.loading("Enviando imagem...");
       try {
         const url = await uploadImage(file, userId, "editor-images", (progress) => {
           toast.loading(`Enviando imagem... ${progress}%`, { id: toastId });
         });
+
+        console.log("[Editor] Image uploaded successfully:", url);
 
         if (pos !== undefined) {
           editor.chain().focus().insertContentAt(pos, {
@@ -244,6 +254,7 @@ export function Editor({
 
         toast.success("Imagem enviada!", { id: toastId });
       } catch (error) {
+        console.error("[Editor] Image upload failed:", error);
         toast.error(
           error instanceof Error ? error.message : "Erro ao enviar imagem.",
           { id: toastId }
