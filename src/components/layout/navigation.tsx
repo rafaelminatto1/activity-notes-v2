@@ -42,11 +42,16 @@ interface DocumentItemProps {
   title: string;
   icon: string;
   type: "document" | "canvas";
+  canvasData?: {
+    nodes: Record<string, unknown>[];
+    edges: Record<string, unknown>[];
+    viewport?: { x: number; y: number; zoom: number };
+  };
   childCount: number;
   level: number;
 }
 
-function DocumentItem({ id, title, icon, type, childCount, level }: DocumentItemProps) {
+function DocumentItem({ id, title, icon, type, canvasData, childCount, level }: DocumentItemProps) {
   const router = useRouter();
   const params = useParams();
   const { user, userProfile } = useAuth();
@@ -97,6 +102,16 @@ function DocumentItem({ id, title, icon, type, childCount, level }: DocumentItem
     try {
       const docId = await createDocument(user.uid, {
         title: `${title || "Sem título"} (cópia)`,
+        type,
+        icon,
+        ...(type === "canvas"
+          ? {
+              canvasData: canvasData ?? {
+                nodes: [],
+                edges: [],
+              },
+            }
+          : {}),
       });
       router.push(`/documents/${docId}`);
       toast.success("Documento duplicado.");
@@ -281,6 +296,7 @@ function DocumentList({ parentDocumentId, level }: DocumentListProps) {
           title={doc.title}
           icon={doc.icon}
           type={doc.type}
+          canvasData={doc.canvasData}
           childCount={doc.childCount}
           level={level}
         />

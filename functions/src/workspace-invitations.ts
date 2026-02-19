@@ -33,7 +33,7 @@ const db = getFirestore();
 
 function readLegacyConfig(path: string): string | undefined {
   const segments = path.split(".");
-  let current: unknown = functionsV1.config();
+  let current: unknown = (functionsV1 as any).config();
   for (const segment of segments) {
     if (!current || typeof current !== "object") return undefined;
     current = (current as Record<string, unknown>)[segment];

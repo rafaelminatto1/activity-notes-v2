@@ -4,7 +4,12 @@ import { useParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Undo2, AlertTriangle } from "lucide-react";
-import { subscribeToDocument, updateDocument, restoreDocument } from "@/lib/firebase/firestore";
+import {
+  subscribeToDocument,
+  updateDocument,
+  restoreDocument,
+  addToRecentDocuments,
+} from "@/lib/firebase/firestore";
 import { useAuth } from "@/hooks/use-auth";
 import { useEditorStore } from "@/stores/editor-store";
 import { CoverImage, AddCoverButton } from "@/components/shared/cover-image";
@@ -62,6 +67,13 @@ export default function DocumentPage() {
   const [aiPanelLoading, setAiPanelLoading] = useState(false);
   const [aiPanelUsage, setAiPanelUsage] = useState({ count: 0, remaining: 0, limit: 50 });
   const [documentContext, setDocumentContext] = useState("");
+
+  // Track access
+  useEffect(() => {
+    if (user && params.documentId && !loading && document) {
+      addToRecentDocuments(user.uid, params.documentId);
+    }
+  }, [user, params.documentId, loading, document]);
 
   // Local editable state
   const [title, setTitle] = useState("");
@@ -335,6 +347,8 @@ export default function DocumentPage() {
                 documentId={document.id}
                 initialNodes={document.canvasData?.nodes}
                 initialEdges={document.canvasData?.edges}
+                initialViewport={document.canvasData?.viewport}
+                editable={!document.isArchived}
               />
             ) : user && (
               <Editor

@@ -17,6 +17,7 @@ import {
   Network,
   Target,
   LayoutDashboard,
+  Brush,
   Briefcase,
   Home,
   Users,
@@ -177,6 +178,11 @@ function SidebarContent() {
           icon={<LayoutDashboard className="h-4 w-4" />}
           label="Dashboard"
           onClick={() => navigateTo("/dashboard")}
+        />
+        <SidebarButton
+          icon={<Brush className="h-4 w-4" />}
+          label="Canvas"
+          onClick={() => navigateTo("/canvas")}
         />
         <SidebarButton
           icon={<Search className="h-4 w-4" />}

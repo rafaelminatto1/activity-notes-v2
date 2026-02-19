@@ -9,11 +9,16 @@ import {
   Clock,
   FileText,
   FolderOpen,
-  PlusCircle,
   Users,
+  Search,
+  LayoutGrid,
+  Plus,
+  ChevronRight,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import {
   createDocument,
@@ -27,6 +32,9 @@ import {
 } from "@/lib/firebase/projects";
 import { subscribeToSpaces } from "@/lib/firebase/spaces";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import type { Document } from "@/types/document";
 import type { Project, ProjectKind } from "@/types/project";
 import type { Space } from "@/types/space";
@@ -42,6 +50,7 @@ export default function DocumentsPage() {
   const [projectDocs, setProjectDocs] = useState<Document[]>([]);
   const [spaceDocs, setSpaceDocs] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [ownedProjects, setOwnedProjects] = useState<Project[]>([]);
   const [sharedProjects, setSharedProjects] = useState<Project[]>([]);
@@ -145,59 +154,61 @@ export default function DocumentsPage() {
   const firstName = displayName.split(" ")[0] || "";
   const greeting = getGreeting();
 
+  const filteredRecents = useMemo(() => {
+    if (!searchQuery) return recentDocs;
+    return recentDocs.filter(doc => 
+      doc.title?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [recentDocs, searchQuery]);
+
   if (projectId && currentProject) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-8">
-        <div className="mb-6 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.push("/documents")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-md text-xl"
-              style={{ backgroundColor: currentProject.color }}
+      <div className="mx-auto max-w-7xl px-4 py-8 md:px-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => router.push("/documents")}
+              className="rounded-full"
             >
-              {currentProject.icon}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">{currentProject.name}</h1>
-              <p className="text-sm text-muted-foreground">{projectDocs.length} documentos</p>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-4">
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl shadow-sm"
+                style={{ backgroundColor: `${currentProject.color}20`, color: currentProject.color }}
+              >
+                {currentProject.icon || "📁"}
+              </div>
+              <div>
+                <h1 className="text-3xl font-extrabold tracking-tight">{currentProject.name}</h1>
+                <p className="text-sm text-muted-foreground">{projectDocs.length} documentos encontrados</p>
+              </div>
             </div>
           </div>
-        </div>
+          <Button onClick={handleCreateDocument} size="lg" className="rounded-full shadow-md transition-all hover:shadow-lg">
+            <Plus className="mr-2 h-5 w-5" />
+            Novo Documento
+          </Button>
+        </motion.div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <button
-            onClick={handleCreateDocument}
-            className="flex h-32 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-accent transition-colors"
-          >
-            <PlusCircle className="h-8 w-8 text-muted-foreground" />
-            <span className="font-medium text-muted-foreground">Novo Documento</span>
-          </button>
-
-          {loading ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-32 rounded-lg" />
-            ))
-          ) : (
-            projectDocs.map((doc) => (
-              <button
-                key={doc.id}
-                onClick={() => router.push(`/documents/${doc.id}`)}
-                className="flex h-32 flex-col justify-between rounded-lg border p-4 text-left hover:bg-accent transition-colors"
-              >
-                <div className="flex items-start justify-between">
-                  <span className="text-2xl">{doc.icon || "📄"}</span>
-                  {doc.isPublished && (
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                      Publicado
-                    </span>
-                  )}
-                </div>
-                <span className="font-medium line-clamp-2">{doc.title || "Sem título"}</span>
-              </button>
-            ))
-          )}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <AnimatePresence mode="popLayout">
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-44 rounded-2xl" />
+              ))
+            ) : (
+              projectDocs.map((doc, idx) => (
+                <DocumentCard key={doc.id} doc={doc} idx={idx} onClick={() => router.push(`/documents/${doc.id}`)} />
+              ))
+            )}
+          </AnimatePresence>
         </div>
       </div>
     );
@@ -205,219 +216,307 @@ export default function DocumentsPage() {
 
   if (spaceId && currentSpace) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-8">
-        <div className="mb-6 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.push("/documents")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-md text-xl"
-              style={{ backgroundColor: currentSpace.color }}
+      <div className="mx-auto max-w-7xl px-4 py-8 md:px-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => router.push("/documents")}
+              className="rounded-full"
             >
-              {currentSpace.icon}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">{currentSpace.name}</h1>
-              <p className="text-sm text-muted-foreground">{spaceDocs.length} documentos</p>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-4">
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl shadow-sm"
+                style={{ backgroundColor: `${currentSpace.color}20`, color: currentSpace.color }}
+              >
+                {currentSpace.icon || "🏢"}
+              </div>
+              <div>
+                <h1 className="text-3xl font-extrabold tracking-tight">{currentSpace.name}</h1>
+                <p className="text-sm text-muted-foreground">{spaceDocs.length} documentos neste espaço</p>
+              </div>
             </div>
           </div>
-        </div>
+          <Button onClick={handleCreateDocument} size="lg" className="rounded-full shadow-md transition-all hover:shadow-lg">
+            <Plus className="mr-2 h-5 w-5" />
+            Novo Documento
+          </Button>
+        </motion.div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <button
-            onClick={handleCreateDocument}
-            className="flex h-32 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-accent transition-colors"
-          >
-            <PlusCircle className="h-8 w-8 text-muted-foreground" />
-            <span className="font-medium text-muted-foreground">Novo Documento</span>
-          </button>
-
-          {loading ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-32 rounded-lg" />
-            ))
-          ) : (
-            spaceDocs.map((doc) => (
-              <button
-                key={doc.id}
-                onClick={() => router.push(`/documents/${doc.id}`)}
-                className="flex h-32 flex-col justify-between rounded-lg border p-4 text-left hover:bg-accent transition-colors"
-              >
-                <div className="flex items-start justify-between">
-                  <span className="text-2xl">{doc.icon || "📄"}</span>
-                  {doc.isPublished && (
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                      Publicado
-                    </span>
-                  )}
-                </div>
-                <span className="font-medium line-clamp-2">{doc.title || "Sem título"}</span>
-              </button>
-            ))
-          )}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <AnimatePresence mode="popLayout">
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-44 rounded-2xl" />
+              ))
+            ) : (
+              spaceDocs.map((doc, idx) => (
+                <DocumentCard key={doc.id} doc={doc} idx={idx} onClick={() => router.push(`/documents/${doc.id}`)} />
+              ))
+            )}
+          </AnimatePresence>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12">
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold">
-          {greeting}
-          {firstName ? `, ${firstName}` : ""}
-        </h1>
-        <p className="mt-1 text-muted-foreground">Seu espaço pessoal de trabalho.</p>
-      </div>
+    <div className="mx-auto max-w-7xl px-4 py-10 md:px-8">
+      {/* Dashboard Header */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between"
+      >
+        <div className="space-y-2">
+          <h1 className="text-4xl font-black tracking-tight flex items-center gap-2">
+            {greeting}
+            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              {firstName ? `, ${firstName}` : "!"}
+            </span>
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-md font-medium">
+            O que vamos criar hoje? Comece uma nova nota ou continue seu projeto.
+          </p>
+        </div>
 
-      <div className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="flex w-full flex-col gap-3 sm:max-w-md sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input 
+              placeholder="Buscar em recentes..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 h-11 rounded-full bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary shadow-inner"
+            />
+          </div>
+          <Button onClick={handleCreateDocument} size="lg" className="h-11 rounded-full shadow-md hover:shadow-lg transition-all px-6">
+            <Plus className="mr-2 h-5 w-5" />
+            Criar Nota
+          </Button>
+        </div>
+      </motion.div>
+
+      {/* Quick Actions Grid */}
+      <div className="mb-14 grid gap-4 grid-cols-2 lg:grid-cols-4">
         <ActionCard
-          icon={<FolderOpen className="h-5 w-5" />}
-          title="Pasta"
-          description="Gerenciar pastas"
+          icon={<FolderOpen className="h-6 w-6" />}
+          title="Pastas"
+          description="Projetos organizados"
+          color="bg-blue-500"
           onClick={() => router.push("/pastas")}
         />
         <ActionCard
-          icon={<BookOpenText className="h-5 w-5" />}
-          title="Caderno"
-          description="Gerenciar cadernos"
+          icon={<BookOpenText className="h-6 w-6" />}
+          title="Cadernos"
+          description="Ideias em sequência"
+          color="bg-orange-500"
           onClick={() => router.push("/cadernos")}
         />
         <ActionCard
-          icon={<Users className="h-5 w-5" />}
-          title="Compartilhado comigo"
-          description="Ver itens compartilhados"
+          icon={<Users className="h-6 w-6" />}
+          title="Shared"
+          description="Trabalho em equipe"
+          color="bg-green-500"
           onClick={() => router.push("/compartilhados")}
         />
         <ActionCard
-          icon={<Building2 className="h-5 w-5" />}
-          title="Espaço"
-          description="Gerenciar espaços"
+          icon={<Building2 className="h-6 w-6" />}
+          title="Espaços"
+          description="Ambientes isolados"
+          color="bg-purple-500"
           onClick={() => router.push("/espacos")}
         />
       </div>
 
-      <div className="mb-10">
-        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <Clock className="h-4 w-4" />
-          Recentes
+      {/* Recents Section */}
+      <div className="mb-14">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="rounded-full bg-primary/10 p-2">
+              <Clock className="h-5 w-5 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight">Documentos Recentes</h2>
+          </div>
+          {recentDocs.length > 0 && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <LayoutGrid className="h-4 w-4" />
+              <span>Grid View</span>
+            </div>
+          )}
         </div>
 
         {loading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-48 rounded-2xl" />
             ))}
           </div>
-        ) : recentDocs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
-            <FileText className="mb-3 h-10 w-10 text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground">Nenhum documento recente</p>
-            <Button variant="link" size="sm" className="mt-1" onClick={handleCreateDocument}>
-              Criar seu primeiro documento
+        ) : filteredRecents.length === 0 ? (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-muted/50 py-20 bg-muted/5"
+          >
+            <div className="mb-4 rounded-full bg-muted p-6">
+              <FileText className="h-12 w-12 text-muted-foreground/30" />
+            </div>
+            <p className="text-xl font-semibold text-muted-foreground">Nenhum documento encontrado</p>
+            <p className="mt-2 text-muted-foreground">Que tal criar seu primeiro registro agora?</p>
+            <Button size="lg" variant="outline" className="mt-6 rounded-full" onClick={handleCreateDocument}>
+              Começar Documento
             </Button>
-          </div>
+          </motion.div>
         ) : (
-          <div className="space-y-0.5">
-            {recentDocs.map((doc) => (
-              <button
-                key={doc.id}
-                onClick={() => router.push(`/documents/${doc.id}`)}
-                className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors text-left"
-              >
-                {doc.icon ? (
-                  <span className="text-base">{doc.icon}</span>
-                ) : (
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                )}
-                <span className="truncate font-medium">{doc.title || "Sem título"}</span>
-              </button>
-            ))}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <AnimatePresence mode="popLayout">
+              {filteredRecents.map((doc, idx) => (
+                <DocumentCard 
+                  key={doc.id} 
+                  doc={doc} 
+                  idx={idx}
+                  onClick={() => router.push(`/documents/${doc.id}`)} 
+                />
+              ))}
+            </AnimatePresence>
           </div>
         )}
       </div>
 
-      <div id="folder-projects-section" className="mb-10">
-        <SectionTitle icon={<FolderOpen className="h-4 w-4" />} title="Pastas" />
-        {folderProjects.length === 0 ? (
-          <EmptySection text="Nenhuma pasta criada ainda." />
-        ) : (
-          <div className="space-y-1">
-            {folderProjects.map((project) => (
-              <button
-                key={project.id}
-                onClick={() => router.push(`/documents?project=${project.id}`)}
-                className="flex w-full items-center gap-3 rounded-md border px-3 py-2 text-left hover:bg-accent transition-colors"
-              >
-                <span className="text-base">{project.icon || "📁"}</span>
-                <span className="flex-1 truncate font-medium">{project.name}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Hierarchical Collections Section */}
+      <div className="grid gap-12 lg:grid-cols-2">
+        {/* Folders & Notebooks */}
+        <div className="space-y-10">
+          <section>
+            <SectionTitle icon={<FolderOpen className="h-5 w-5" />} title="Minhas Pastas" action={() => router.push("/pastas")} />
+            <div className="grid gap-3">
+              {folderProjects.length === 0 ? (
+                <EmptySection text="Nenhuma pasta criada ainda." />
+              ) : (
+                folderProjects.map((project, idx) => (
+                  <CollectionItem 
+                    key={project.id} 
+                    idx={idx}
+                    icon={project.icon || "📁"} 
+                    title={project.name} 
+                    onClick={() => router.push(`/documents?project=${project.id}`)} 
+                  />
+                ))
+              )}
+            </div>
+          </section>
 
-      <div id="notebook-projects-section" className="mb-10">
-        <SectionTitle icon={<BookOpenText className="h-4 w-4" />} title="Cadernos" />
-        {notebookProjects.length === 0 ? (
-          <EmptySection text="Nenhum caderno criado ainda." />
-        ) : (
-          <div className="space-y-1">
-            {notebookProjects.map((project) => (
-              <button
-                key={project.id}
-                onClick={() => router.push(`/documents?project=${project.id}`)}
-                className="flex w-full items-center gap-3 rounded-md border px-3 py-2 text-left hover:bg-accent transition-colors"
-              >
-                <span className="text-base">{project.icon || "📓"}</span>
-                <span className="flex-1 truncate font-medium">{project.name}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+          <section>
+            <SectionTitle icon={<BookOpenText className="h-5 w-5" />} title="Meus Cadernos" action={() => router.push("/cadernos")} />
+            <div className="grid gap-3">
+              {notebookProjects.length === 0 ? (
+                <EmptySection text="Nenhum caderno criado ainda." />
+              ) : (
+                notebookProjects.map((project, idx) => (
+                  <CollectionItem 
+                    key={project.id} 
+                    idx={idx}
+                    icon={project.icon || "📓"} 
+                    title={project.name} 
+                    onClick={() => router.push(`/documents?project=${project.id}`)} 
+                  />
+                ))
+              )}
+            </div>
+          </section>
+        </div>
 
-      <div id="shared-projects-section" className="mb-10">
-        <SectionTitle icon={<Users className="h-4 w-4" />} title="Compartilhados comigo" />
-        {sharedProjects.length === 0 ? (
-          <EmptySection text="Nenhum projeto compartilhado com você." />
-        ) : (
-          <div className="space-y-1">
-            {sharedProjects.map((project) => (
-              <button
-                key={project.id}
-                onClick={() => router.push(`/documents?project=${project.id}`)}
-                className="flex w-full items-center gap-3 rounded-md border px-3 py-2 text-left hover:bg-accent transition-colors"
-              >
-                <span className="text-base">{project.icon || "🤝"}</span>
-                <span className="flex-1 truncate font-medium">{project.name}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+        {/* Spaces & Shared */}
+        <div className="space-y-10">
+          <section>
+            <SectionTitle icon={<Building2 className="h-5 w-5" />} title="Espaços de Trabalho" action={() => router.push("/espacos")} />
+            <div className="grid gap-3">
+              {spaces.length === 0 ? (
+                <EmptySection text="Nenhum espaço configurado." />
+              ) : (
+                spaces.map((space, idx) => (
+                  <CollectionItem 
+                    key={space.id} 
+                    idx={idx}
+                    icon={space.icon || "🏢"} 
+                    title={space.name} 
+                    onClick={() => router.push(`/documents?space=${space.id}`)} 
+                  />
+                ))
+              )}
+            </div>
+          </section>
 
-      <div id="spaces-section" className="mb-6">
-        <SectionTitle icon={<Building2 className="h-4 w-4" />} title="Espaços" />
-        {spaces.length === 0 ? (
-          <EmptySection text="Nenhum espaço criado ainda." />
-        ) : (
-          <div className="space-y-1">
-            {spaces.map((space) => (
-              <button
-                key={space.id}
-                onClick={() => router.push(`/documents?space=${space.id}`)}
-                className="flex w-full items-center gap-3 rounded-md border px-3 py-2 text-left hover:bg-accent transition-colors"
-              >
-                <span className="text-base">{space.icon || "🏢"}</span>
-                <span className="flex-1 truncate font-medium">{space.name}</span>
-              </button>
-            ))}
-          </div>
-        )}
+          <section>
+            <SectionTitle icon={<Users className="h-5 w-5" />} title="Compartilhados" action={() => router.push("/compartilhados")} />
+            <div className="grid gap-3">
+              {sharedProjects.length === 0 ? (
+                <EmptySection text="Nada compartilhado com você no momento." />
+              ) : (
+                sharedProjects.map((project, idx) => (
+                  <CollectionItem 
+                    key={project.id} 
+                    idx={idx}
+                    icon={project.icon || "🤝"} 
+                    title={project.name} 
+                    onClick={() => router.push(`/documents?project=${project.id}`)} 
+                  />
+                ))
+              )}
+            </div>
+          </section>
+        </div>
       </div>
     </div>
+  );
+}
+
+function DocumentCard({ doc, idx, onClick }: { doc: Document; idx: number; onClick: () => void }) {
+  const lastUpdate = doc.updatedAt?.toMillis?.() 
+    ? formatDistanceToNow(doc.updatedAt.toMillis(), { addSuffix: true, locale: ptBR })
+    : "Recentemente";
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: idx * 0.05 }}
+      whileHover={{ y: -5 }}
+      onClick={onClick}
+      className="group relative flex h-48 flex-col justify-between overflow-hidden rounded-3xl border bg-card p-6 text-left shadow-sm transition-all hover:shadow-xl hover:border-primary/20 dark:hover:bg-accent/30"
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted transition-colors group-hover:bg-primary/10">
+          <span className="text-3xl">{doc.icon || "📄"}</span>
+        </div>
+        {doc.isPublished && (
+          <div className="flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-green-600">
+            <span className="h-1 w-1 rounded-full bg-green-600 animate-pulse" />
+            Live
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="line-clamp-2 font-bold text-lg leading-tight group-hover:text-primary transition-colors">
+          {doc.title || "Sem título"}
+        </h3>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Clock className="h-3 w-3" />
+          <span>{lastUpdate}</span>
+        </div>
+      </div>
+
+      {/* Decorative gradient */}
+      <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/5 blur-3xl transition-opacity group-hover:opacity-100 opacity-0" />
+    </motion.button>
   );
 }
 
@@ -425,40 +524,72 @@ function ActionCard({
   icon,
   title,
   description,
+  color,
   onClick,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
+  color: string;
   onClick: () => void;
 }) {
   return (
-    <button
+    <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className="flex flex-col gap-2 rounded-lg border p-4 text-left transition-colors hover:bg-accent"
+      className="flex flex-col gap-4 rounded-3xl border bg-card p-5 text-left transition-all hover:shadow-lg hover:border-muted-foreground/20"
     >
-      <div className="text-muted-foreground">{icon}</div>
-      <div>
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
+      <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${color} text-white shadow-lg`}>
+        {icon}
       </div>
-    </button>
+      <div>
+        <p className="text-lg font-bold">{title}</p>
+        <p className="text-sm text-muted-foreground leading-tight">{description}</p>
+      </div>
+    </motion.button>
   );
 }
 
-function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string }) {
+function CollectionItem({ icon, title, onClick, idx }: { icon: string; title: string; onClick: () => void, idx: number }) {
   return (
-    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-      {icon}
-      {title}
+    <motion.button
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: idx * 0.05 }}
+      onClick={onClick}
+      className="group flex w-full items-center gap-4 rounded-2xl border bg-card px-4 py-3.5 text-left transition-all hover:bg-accent hover:border-primary/20"
+    >
+      <span className="text-2xl filter group-hover:drop-shadow-sm transition-all">{icon}</span>
+      <span className="flex-1 truncate font-semibold text-sm">{title}</span>
+      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+    </motion.button>
+  );
+}
+
+function SectionTitle({ icon, title, action }: { icon: React.ReactNode; title: string; action?: () => void }) {
+  return (
+    <div className="mb-4 flex items-center justify-between">
+      <div className="flex items-center gap-2.5">
+        <div className="rounded-lg bg-muted p-1.5 text-muted-foreground">
+          {icon}
+        </div>
+        <h3 className="text-lg font-bold tracking-tight">{title}</h3>
+      </div>
+      {action && (
+        <Button variant="ghost" size="sm" onClick={action} className="text-xs font-bold text-primary hover:bg-primary/10">
+          Ver todos
+        </Button>
+      )}
     </div>
   );
 }
 
 function EmptySection({ text }: { text: string }) {
   return (
-    <div className="rounded-lg border border-dashed px-4 py-6 text-sm text-muted-foreground">
-      {text}
+    <div className="flex items-center gap-3 rounded-2xl border border-dashed px-5 py-8 text-sm text-muted-foreground bg-muted/5">
+      <Sparkles className="h-5 w-5 opacity-20" />
+      <span>{text}</span>
     </div>
   );
 }
@@ -481,6 +612,7 @@ function resolveProjectKind(project: Project): ProjectKind {
 
 function getGreeting(): string {
   const hour = new Date().getHours();
+  if (hour < 5) return "Boa madrugada";
   if (hour < 12) return "Bom dia";
   if (hour < 18) return "Boa tarde";
   return "Boa noite";

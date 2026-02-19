@@ -61,6 +61,24 @@ export async function updateUserProfile(userId: string, data: UserProfileUpdate)
   await updateDoc(ref, { ...data, updatedAt: serverTimestamp() });
 }
 
+export async function addToRecentDocuments(userId: string, documentId: string) {
+  const ref = doc(getDb(), "users", userId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+
+  const profile = snap.data() as UserProfile;
+  const recentIds = profile.recentDocIds || [];
+  
+  // Remove if already exists to move it to the front
+  const filteredIds = recentIds.filter((id) => id !== documentId);
+  const newRecentIds = [documentId, ...filteredIds].slice(0, 20);
+
+  await updateDoc(ref, {
+    recentDocIds: newRecentIds,
+    updatedAt: serverTimestamp(),
+  });
+}
+
 // ---- Favoritos (denormalizados no user doc para economizar reads) ----
 
 export async function toggleFavorite(userId: string, docId: string): Promise<boolean> {
@@ -327,6 +345,47 @@ export function subscribeToSpaceDocuments(
     callback(docs);
   }, (error) => {
     console.error("Error subscribing to space documents:", error);
+  });
+}
+
+export function subscribeToProjectCanvases(
+  projectId: string,
+  callback: (docs: Document[]) => void
+) {
+  const q = query(
+    collection(getDb(), "documents"),
+    where("projectId", "==", projectId),
+    where("type", "==", "canvas"),
+    where("isArchived", "==", false)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const docs = snapshot.docs
+      .map((d) => ({ id: d.id, ...d.data() }) as Document)
+      .sort((a, b) => (b.updatedAt?.toMillis?.() ?? 0) - (a.updatedAt?.toMillis?.() ?? 0));
+    callback(docs);
+  }, (error) => {
+    console.error("Error subscribing to project canvases:", error);
+  });
+}
+
+export function subscribeToCanvasDocuments(
+  userId: string,
+  callback: (docs: Document[]) => void
+) {
+  const q = query(collection(getDb(), "documents"), where("userId", "==", userId));
+
+  return onSnapshot(q, (snapshot) => {
+    const docs = snapshot.docs
+      .map((d) => ({ id: d.id, ...d.data() }) as Document)
+      .filter((d) => !d.isArchived && d.type === "canvas")
+      .sort(
+        (a, b) =>
+          (b.updatedAt?.toMillis?.() ?? 0) - (a.updatedAt?.toMillis?.() ?? 0)
+      );
+    callback(docs);
+  }, (error) => {
+    console.error("Error subscribing to canvas documents:", error);
   });
 }
 

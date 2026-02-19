@@ -1,8 +1,11 @@
 const CACHE_NAME = 'activity-notes-v1';
 const ASSETS_TO_CACHE = [
   '/',
-  '/favicon.ico',
-  '/globals.css',
+  '/file.svg',
+  '/globe.svg',
+  '/next.svg',
+  '/vercel.svg',
+  '/window.svg'
   // Next.js chunks will be cached dynamically
 ];
 

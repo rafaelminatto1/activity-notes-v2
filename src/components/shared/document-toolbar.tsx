@@ -126,8 +126,10 @@ export function DocumentToolbar({ document }: DocumentToolbarProps) {
     try {
       const docId = await createDocument(user.uid, {
         title: `${document.title || "Sem título"} (cópia)`,
-        content: document.content,
-        plainText: document.plainText,
+        type: document.type,
+        content: document.type === "canvas" ? null : document.content,
+        plainText: document.type === "canvas" ? "" : document.plainText,
+        canvasData: document.type === "canvas" ? document.canvasData : undefined,
         icon: document.icon,
         parentDocumentId: document.parentDocumentId,
       });
